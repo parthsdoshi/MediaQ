@@ -37,7 +37,6 @@ class App extends Component {
                     onReady={this._onReady} />
                 )
         }
-
         return (
             <div className="App">
                 <Header />

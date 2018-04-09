@@ -30,12 +30,7 @@ export function loadYoutubeAPI(youtubeCallback) {
     document.body.appendChild(script);
 }
 
-/*componentDidMount() {
-    console.log('asdf');
-    this.loadYoutubeApi();
-}*/
-
-export function removeEmptyParams(params) {
+function removeEmptyParams(params) {
     for (var p in params) {
         if (!params[p] || params[p] === 'undefined') {
             delete params[p];
@@ -44,13 +39,13 @@ export function removeEmptyParams(params) {
     return params;
 }
 
-export function executeRequest(request, youtubeSearchCallback) {
+function executeRequest(request, youtubeSearchCallback) {
     request.execute(function(response) {
         youtubeSearchCallback(response)
     });
 }
 
-export function buildApiRequest(requestMethod, path, params, youtubeSearchCallback) {
+function buildApiRequest(requestMethod, path, params, youtubeSearchCallback) {
     params = removeEmptyParams(params);
     var request = gapi.client.request({
         'method': requestMethod,
@@ -61,6 +56,7 @@ export function buildApiRequest(requestMethod, path, params, youtubeSearchCallba
 }
 
 export function executeSearch(searchtag, youtubeSearchCallback) {
+    console.log('Youtube API called with ' + searchtag)
     buildApiRequest('GET',
         '/youtube/v3/search',
         {'maxResults': '5',
@@ -69,18 +65,3 @@ export function executeSearch(searchtag, youtubeSearchCallback) {
             'type': ''},
         youtubeSearchCallback);
 }
-
-
-/*render() {
-    if (this.state && this.state.gapiReady) {
-        this.executeSearch('linkingpark castle of glass');
-        return (
-            <h1>GAPI is loaded and ready to use.</h1>
-        );
-    } else {
-        return (
-            <h1>.................</h1>
-
-        );
-    };
-};*/
