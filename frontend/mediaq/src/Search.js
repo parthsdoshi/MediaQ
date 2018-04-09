@@ -94,9 +94,7 @@ class Search extends Component {
     }
 
     handleKeyPress(target) {
-        if(target.charCode==13){
-                this.searchYoutube(this.state.value);
-        }
+        this.searchYoutube(this.state.value);
     }
 
     handleChange(event) {
@@ -106,10 +104,10 @@ class Search extends Component {
     render() {
         return (
         <div>
+        <Button onClick={this.handleKeyPress} color="primary">I'm feeling lucky</Button>{' '}
         <input type="text" onKeyPress={this.handleKeyPress} onChange={this.handleChange} value={this.state.value}/>
         <h1>{this.getResultTitle(0)}</h1>
         {this.getResultThumbnailTag(0)}
-        <h1>VIDEO</h1>
         {this.getResultEmbedded(0)}
         </div>);
         
