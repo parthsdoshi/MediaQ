@@ -11,15 +11,11 @@ ADD ./mediaq/package.json /app/package.json
 
 # Install any needed packages specified in requirements.txt
 RUN npm install
-RUN npm install watch
+# RUN npm install watch
 
-# Make port 80 available to the world outside this container
-# EXPOSE 80
-
-# Define environment variable
-# ENV NAME MediaQWorld
+# have to set this for watch to work...
 ENV TERM xterm
 
-# Run app.py when the container launches
-# CMD ["npm", "run", "build"]
-CMD ["watch", "-n", "10", "npm", "run", "build"]
+# compiles react files under node 8
+CMD ["npm", "run", "build"]
+# CMD ["watch", "-n", "10", "npm", "run", "build"]
