@@ -12,6 +12,16 @@ class App extends Component {
         autoplay: 1
       }
     };
+    var youtubevideos = []
+    for (var i = 0; i < 10; i++){
+        youtubevideos.push
+          (<YouTube
+            videoId="2g811Eo7K8U"
+            opts={opts}
+            onReady={this._onReady}
+           />)
+    }
+
     return (
       <div className="App">
         <header className="App-header">
@@ -21,11 +31,7 @@ class App extends Component {
         <p className="App-intro">
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
-        <YouTube
-            videoId="2g811Eo7K8U"
-            opts={opts}
-            onReady={this._onReady}
-        />
+        {youtubevideos}
       </div>
     );
   }
