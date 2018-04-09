@@ -9,6 +9,7 @@ export function initClient() {
     gapi.client.init({
         apiKey: 'AIzaSyCSR-D790Htqm9vFAoDojNjjE3inJ-gONQ',
         clientId: API_KEY,
+        scope: 'https://www.googleapis.com/auth/youtube.readonly'
     });
 }
 
@@ -43,29 +44,30 @@ export function removeEmptyParams(params) {
     return params;
 }
 
-export function executeRequest(request) {
+export function executeRequest(request, youtubeSearchCallback) {
     request.execute(function(response) {
-        console.log(response);
+        youtubeSearchCallback(response)
     });
 }
 
-export function buildApiRequest(requestMethod, path, params) {
+export function buildApiRequest(requestMethod, path, params, youtubeSearchCallback) {
     params = removeEmptyParams(params);
     var request = gapi.client.request({
         'method': requestMethod,
         'path': path,
         'params': params
     });
-    executeRequest(request);
+    executeRequest(request, youtubeSearchCallback);
 }
 
-export function executeSearch(searchtag) {
+export function executeSearch(searchtag, youtubeSearchCallback) {
     buildApiRequest('GET',
         '/youtube/v3/search',
         {'maxResults': '5',
             'part': 'snippet',
             'q': searchtag,
-            'type': ''});
+            'type': ''},
+        youtubeSearchCallback);
 }
 
 
