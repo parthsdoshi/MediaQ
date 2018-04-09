@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import YouTube from 'react-youtube';
+import { loadYoutubeApi, initGapi , executeSearch} from "./youtube.js";
 
 class App extends Component {
   render() {
@@ -13,7 +14,7 @@ class App extends Component {
       }
     };
     var youtubevideos = []
-    for (var i = 0; i < 10; i++){
+    for (var i = 0; i < 1; i++){
         youtubevideos.push
           (<YouTube
             videoId="2g811Eo7K8U"
@@ -21,7 +22,7 @@ class App extends Component {
             onReady={this._onReady}
            />)
     }
-
+    executeSearch();
     return (
       <div className="App">
         <header className="App-header">
