@@ -1,12 +1,14 @@
 version: '3'
 services:
-    backend:
-        build: ./backend
-        ports:
-            - "5000:5000"
-        volumes:
-            - ./backend:/backend
     frontend:
         build: ./frontend
         volumes:
-            - ./frontend:/frontend
+            - ./frontend/mediaq/build:/app/build
+            - ./frontend/mediaq/src:/app/src
+            - ./frontend/mediaq/public:/app/public
+    backend:
+        build: ./backend
+        ports:
+            - "5000:80"
+        volumes:
+            - ./frontend/mediaq/build:/build

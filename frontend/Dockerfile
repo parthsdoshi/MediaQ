@@ -1,20 +1,25 @@
 # Use an official Python runtime as a parent image
-FROM python:3
+FROM node:8
 
 # Set the working directory to /app
 WORKDIR /app
 
 # Copy the current directory contents into the container at /app
-ADD . /app
+ADD ./mediaq/config /app/config
+ADD ./mediaq/scripts /app/scripts
+ADD ./mediaq/package.json /app/package.json
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --trusted-host pypi.python.org -r requirements.txt
+RUN npm install
+RUN npm install watch
 
 # Make port 80 available to the world outside this container
 # EXPOSE 80
 
 # Define environment variable
 # ENV NAME MediaQWorld
+ENV TERM xterm
 
 # Run app.py when the container launches
-CMD ["python", "app.py"]
+# CMD ["npm", "run", "build"]
+CMD ["watch", "-n", "10", "npm", "run", "build"]
