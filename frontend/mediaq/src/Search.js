@@ -26,7 +26,8 @@ class Search extends Component {
         this.searchYoutube = this.searchYoutube.bind(this);
         this.getResultID = this.getResultID.bind(this);
         this.getResultEmbedded = this.getResultEmbedded.bind(this);
-        this.handleKeyPress = this.handleKeyPress.bind(this);
+        this.handleKeyboardKeyPress = this.handleKeyboardKeyPress.bind(this);
+        this.handleButtonPress = this.handleButtonPress.bind(this);
         this.handleChange = this.handleChange.bind(this);
 
         loadYoutubeAPI(this.youtubeCallback)
@@ -93,8 +94,14 @@ class Search extends Component {
         return null;
     }
 
-    handleKeyPress(target) {
+    handleButtonPress(target) {
         this.searchYoutube(this.state.value);
+    }
+    
+    handleKeyboardKeyPress(target) {
+        if(target.charCode==13){
+                this.searchYoutube(this.state.value);
+        }
     }
 
     handleChange(event) {
@@ -104,8 +111,8 @@ class Search extends Component {
     render() {
         return (
         <div>
-        <Button onClick={this.handleKeyPress} color="primary">I'm feeling lucky</Button>{' '}
-        <input type="text" onKeyPress={this.handleKeyPress} onChange={this.handleChange} value={this.state.value}/>
+        <Button onClick={this.handleButtonPress} color="primary">I'm feeling lucky</Button>{' '}
+        <input type="text" onKeyPress={this.handleKeyboardKeyPress} onChange={this.handleChange} value={this.state.value}/>
         <h1>{this.getResultTitle(0)}</h1>
         {this.getResultThumbnailTag(0)}
         {this.getResultEmbedded(0)}
