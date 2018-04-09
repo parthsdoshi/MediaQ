@@ -8,7 +8,8 @@ class Search extends Component {
 
         this.state = {
             youtubeResults: {},
-            spotifyResults: {} 
+            spotifyResults: {},
+            youtubeSearchReady: false
         }
 
         this.youtubeCallback = this.youtubeCallback.bind(this);
@@ -24,13 +25,20 @@ class Search extends Component {
 
     youtubeSearchCallback(response) {
         console.log(response);
-        this.setState({youtubeResults: response})
+        this.setState({youtubeResults: response, youtubeSearchReady: true})
     }
 
     render() {
-
-        return (<div/>)
-
+        if (this.state.youtubeSearchReady) {
+            return (<div>
+        <h1>{this.state.youtubeResults.items[0].snippet.title}</h1>
+        <img src={this.state.youtubeResults.items[0].snippet.thumbnails.default.url}></img>
+        </div>);
+        } else {
+            return (
+                <h1>.................</h1>
+            );
+        };
     }
 
 }
