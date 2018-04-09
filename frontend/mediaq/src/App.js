@@ -1,11 +1,24 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-
-import Search from './Search';
 import YouTube from 'react-youtube';
+import { Container } from 'reactstrap';
+
+import Header from './Header';
+import Queue from './Queue';
+import Search from './Search';
 
 class App extends Component {
+    constructor(props) {
+        super(props)
+
+        this.state = {};
+
+        this.loggedIn = this.loggedIn.bind(this);
+    }
+
+    loggedIn() {
+
+    }
+
     render() {
         const opts = {
             height: '390',
@@ -21,21 +34,17 @@ class App extends Component {
                 <YouTube
                     videoId="2g811Eo7K8U"
                     opts={opts}
-                    onReady={this._onReady}/>
+                    onReady={this._onReady} />
                 )
         }
 
         return (
             <div className="App">
-                <header className="App-header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    <h1 className="App-title">Welcome to React</h1>
-                </header>
-                <p className="App-intro">
-                    To get started, edit <code>src/App.js</code> and save to reload.
-                </p>
+                <Header />
+                <Container>
+                    <Queue />
+                </Container>
                 <Search />
-                {youtubevideos}
             </div>
             );
     }
