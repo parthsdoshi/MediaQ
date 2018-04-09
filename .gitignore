@@ -60,3 +60,4 @@ typings/
 .*.swp
 
 build
+*.bak
