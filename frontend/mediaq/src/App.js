@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import GoogleUtils from './youtube.js';
 import YouTube from 'react-youtube';
-import { loadYoutubeApi, initGapi , executeSearch} from "./youtube.js";
 
 class App extends Component {
   render() {
@@ -22,7 +22,6 @@ class App extends Component {
             onReady={this._onReady}
            />)
     }
-    executeSearch();
     return (
       <div className="App">
         <header className="App-header">
@@ -32,6 +31,7 @@ class App extends Component {
         <p className="App-intro">
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
+        <GoogleUtils />
         {youtubevideos}
       </div>
     );

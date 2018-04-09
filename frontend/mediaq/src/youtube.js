@@ -1,60 +1,43 @@
 /* global gapi */
 
+import React, { Component } from 'react';
+
 const API_KEY = '967952823565-ujd2c9i8p32skqcduc93qhu3kah4aif8.apps.googleusercontent.com';
+var GoogleAuth;
 
- export var initGapi = () => {
-    console.log('Initializing GAPI...');
-    console.log('Creating the google script tag...');
+export default class GoogleUtils extends Component {
 
-    const script = document.createElement("script");
-    script.onload = () => {
-      console.log('Loaded script, now loading our api...')
-      // Gapi isn't available immediately so we have to wait until it is to use gapi.
-      loadClientWhenGapiReady(script);
-    };
-    script.src = "https://apis.google.com/js/api.js";
-    
-    document.body.appendChild(script);
-  }
-var loadClientWhenGapiReady = (script) => {
-    console.log('Trying To Load Client!');
-    console.log(script)
-    if(script.getAttribute('gapi_processed')){
-      console.log('Client is ready! Now you can access gapi. :)');
-      if(window.location.hostname==='localhost'){
-        gapi.client.load("http://localhost:8080/_ah/api/discovery/v1/apis/metafields/v1/rest")
-        .then((response) => {
-          console.log("Connected to metafields API locally.");
-          },
-          function (err) {
-            console.log("Error connecting to metafields API locally.");
-          }
-        );
+
+    initClient() {
+        // Initialize the client with API key and People API, and initialize OAuth with an
+        // OAuth 2.0 client ID and scopes (space delimited string) to request access.
+        gapi.client.init({
+            apiKey: 'AIzaSyCSR-D790Htqm9vFAoDojNjjE3inJ-gONQ',
+            clientId: API_KEY,
+        });
       }
-    }
-    else{
-      console.log('Client wasn\'t ready, trying again in 100ms');
-      setTimeout(() => {loadClientWhenGapiReady(script)}, 100);
-    }
-  }
   
-  export function loadYoutubeApi() {
+  loadYoutubeApi() {
+      
     const script = document.createElement("script");
-    script.src = "https://apis.google.com/js/client.js";
+    script.src = "https://apis.google.com/js/api.js";
 
     script.onload = () => {
       gapi.load('client', () => {
-        gapi.client.setApiKey(API_KEY);
+        gapi.load('client:auth2', this.initClient);
         gapi.client.load('youtube', 'v3', () => {
           this.setState({ gapiReady: true });
         });
       });
     };
-
     document.body.appendChild(script);
   }
 
-  function removeEmptyParams(params) {
+  componentDidMount() {
+    console.log('asdf');
+    this.loadYoutubeApi();
+  }
+     removeEmptyParams(params) {
     for (var p in params) {
       if (!params[p] || params[p] === 'undefined') {
         delete params[p];
@@ -63,27 +46,43 @@ var loadClientWhenGapiReady = (script) => {
     return params;
   }
 
-  function executeRequest(request) {
+   executeRequest(request) {
     request.execute(function(response) {
       console.log(response);
     });
   }
 
-  function buildApiRequest(requestMethod, path, params) {
-    params = removeEmptyParams(params);
+   buildApiRequest(requestMethod, path, params) {
+    params = this.removeEmptyParams(params);
     var request = gapi.client.request({
           'method': requestMethod,
           'path': path,
           'params': params
       });
-    executeRequest(request);
+    this.executeRequest(request);
   }
   
-  export function executeSearch(searchtag) {
-    buildApiRequest('GET',
+   executeSearch(searchtag) {
+    this.buildApiRequest('GET',
                 '/youtube/v3/search',
-                {'maxResults': '25',
+                {'maxResults': '5',
                  'part': 'snippet',
-                 'q': 'linkinpark',
+                 'q': searchtag,
                  'type': ''});
   }
+
+
+  render() {
+    if (this.state && this.state.gapiReady) {
+     this.executeSearch('linkingpark castle of glass');
+     return (
+       <h1>GAPI is loaded and ready to use.</h1>
+     );
+  } else {
+      return (
+       <h1>.................</h1>
+       
+     );
+  };
+  };
+}
