@@ -15,6 +15,8 @@ def serve(path):
         else:
             return send_from_directory('/build', 'index.html')
 
+@app.route('/test')
+def test_serve(path):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
