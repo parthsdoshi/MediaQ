@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {loadYoutubeAPI, executeSearch} from './google_utils';
 import { Button } from 'reactstrap';
+import { InputGroup, InputGroupText, InputGroupAddon, Input } from 'reactstrap';
 import YouTube from 'react-youtube';
 
 class Search extends Component {
@@ -12,7 +13,8 @@ class Search extends Component {
             youtubeResults: {},
             spotifyResults: {},
             youtubeSearchReady: false,
-            youtubeReady: false
+            youtubeReady: false,
+            value: ''
         }
 
         this.youtubeCallback = this.youtubeCallback.bind(this);
@@ -24,6 +26,8 @@ class Search extends Component {
         this.searchYoutube = this.searchYoutube.bind(this);
         this.getResultID = this.getResultID.bind(this);
         this.getResultEmbedded = this.getResultEmbedded.bind(this);
+        this.handleKeyPress = this.handleKeyPress.bind(this);
+        this.handleChange = this.handleChange.bind(this);
 
         loadYoutubeAPI(this.youtubeCallback)
     }
@@ -39,9 +43,8 @@ class Search extends Component {
     }
     
     searchYoutube(searchTag) {
-        searchTag = "linking park castle of glass"
+        this.state.youtubeSearch = false;
         if( this.state.youtubeReady ){
-            this.state.youtubeSearch = false;
             executeSearch(searchTag, this.youtubeSearchCallback);
         } else {
             return;
@@ -90,10 +93,20 @@ class Search extends Component {
         return null;
     }
 
+    handleKeyPress(target) {
+        if(target.charCode==13){
+                this.searchYoutube(this.state.value);
+        }
+    }
+
+    handleChange(event) {
+        this.setState({value: event.target.value});
+    }
+
     render() {
         return (
         <div>
-        <Button onClick={this.searchYoutube} color="primary">primary</Button>{' '}
+        <input type="text" onKeyPress={this.handleKeyPress} onChange={this.handleChange} value={this.state.value}/>
         <h1>{this.getResultTitle(0)}</h1>
         {this.getResultThumbnailTag(0)}
         <h1>VIDEO</h1>
