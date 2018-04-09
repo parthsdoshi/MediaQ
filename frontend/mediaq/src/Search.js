@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {loadYoutubeAPI, executeSearch} from './google_utils';
 import { Button } from 'reactstrap';
+import YouTube from 'react-youtube';
 
 class Search extends Component {
 
@@ -19,9 +20,10 @@ class Search extends Component {
         
         this.getResultTitle = this.getResultTitle.bind(this);
         this.getResultThumbnailUrl = this.getResultThumbnailUrl.bind(this);
-        this.getResultThumbnailTag = this.getResultThumbnailTag.bind(this);
-        
+        this.getResultThumbnailTag = this.getResultThumbnailTag.bind(this);        
         this.searchYoutube = this.searchYoutube.bind(this);
+        this.getResultID = this.getResultID.bind(this);
+        this.getResultEmbedded = this.getResultEmbedded.bind(this);
 
         loadYoutubeAPI(this.youtubeCallback)
     }
@@ -55,13 +57,35 @@ class Search extends Component {
     }
     getResultThumbnailUrl(number) {
         if (this.state.youtubeSearchReady) {
-            return this.state.youtubeResults.items[0].snippet.thumbnails.default.url;
+            return this.state.youtubeResults.items[number].snippet.thumbnails.default.url;
         }
         return null;
     }
     getResultThumbnailTag(number) {
         if (this.state.youtubeSearchReady) {
-            return (<img src={this.state.youtubeResults.items[0].snippet.thumbnails.default.url}></img>);
+            return (<img src={this.state.youtubeResults.items[number].snippet.thumbnails.default.url}></img>);
+        }
+        return null;
+    }
+    getResultID(number) {
+        if (this.state.youtubeSearchReady) {
+            return this.state.youtubeResults.items[number].id.videoId
+        }
+        return null;
+    }
+    
+    getResultEmbedded(number) {
+        if (this.state.youtubeSearchReady) {
+            const opts = {
+                height: '390',
+                width: '640',
+                playerVars: { // https://developers.google.com/youtube/player_parameters
+                    autoplay: 1
+                }
+            };
+            return (<YouTube    videoId={this.getResultID(number)}
+                        opts={opts}
+                        onReady={this._onReady} />)
         }
         return null;
     }
@@ -72,6 +96,8 @@ class Search extends Component {
         <Button onClick={this.searchYoutube} color="primary">primary</Button>{' '}
         <h1>{this.getResultTitle(0)}</h1>
         {this.getResultThumbnailTag(0)}
+        <h1>VIDEO</h1>
+        {this.getResultEmbedded(0)}
         </div>);
         
     }
