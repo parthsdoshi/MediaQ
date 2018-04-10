@@ -189,7 +189,10 @@ class Search extends Component {
         {this.state.youtubeSearchReady && this.getResultMedia(2)}
         {this.state.youtubeSearchReady && this.getResultMedia(3)}
         {this.state.youtubeSearchReady && this.getResultMedia(4)}
-        
+        {this.state.youtubeSearchReady && <Col sm={{ size: 'auto', offset: 0 }}>
+            <Button onClick={this.handleButtonPress} color="primary">More Results</Button>{' '}
+        </Col>}
+
         </Container>
         );
         
