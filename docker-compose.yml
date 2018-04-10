@@ -13,3 +13,9 @@ services:
         volumes:
             - ./frontend/mediaq/build:/build
             - ./backend/app.py:/app/app.py
+    database:
+        build: ./database
+        ports:
+            - "6379:6379"
+        volumes:
+            - ./database/redis_data:/data

@@ -1,6 +1,10 @@
+# GET/POST server
 flask
 
-# we need flask-socketio to communicate with socketio protocol
+# we need flask-socketio to communicate with socketio protocol on client
 flask-socketio
 # should let socketio use native WebSockets
 eventlet
+
+# database
+redis
