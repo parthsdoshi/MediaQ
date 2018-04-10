@@ -55,11 +55,11 @@ function buildApiRequest(requestMethod, path, params, youtubeSearchCallback) {
     executeRequest(request, youtubeSearchCallback);
 }
 
-export function executeSearch(searchtag, youtubeSearchCallback) {
+export function executeSearch(searchtag, numberOfResults, youtubeSearchCallback) {
     console.log('Youtube API called with ' + searchtag)
     buildApiRequest('GET',
         '/youtube/v3/search',
-        {'maxResults': '5',
+        {'maxResults': numberOfResults,
             'part': 'snippet',
             'q': searchtag,
             'type': ''},
