@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import YouTube from 'react-youtube';
 import { Container } from 'reactstrap';
+import io from 'socket.io-client'
 
 import Header from './Header';
+import InitialConnect from './InitialConnect';
 import Queue from './Queue';
 import Search from './Search';
 
@@ -10,17 +12,31 @@ class App extends Component {
     constructor(props) {
         super(props)
 
-        this.state = {};
+        this.state = {
+            loggedIn: false,
+            connectionEstablished: false
+        };
 
-        this.loggedIn = this.loggedIn.bind(this);
+        this.loggedInCallback = this.loggedInCallback.bind(this);
     }
 
-    loggedIn() {
+    componentDidMount() {
+        this.socket = io('http://' + document.domain + ':' + window.location.port);
+        this.socket.on('connect', (data) => {
+            this.setState({connectionEstablished: true});
+        });
+    }
 
+    loggedInCallback(groupid) {
+        console.log(groupid);
+        this.setState({loggedIn: true});
     }
 
     render() {
-        const opts = {
+        const paddingTopStyle = {
+            paddingTop: 50
+        };
+        /*const opts = {
             height: '390',
             width: '640',
             playerVars: { // https://developers.google.com/youtube/player_parameters
@@ -36,13 +52,29 @@ class App extends Component {
                     opts={opts}
                     onReady={this._onReady} />
                 )
-        }
+        }*/
+        // TODO: use Fade reactstrap component to make below look better if we have time
         return (
             <div className="App">
                 <Header />
-                <Container>
-                    <Queue />
-                </Container>
+                <div style={paddingTopStyle}>
+                    {this.state.connectionEstablished &&
+                        <div>
+                            {!this.state.loggedIn &&
+                                <InitialConnect socket={this.socket}
+                                    loggedInCallback={this.loggedInCallback} />
+                            }
+                            {this.state.loggedIn &&
+                                <div>
+                                    <Container>
+                                        <Queue />
+                                    </Container>
+                                    <Search />
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
             );
     }
