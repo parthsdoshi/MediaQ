@@ -43,7 +43,6 @@ class App extends Component {
                 <Container>
                     <Queue />
                 </Container>
-                <Search />
             </div>
             );
     }

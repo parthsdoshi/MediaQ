@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import {loadYoutubeAPI, executeSearch} from './google_utils';
-import { Button } from 'reactstrap';
-import { Container, Row, Col, InputGroup, InputGroupText, InputGroupAddon, Input } from 'reactstrap';
+import { loadYoutubeAPI, executeSearch } from './google_utils';
+import { Media, Button, Container, Row, Col } from 'reactstrap';
 import YouTube from 'react-youtube';
 
 class Search extends Component {
@@ -14,10 +13,12 @@ class Search extends Component {
             spotifyResults: {},
             youtubeSearchReady: false,
             youtubeReady: false,
-            value: '',
+            searchBoxTextValue: '',
             defaultWidth: 640,
             defaultHeight: 390
         }
+        
+        this.numberOfResults = 5
 
         this.youtubeCallback = this.youtubeCallback.bind(this);
         this.youtubeSearchCallback = this.youtubeSearchCallback.bind(this);
@@ -30,6 +31,9 @@ class Search extends Component {
         this.getResultID = this.getResultID.bind(this);
         this.getResultEmbedded = this.getResultEmbedded.bind(this);
         this.getResultEmbeddedSpecificSize = this.getResultEmbeddedSpecificSize.bind(this);
+        this.getResultMedia = this.getResultMedia.bind(this);
+        
+        this.addToPlaylist = this.addToPlaylist.bind(this);
         
         this.handleKeyboardKeyPress = this.handleKeyboardKeyPress.bind(this);
         this.handleButtonPress = this.handleButtonPress.bind(this);
@@ -50,10 +54,10 @@ class Search extends Component {
         this.setState({youtubeResults: response, youtubeSearchReady: true})
     }
     
-    searchYoutube(searchTag) {
+    searchYoutube(searchTag, numberOfResults) {
         this.state.youtubeSearch = false;
         if( this.state.youtubeReady ){
-            executeSearch(searchTag, 1, this.youtubeSearchCallback);
+            executeSearch(searchTag, numberOfResults, this.youtubeSearchCallback);
         } else {
             return;
         }
@@ -61,43 +65,56 @@ class Search extends Component {
     }
     
     getResultTitle(number) {
-        if (this.state.youtubeSearchReady) {
+        if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return this.state.youtubeResults.items[number].snippet.title
         }
         return null;
     }
+    
     getResultThumbnailUrl(number) {
-        if (this.state.youtubeSearchReady) {
+        if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return this.state.youtubeResults.items[number].snippet.thumbnails.default.url;
         }
         return null;
     }
+    
     getResultThumbnailTag(number) {
-        if (this.state.youtubeSearchReady) {
+        if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return (<img src={this.state.youtubeResults.items[number].snippet.thumbnails.default.url}></img>);
         }
         return null;
     }
+    
     getResultID(number) {
-        if (this.state.youtubeSearchReady) {
+        if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return this.state.youtubeResults.items[number].id.videoId
         }
         return null;
     }
     
+    logVideoEnd() {
+        console.log('Your video ended');
+    }
+
+    addToPlaylist(number) {
+        console.log('Reult clicked ' + number);
+        this.props.triggerParentUpdate(this.getResultEmbedded(number));
+    }
+    
     getResultEmbeddedSpecificSize(number, height, width) {
-        if (this.state.youtubeSearchReady) {
+        if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             const opts = {
                 height: height,
                 width: width,
                 playerVars: { // https://developers.google.com/youtube/player_parameters
-                    autoplay: 1
+                    autoplay: 1,
+                    rel: 0,
                 }
             };
             return (<YouTube    videoId={this.getResultID(number)}
                         opts={opts}
                         onReady={this._onReady}
-                        autoplay='1'/>)
+                        onEnd={this.logVideoEnd}/>)
         }
         return null;
     }
@@ -105,9 +122,29 @@ class Search extends Component {
     getResultEmbedded(number) {
         return this.getResultEmbeddedSpecificSize(number, this.state.defaultHeight, this.state.defaultWidth);
     }
+    
+    getResultMedia(number) {
+        if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
+            return (
+                <Media>
+                  <Media left href="#">
+                    <Media object src={this.getResultThumbnailUrl(number)} alt="Youtube Video Thumbnail" />
+                  </Media>
+                    <Media body>
+                    <Media heading>
+                        {this.getResultTitle(number)}
+                    </Media>
+                    <Button color="success" onClick={() => this.addToPlaylist(number)}> Add To Playlist</Button>{' '}
+                    </Media>
+                    
+                </Media>
+            );
+        }
+        return null;
+    }
 
     handleButtonPress(target) {
-        this.searchYoutube(this.state.value);
+        this.searchYoutube(this.state.searchBoxTextValue, this.numberOfResults);
     }
 
     handlePlusButtonPress(target) {
@@ -122,12 +159,12 @@ class Search extends Component {
     
     handleKeyboardKeyPress(target) {
         if(target.charCode==13){
-                this.searchYoutube(this.state.value);
+                this.searchYoutube(this.state.searchBoxTextValue);
         }
     }
 
     handleChange(event) {
-        this.setState({value: event.target.value});
+        this.setState({searchBoxTextValue: event.target.value});
     }
 
     render() {
@@ -138,21 +175,14 @@ class Search extends Component {
             <input type="text" onKeyPress={this.handleKeyboardKeyPress} onChange={this.handleChange} value={this.state.value}/>
         </Col>
         <Col sm={{ size: 'auto', offset: 0 }}>
-            <Button onClick={this.handleButtonPress} color="primary">I'm feeling lucky</Button>{' '}
-        </Col>
-        <Col sm={{ size: 'auto', offset: 0 }}>
-            <Button onClick={this.handlePlusButtonPress} color="primary">+</Button>{' '}
-        </Col>
-        <Col sm={{ size: 'auto', offset: 0 }}>
-            <Button onClick={this.handleMinusButtonPress} color="primary">-</Button>{' '}
+            <Button onClick={this.handleButtonPress} color="primary">Search</Button>{' '}
         </Col>
         </Row>
-        <Row>
-        <Col>
-            <h1>{this.getResultTitle(0)}</h1>
-            {this.getResultEmbedded(0)}
-        </Col>
-        </Row>
+        {this.getResultMedia(0)}
+        {this.getResultMedia(1)}
+        {this.getResultMedia(2)}
+        {this.getResultMedia(3)}
+        {this.getResultMedia(4)}
         </Container>
         );
         
