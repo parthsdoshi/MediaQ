@@ -36,7 +36,8 @@ class Search extends Component {
         this.addToPlaylist = this.addToPlaylist.bind(this);
         
         this.handleKeyboardKeyPress = this.handleKeyboardKeyPress.bind(this);
-        this.handleButtonPress = this.handleButtonPress.bind(this);
+        this.handleSearchButtonPress = this.handleSearchButtonPress.bind(this);
+        this.handleMoreResultsButtonPress = this.handleMoreResultsButtonPress.bind(this);
         this.handlePlusButtonPress = this.handlePlusButtonPress.bind(this);
         this.handleMinusButtonPress = this.handleMinusButtonPress.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -68,7 +69,7 @@ class Search extends Component {
         if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return this.state.youtubeResults.items[number].snippet.title
         }
-        console.log('getResultTitle was called before search results were ready');
+        console.log('getResultTitle was called before search results were ready or called with out of bounds element');
         return null;
     }
     
@@ -76,7 +77,7 @@ class Search extends Component {
         if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return this.state.youtubeResults.items[number].snippet.thumbnails.default.url;
         }
-        console.log('getResultThumbnailUrl was called before search results were ready');
+        console.log('getResultThumbnailUrl was called before search results were ready or called with out of bounds element');
         return null;
     }
     
@@ -84,7 +85,7 @@ class Search extends Component {
         if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return (<img src={this.state.youtubeResults.items[number].snippet.thumbnails.default.url}></img>);
         }
-        console.log('getResultThumbnailTag was called before search results were ready');
+        console.log('getResultThumbnailTag was called before search results were ready or called with out of bounds element');
         return null;
     }
     
@@ -92,7 +93,7 @@ class Search extends Component {
         if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return this.state.youtubeResults.items[number].id.videoId
         }
-        console.log('getResultID was called before search results were ready');
+        console.log('getResultID was called before search results were ready or called with out of bounds element');
         return null;
     }
     
@@ -120,7 +121,7 @@ class Search extends Component {
                         onReady={this._onReady}
                         onEnd={this.logVideoEnd}/>)
         }
-        console.log('getResultEmbeddedSpecificSize was called before search results were ready');
+        console.log('getResultEmbeddedSpecificSize was called before search results were ready or called with out of bounds element');
         return null;
     }
     
@@ -145,14 +146,19 @@ class Search extends Component {
                 </Media>
             );
         }
-        console.log('getResultMedia was called before search results were ready');
+        console.log('getResultMedia was called before search results were ready or called with out of bounds element');
         return null;
     }
 
-    handleButtonPress(target) {
+    handleSearchButtonPress(target) {
         this.searchYoutube(this.state.searchBoxTextValue, this.numberOfResults);
     }
-
+    
+    handleMoreResultsButtonPress(target) {
+        this.numberOfResults += 5;
+        this.handleSearchButtonPress(target);
+    }
+    
     handlePlusButtonPress(target) {
         this.setState({defaultHeight: this.state.defaultHeight + 50});
         this.setState({defaultWidth: this.state.defaultWidth + 50});
@@ -174,6 +180,12 @@ class Search extends Component {
     }
 
     render() {
+        var youtubeMedia = [];
+        if( this.state.youtubeSearchReady ){
+            for (var i = 0; i < this.state.youtubeResults.items.length; i++) {
+              youtubeMedia.push(this.getResultMedia(i));
+            }
+        }
         return (
         <Container>
         <Row>
@@ -181,16 +193,12 @@ class Search extends Component {
             <input type="text" onKeyPress={this.handleKeyboardKeyPress} onChange={this.handleChange} value={this.state.value}/>
         </Col>
         <Col sm={{ size: 'auto', offset: 0 }}>
-            <Button onClick={this.handleButtonPress} color="primary">Search</Button>{' '}
+            <Button onClick={this.handleSearchButtonPress} color="primary">Search</Button>{' '}
         </Col>
         </Row>
-        {this.state.youtubeSearchReady && this.getResultMedia(0)}
-        {this.state.youtubeSearchReady && this.getResultMedia(1)}
-        {this.state.youtubeSearchReady && this.getResultMedia(2)}
-        {this.state.youtubeSearchReady && this.getResultMedia(3)}
-        {this.state.youtubeSearchReady && this.getResultMedia(4)}
+        {youtubeMedia}
         {this.state.youtubeSearchReady && <Col sm={{ size: 'auto', offset: 0 }}>
-            <Button onClick={this.handleButtonPress} color="primary">More Results</Button>{' '}
+            <Button onClick={this.handleMoreResultsButtonPress} color="primary">More Results</Button>{' '}
         </Col>}
 
         </Container>
