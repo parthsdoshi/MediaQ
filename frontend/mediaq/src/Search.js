@@ -96,7 +96,8 @@ class Search extends Component {
             };
             return (<YouTube    videoId={this.getResultID(number)}
                         opts={opts}
-                        onReady={this._onReady} />)
+                        onReady={this._onReady}
+                        autoplay='1'/>)
         }
         return null;
     }
