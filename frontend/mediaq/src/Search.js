@@ -22,7 +22,7 @@ class Search extends Component {
 
         this.youtubeCallback = this.youtubeCallback.bind(this);
         this.youtubeSearchCallback = this.youtubeSearchCallback.bind(this);
-
+        
         this.searchYoutube = this.searchYoutube.bind(this);
         
         this.getResultTitle = this.getResultTitle.bind(this);
@@ -43,7 +43,7 @@ class Search extends Component {
 
         loadYoutubeAPI(this.youtubeCallback)
     }
-
+    
     youtubeCallback() {
         console.log("API loaded");
         this.setState({youtubeReady: true})
@@ -68,6 +68,7 @@ class Search extends Component {
         if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return this.state.youtubeResults.items[number].snippet.title
         }
+        console.log('getResultTitle was called before search results were ready');
         return null;
     }
     
@@ -75,6 +76,7 @@ class Search extends Component {
         if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return this.state.youtubeResults.items[number].snippet.thumbnails.default.url;
         }
+        console.log('getResultThumbnailUrl was called before search results were ready');
         return null;
     }
     
@@ -82,6 +84,7 @@ class Search extends Component {
         if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return (<img src={this.state.youtubeResults.items[number].snippet.thumbnails.default.url}></img>);
         }
+        console.log('getResultThumbnailTag was called before search results were ready');
         return null;
     }
     
@@ -89,6 +92,7 @@ class Search extends Component {
         if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return this.state.youtubeResults.items[number].id.videoId
         }
+        console.log('getResultID was called before search results were ready');
         return null;
     }
     
@@ -116,6 +120,7 @@ class Search extends Component {
                         onReady={this._onReady}
                         onEnd={this.logVideoEnd}/>)
         }
+        console.log('getResultEmbeddedSpecificSize was called before search results were ready');
         return null;
     }
     
@@ -140,6 +145,7 @@ class Search extends Component {
                 </Media>
             );
         }
+        console.log('getResultMedia was called before search results were ready');
         return null;
     }
 
@@ -178,11 +184,12 @@ class Search extends Component {
             <Button onClick={this.handleButtonPress} color="primary">Search</Button>{' '}
         </Col>
         </Row>
-        {this.getResultMedia(0)}
-        {this.getResultMedia(1)}
-        {this.getResultMedia(2)}
-        {this.getResultMedia(3)}
-        {this.getResultMedia(4)}
+        {this.state.youtubeSearchReady && this.getResultMedia(0)}
+        {this.state.youtubeSearchReady && this.getResultMedia(1)}
+        {this.state.youtubeSearchReady && this.getResultMedia(2)}
+        {this.state.youtubeSearchReady && this.getResultMedia(3)}
+        {this.state.youtubeSearchReady && this.getResultMedia(4)}
+        
         </Container>
         );
         
