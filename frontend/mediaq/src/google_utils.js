@@ -62,6 +62,6 @@ export function executeSearch(searchtag, numberOfResults, youtubeSearchCallback)
         {'maxResults': numberOfResults,
             'part': 'snippet',
             'q': searchtag,
-            'type': ''},
+            'type': 'video'},
         youtubeSearchCallback);
 }
