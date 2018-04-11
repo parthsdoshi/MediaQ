@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import Search from './Search'
+import Search from './Search';
+import PauseIcon from 'open-iconic/svg/media-pause.svg';
+import PlayIcon from 'open-iconic/svg/media-play.svg';
+import PlusIcon from 'open-iconic/svg/plus.svg';
 
 class Queue extends Component {
 
@@ -17,7 +20,7 @@ class Queue extends Component {
         };
     }
 
-    searchModelToggle = () => {
+    searchModalToggle = () => {
         this.setState({
             modal: !this.state.modal
         });
@@ -37,14 +40,14 @@ class Queue extends Component {
                     isOpen={this.state.modal} 
                     toggle={this.toggle} 
                     className={this.props.className}>
-                    <ModalHeader toggle={this.searchModelToggle}>
+                    <ModalHeader toggle={this.searchModalToggle}>
                         Add a new song
                     </ModalHeader>
                     <ModalBody>
                         <Search loadVideoCallback={this.loadVideoCallback}/>
                     </ModalBody>
                     <ModalFooter>
-                        <Button color="secondary" onClick={this.searchModelToggle}>
+                        <Button color="secondary" onClick={this.searchModalToggle}>
                             Cancel
                         </Button>
                     </ModalFooter>
@@ -59,19 +62,19 @@ class Queue extends Component {
                             <th>Album</th>
                             <th>Source</th>
                             <th>
-                                <Button onClick={this.searchModelToggle} color="primary">
-                                    +
+                                <Button onClick={this.searchModalToggle} color="primary">
+                                    <img alt="Add to Queue" src={PlusIcon} />
                                 </Button>{' '}
                             </th>
                         </tr>
                     </thead>
-                    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+                    <script href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
                     <tbody>
                         <tr>
                             <th scope="row">1</th>
                             <td>
                                 <Button onClick={this.searchModelToggle} color="primary">
-                                    <i class="material-icons">pause_circle_outline</i>
+                                    <img alt="pause" src={PauseIcon} />
                                 </Button>
                             </td>
                             <td>In the end</td>
@@ -82,8 +85,8 @@ class Queue extends Component {
                         <tr>
                             <th scope="row">2</th>
                             <td>
-                                <Button onClick={this.searchModelToggle} color="primary">
-                                    <i class="material-icons">play_circle_outline</i>
+                                <Button onClick={this.searchModalToggle} color="primary">
+                                    <img alt="play" src={PlayIcon} />
                                 </Button>
                             </td>
                             <td>Breaking The Habit</td>
