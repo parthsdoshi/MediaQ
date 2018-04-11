@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
-import YouTube from 'react-youtube';
 import { Container } from 'reactstrap';
 import io from 'socket.io-client'
 
 import Header from './Header';
 import InitialConnect from './InitialConnect';
 import Queue from './Queue';
-import Search from './Search';
 
 class App extends Component {
     constructor(props) {
@@ -17,7 +15,7 @@ class App extends Component {
             connectionEstablished: false,
             displayName: '',
             qID: ''
-            };
+        };
 
     }
 
@@ -27,7 +25,7 @@ class App extends Component {
             this.setState({connectionEstablished: true});
         });
     }
-    
+
     setDisplayNameCallback = (displayName) => {
         if(displayName === '') { //user canceled login screen
             this.setState({
@@ -42,7 +40,7 @@ class App extends Component {
             displayName: displayName
         });
     }
-    
+
     setQIDCallback = (qID) => {
         this.setState({
             qID: qID
@@ -76,22 +74,22 @@ class App extends Component {
         return (
             <div className="App">
                 <Header displayName={this.state.displayName} qID={this.state.qID} />
-                    <div style={paddingTopStyle}>
+                <div style={paddingTopStyle}>
                     {this.state.connectionEstablished &&
+                    <div>
+                        {!this.state.loggedIn &&
+                        <InitialConnect socket={this.socket}
+                            setDisplayNameCallback={this.setDisplayNameCallback}
+                            setQIDCallback={this.setQIDCallback}/>
+                        }
+                        {this.state.loggedIn &&
                         <div>
-                            {!this.state.loggedIn &&
-                                <InitialConnect socket={this.socket}
-                                    setDisplayNameCallback={this.setDisplayNameCallback}
-                                    setQIDCallback={this.setQIDCallback}/>
-                            }
-                            {this.state.loggedIn &&
-                                <div>
-                                    <Container>
-                                        <Queue />
-                                    </Container>
-                                </div>
-                            }
+                            <Container>
+                                <Queue />
+                            </Container>
                         </div>
+                        }
+                    </div>
                     }
                 </div>
             </div>

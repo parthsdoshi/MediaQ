@@ -9,17 +9,22 @@ class PopupModal extends Component {
         super(props)
         this.modelWantsToCloseCallback = this.props.modelWantsToCloseCallback;
     }
-    
+
     render() {
         return (
             <div>
-            <Modal isOpen={true} className={this.props.className}>
-                <ModalHeader toggle={this.modelWantsToCloseCallback}>{this.props.title}</ModalHeader>
-                <ModalBody>{this.props.body}</ModalBody>
-                <ModalFooter>
-                    <Button color="danger" onClick={this.modelWantsToCloseCallback}>Ok</Button>
-                </ModalFooter>
-            </Modal>
+                <Modal isOpen={true} className={this.props.className}>
+                    <ModalHeader toggle={this.modelWantsToCloseCallback}>
+                        {this.props.title}
+                    </ModalHeader>
+                    <ModalBody>{this.props.body}</ModalBody>
+                    <ModalFooter>
+                        <Button color="danger" 
+                            onClick={this.modelWantsToCloseCallback}>
+                            Ok
+                        </Button>
+                    </ModalFooter>
+                </Modal>
             </div>
             );
     }

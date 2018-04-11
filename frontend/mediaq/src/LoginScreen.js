@@ -8,9 +8,9 @@ class LoginScreen extends Component {
 
     constructor(props) {
         super(props)
-        
+
         this.hideLoginAndCallParentCallback = this.props.hideLoginAndCallParentCallback;
-        
+
         this.state = {
             displaynameBoxText: '',
             qIDBoxText: '',
@@ -21,11 +21,11 @@ class LoginScreen extends Component {
             warningModalBody: ''
         };
     }
-    
+
 
     handleKeyboardKeyPress = (target) => {
-        if(target.charCode==13){
-                this.callParent();
+        if(target.charCode === 13){
+            this.callParent();
         }
     }
 
@@ -43,7 +43,7 @@ class LoginScreen extends Component {
         });
         this.hideLoginAndCallParentCallback('', '');
     }
-    
+
     callParent = () => {
         if (this.state.displaynameBoxText === '') {
             this.setState({
@@ -68,7 +68,7 @@ class LoginScreen extends Component {
         });
         this.hideLoginAndCallParentCallback(this.state.displaynameBoxText, this.state.qIDBoxText);
     }
-    
+
     hideWarning = () => {
         this.setState({
             warningModal: false,
@@ -78,26 +78,34 @@ class LoginScreen extends Component {
     }
 
 
-    
+
     render() {
         return (
             <div>
-            <Modal isOpen={this.state.modal} className={this.props.className}>
-                    <ModalHeader toggle={this.modalTurnOff}>{this.props.userAction}</ModalHeader>
+                <Modal isOpen={this.state.modal} className={this.props.className}>
+                    <ModalHeader toggle={this.modalTurnOff}>
+                        {this.props.userAction}
+                    </ModalHeader>
                     <ModalBody>
                         <div className="form-group">
-                            <Input placeholder="Display Name" onKeyPress={this.handleKeyboardKeyPress} onChange={this.handleTextChangeDisplayname} />
+                            <Input placeholder="Display Name" 
+                                onKeyPress={this.handleKeyboardKeyPress} 
+                                onChange={this.handleTextChangeDisplayname} />
                         </div>
-                        
+
                         { this.state.showQIDInput && 
                         <div className="form-group">
-                            <Input placeholder="Queue ID" onKeyPress={this.handleKeyboardKeyPress} onChange={this.handleTextChangeqID} />
+                            <Input placeholder="Queue ID" 
+                                onKeyPress={this.handleKeyboardKeyPress} 
+                                onChange={this.handleTextChangeqID} />
                         </div>
                         }
-                        
-                        {this.state.warningModal && <PopupModal modelWantsToCloseCallback={this.hideWarning} 
-                                        title={this.state.warningModalTitle} body={this.state.warningModalBody}/>}
-                        
+
+                        {this.state.warningModal && 
+                                <PopupModal modelWantsToCloseCallback={this.hideWarning} 
+                                    title={this.state.warningModalTitle} 
+                                    body={this.state.warningModalBody}/>
+                                }
                     </ModalBody>
                     <ModalFooter>
                         <Button color="primary" onClick={this.callParent}>Start</Button>
