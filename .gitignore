@@ -57,7 +57,15 @@ typings/
 # dotenv environment variables file
 .env
 
+# vim swap files
 .*.swp
 
+# build folder
 build
+
+# notpad++ swap files
 *.bak
+
+# redis database files
+dump.rdb
+data.aof
