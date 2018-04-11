@@ -47,6 +47,13 @@ class InitialConnect extends Component {
     }
 
     hideLoginAndCallParentCallback = (displayName, qID) => {
+        if (displayName === '' && qID === '') { //user clicked cancel
+            this.setState({
+                displayLoginScreen: false,
+                userAction: ''
+            });
+            return;
+        }
         if (this.state.userAction === 'Create a new queue') {
             this.socket.emit('create', {data: ['hi', 'hello']});
             this.setDisplayNameCallback(displayName);
@@ -54,7 +61,6 @@ class InitialConnect extends Component {
                 displayLoginScreen: false,
                 userAction: ''
             });
-
         } else {
             this.socket.emit('join', {data: ''});
             this.setDisplayNameCallback(displayName);
@@ -112,7 +118,7 @@ class InitialConnect extends Component {
                 {this.state.displayQIDModal && 
                 <PopupModal modelWantsToCloseCallback={this.hideQIDModal} 
                     title={'Your new Queue ID: ' + this.state.qID} 
-                    body={'Give the Queue ID ' + this.state.qID + ' to your friends to join your queue'}/>}
+                    body={'Give the Queue ID "' + this.state.qID + '" to your friends to join your queue'}/>}
             </div>
             );
     }
