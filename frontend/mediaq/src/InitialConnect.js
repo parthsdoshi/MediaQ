@@ -17,10 +17,10 @@ class InitialConnect extends Component {
 
         this.socket.on('create', (data) => {
             console.log(data);
+            this.setQIDCallback(data);
         });
         this.socket.on('join', (data) => {
             console.log(data);
-            this.setQIDCallback(data);
         });
     }
 
