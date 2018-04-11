@@ -14,8 +14,8 @@ RUN npm install
 # RUN npm install watch
 
 # have to set this for watch to work...
-ENV TERM xterm
+# ENV TERM xterm
 
 # compiles react files under node 8
-CMD ["npm", "run", "build"]
+CMD ["npm", "run", "docker"]
 # CMD ["watch", "-n", "10", "npm", "run", "build"]
