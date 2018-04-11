@@ -48,7 +48,7 @@ class InitialConnect extends Component {
 
     hideLoginAndCallParentCallback = (displayName, qID) => {
         if (this.state.userAction === 'Create a new queue') {
-            this.socket.emit('create', {data: ''});
+            this.socket.emit('create', {data: ['hi', 'hello']});
             this.setDisplayNameCallback(displayName);
             this.setState({
                 displayLoginScreen: false,
