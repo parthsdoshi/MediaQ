@@ -1,21 +1,25 @@
 import React, { Component } from 'react';
 import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Search from './Search';
+<<<<<<< Updated upstream
 import PauseIcon from 'open-iconic/svg/media-pause.svg';
 import PlayIcon from 'open-iconic/svg/media-play.svg';
 import PlusIcon from 'open-iconic/svg/plus.svg';
+=======
+import QueueRowEntry from './QueueRowEntry';
+>>>>>>> Stashed changes
 
 class Queue extends Component {
 
     // contact server in this component to grab queue
 
     constructor(props) {
-        super(props)
+        super(props);
 
         this.state = {
             searchBoxText: '',
             modal: false,
-            tableContent: null,
+            tableRows: [],
             video: ''
         };
     }
@@ -31,6 +35,10 @@ class Queue extends Component {
             modal: false,
             video: videoObject
         });
+    }
+    
+    insertTableEntry = (tableEntry) => {
+        this.state.tableRows.push(tableEntry);
     }
 
     render() {
@@ -52,6 +60,7 @@ class Queue extends Component {
                         </Button>
                     </ModalFooter>
                 </Modal>
+                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
                 <Table hover>
                     <thead>
                         <tr>
@@ -68,7 +77,6 @@ class Queue extends Component {
                             </th>
                         </tr>
                     </thead>
-                    <script href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
                     <tbody>
                         <tr>
                             <th scope="row">1</th>
