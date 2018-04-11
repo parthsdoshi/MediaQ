@@ -12,6 +12,7 @@ class Queue extends Component {
         this.state = {
             searchBoxText: '',
             modal: false,
+            tableContent: null,
             video: ''
         };
     }
@@ -64,7 +65,32 @@ class Queue extends Component {
                             </th>
                         </tr>
                     </thead>
+                    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
                     <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>
+                                <Button onClick={this.searchModelToggle} color="primary">
+                                    <i class="material-icons">pause_circle_outline</i>
+                                </Button>
+                            </td>
+                            <td>In the end</td>
+                            <td>Linkin Park</td>
+                            <td>Album</td>
+                            <td>Youtube</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>
+                                <Button onClick={this.searchModelToggle} color="primary">
+                                    <i class="material-icons">play_circle_outline</i>
+                                </Button>
+                            </td>
+                            <td>Breaking The Habit</td>
+                            <td>Linkin Park</td>
+                            <td>Album</td>
+                            <td>Youtube</td>
+                        </tr>
                     </tbody>
                 </Table>
                 {this.state.video !== '' && this.state.video}
