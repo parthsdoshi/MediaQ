@@ -28,15 +28,9 @@ class App extends Component {
 
     setDisplayNameCallback = (displayName) => {
         if(displayName === '') { //user canceled login screen
-            this.setState({
-                loggedIn: false,
-                displayName: '',
-                qID: ''
-            });
             return;
         }
         this.setState({
-            loggedIn: true,
             displayName: displayName
         });
     }
@@ -44,6 +38,12 @@ class App extends Component {
     setQIDCallback = (qID) => {
         this.setState({
             qID: qID
+        });
+    }
+    
+    hideInitialConnectCallback = () => {
+        this.setState({
+            loggedIn: true
         });
     }
 
@@ -80,7 +80,8 @@ class App extends Component {
                         {!this.state.loggedIn &&
                         <InitialConnect socket={this.socket}
                             setDisplayNameCallback={this.setDisplayNameCallback}
-                            setQIDCallback={this.setQIDCallback}/>
+                            setQIDCallback={this.setQIDCallback}
+                            hideInitialConnectCallback={this.hideInitialConnectCallback}/>
                         }
                         {this.state.loggedIn &&
                         <div>

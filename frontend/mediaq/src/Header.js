@@ -29,13 +29,6 @@ class Header extends Component {
             isOpen: !this.state.isOpen
         });
     }
-    
-    hideQIDModal = () => {
-        this.setState({
-            displayQIDModal: false
-        });
-    }   
-
 
     render() {
         return (
@@ -58,10 +51,6 @@ class Header extends Component {
                         </Collapse>
                     </Container>
                 </Navbar>
-                {this.props.qID !== '' && this.state.displayQIDModal && 
-                                <PopupModal modelWantsToCloseCallback={this.hideQIDModal} 
-                                    title={'Your new Queue ID: ' + this.props.qID} 
-                                    body={'Give the Queue ID ' + this.props.qID + ' to your friends to join your queue'}/>}
             </div>
             );
     }

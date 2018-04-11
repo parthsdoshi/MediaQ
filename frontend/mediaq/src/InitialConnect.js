@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Jumbotron, Button, Container } from 'reactstrap';
 import LoginScreen from './LoginScreen.js'
+import PopupModal from './PopupModal';
 
 class InitialConnect extends Component {
     constructor(props) {
@@ -8,16 +9,23 @@ class InitialConnect extends Component {
 
         this.setDisplayNameCallback = this.props.setDisplayNameCallback;
         this.setQIDCallback = this.props.setQIDCallback;
+        this.hideMeCallback = this.props.hideInitialConnectCallback;
         this.socket = props.socket;
 
         this.state = {
             displayLoginScreen: false,
-            userAction: ''
+            userAction: '',
+            displayQIDModal: false,
+            qID: '' //needed to pass to popup modal to show user their QID
         };
 
         this.socket.on('create', (data) => {
             console.log(data);
             this.setQIDCallback(data);
+            this.setState({
+                displayQIDModal: true,
+                qID: data
+            });
         });
         this.socket.on('join', (data) => {
             console.log(data);
@@ -41,18 +49,31 @@ class InitialConnect extends Component {
     hideLoginAndCallParentCallback = (displayName, qID) => {
         if (this.state.userAction === 'Create a new queue') {
             this.socket.emit('create', {data: ''});
-            console.log('told server to create');
             this.setDisplayNameCallback(displayName);
+            this.setState({
+                displayLoginScreen: false,
+                userAction: ''
+            });
+
         } else {
             this.socket.emit('join', {data: ''});
             this.setDisplayNameCallback(displayName);
             this.setQIDCallback(qID);
+            this.setState({
+                displayLoginScreen: false,
+                userAction: ''
+            });
+            this.hideMeCallback();
         }
-        this.setState({
-            displayLoginScreen: false,
-            userAction: ''
-        });
     }
+    
+    hideQIDModal = () => {
+        this.setState({
+            displayQIDModal: false
+        });
+        this.hideMeCallback();
+   }   
+
 
     render() {
         return (
@@ -88,6 +109,10 @@ class InitialConnect extends Component {
                     userAction={this.state.userAction}
                     hideLoginAndCallParentCallback={this.hideLoginAndCallParentCallback} />
                 }
+                {this.state.displayQIDModal && 
+                <PopupModal modelWantsToCloseCallback={this.hideQIDModal} 
+                    title={'Your new Queue ID: ' + this.state.qID} 
+                    body={'Give the Queue ID ' + this.state.qID + ' to your friends to join your queue'}/>}
             </div>
             );
     }
