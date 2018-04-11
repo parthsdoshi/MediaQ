@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
 import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Search from './Search';
-<<<<<<< Updated upstream
 import PauseIcon from 'open-iconic/svg/media-pause.svg';
 import PlayIcon from 'open-iconic/svg/media-play.svg';
 import PlusIcon from 'open-iconic/svg/plus.svg';
-=======
 import QueueRowEntry from './QueueRowEntry';
->>>>>>> Stashed changes
 
 class Queue extends Component {
 
@@ -97,7 +94,7 @@ class Queue extends Component {
                                     <img alt="play" src={PlayIcon} />
                                 </Button>
                             </td>
-                            <td>Breaking The Habit</td>
+                            <td>asdfasdfasdf</td>
                             <td>Linkin Park</td>
                             <td>Album</td>
                             <td>Youtube</td>
