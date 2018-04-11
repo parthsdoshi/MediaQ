@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { InputGroup, Container, InputGroupButton, Label, Input, Row, Col, Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import PopupModal from './PopupModal'
 
 class LoginScreen extends Component {
 
@@ -94,15 +95,9 @@ class LoginScreen extends Component {
                         </div>
                         }
                         
-                        <Modal isOpen={this.state.warningModal} className={this.props.className}>
-                            <ModalHeader toggle={this.hideWarning}>{this.state.warningModalTitle}</ModalHeader>
-                            <ModalBody>{this.state.warningModalBody}</ModalBody>
-                            <ModalFooter>
-                                <Button color="danger" onClick={this.hideWarning}>Ok</Button>
-                            </ModalFooter>
-                        </Modal>
-
-
+                        {this.state.warningModal && <PopupModal modelWantsToCloseCallback={this.hideWarning} 
+                                        title={this.state.warningModalTitle} body={this.state.warningModalBody}/>}
+                        
                     </ModalBody>
                     <ModalFooter>
                         <Button color="primary" onClick={this.callParent}>Start</Button>

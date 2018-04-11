@@ -52,7 +52,7 @@ class Queue extends Component {
                         <th>Author/Artist</th>
                         <th>Album</th>
                         <th>Source</th>
-                        <Button onClick={this.searchModelToggle} color="primary">+</Button>{' '}
+                        <td><Button onClick={this.searchModelToggle} color="primary">+</Button>{' '}</td>
                     </tr>
                 </thead>
                 <tbody>

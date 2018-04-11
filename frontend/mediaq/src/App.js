@@ -19,9 +19,6 @@ class App extends Component {
             qID: ''
             };
 
-        this.loggedInCallback = this.loggedInCallback.bind(this);
-        this.setDisplayNameCallback = this.setDisplayNameCallback.bind(this);
-        
     }
 
     componentDidMount() {
@@ -30,13 +27,8 @@ class App extends Component {
             this.setState({connectionEstablished: true});
         });
     }
-
-    loggedInCallback(groupid) {
-        console.log(groupid);
-        this.setState({loggedIn: true});
-    }
     
-    setDisplayNameCallback(displayName, qID) {
+    setDisplayNameCallback = (displayName) => {
         if(displayName === '') { //user canceled login screen
             this.setState({
                 loggedIn: false,
@@ -45,22 +37,18 @@ class App extends Component {
             });
             return;
         }
-
-        if(qID === '') { // create queue selected
-            this.setState({
-                loggedIn: true,
-                displayName: displayName
-            });
-            return;
-        }
-        
-        // join queue selected
         this.setState({
-                loggedIn: true,
-                displayName: displayName,
-                qID: qID
+            loggedIn: true,
+            displayName: displayName
         });
     }
+    
+    setQIDCallback = (qID) => {
+        this.setState({
+            qID: qID
+        });
+    }
+
 
 
     render() {
@@ -93,7 +81,8 @@ class App extends Component {
                         <div>
                             {!this.state.loggedIn &&
                                 <InitialConnect socket={this.socket}
-                                    setDisplayNameCallback={this.setDisplayNameCallback} />
+                                    setDisplayNameCallback={this.setDisplayNameCallback}
+                                    setQIDCallback={this.setQIDCallback}/>
                             }
                             {this.state.loggedIn &&
                                 <div>

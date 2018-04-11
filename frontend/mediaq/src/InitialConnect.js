@@ -7,6 +7,7 @@ class InitialConnect extends Component {
         super(props);
         
         this.setDisplayNameCallback = this.props.setDisplayNameCallback;
+        this.setQIDCallback = this.props.setQIDCallback;
         this.socket = props.socket;
 
         this.state = {
@@ -22,6 +23,7 @@ class InitialConnect extends Component {
         });
         this.socket.on('join', (data) => {
             console.log(data);
+            this.setQIDCallback(data);
         });
     }
 
@@ -30,7 +32,6 @@ class InitialConnect extends Component {
             displayLoginScreen: true,
             userAction: 'Create a new queue'
         });
-        this.socket.emit('create', {data: ''});
     }
 
     joinQueue() {
@@ -38,16 +39,22 @@ class InitialConnect extends Component {
             displayLoginScreen: true,
             userAction: 'Join an existing queue'
         });
-        this.socket.emit('join', {data: ''});
     }
     
     hideLoginAndCallParentCallback = (displayName, qID) => {
+        if (this.state.userAction === 'Create a new queue') {
+            this.socket.emit('create', {data: ''});
+            console.log('told server to create');
+            this.setDisplayNameCallback(displayName);
+        } else {
+            this.socket.emit('join', {data: ''});
+            this.setDisplayNameCallback(displayName);
+            this.setQIDCallback(qID);
+        }
         this.setState({
             displayLoginScreen: false,
             userAction: ''
         });
-        this.setDisplayNameCallback(displayName, qID);
-        
     }
 
     render() {
