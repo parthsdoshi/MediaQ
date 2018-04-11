@@ -7,4 +7,4 @@ WORKDIR /app
 # Use our own config
 ADD ./redis.conf /app/redis.conf
 
-CMD ["redis-server", "./redis.conf"]
+CMD ["redis-server", "/app/redis.conf"]

@@ -8,6 +8,7 @@ WORKDIR /app
 ADD ./mediaq/config /app/config
 ADD ./mediaq/scripts /app/scripts
 ADD ./mediaq/package.json /app/package.json
+ADD ./mediaq/package-lock.json /app/package-lock.json
 
 # Install any needed packages specified in requirements.txt
 RUN npm install
