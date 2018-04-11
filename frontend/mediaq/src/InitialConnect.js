@@ -62,7 +62,7 @@ class InitialConnect extends Component {
                             <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
                         }
                         <Container className="text-center">
-                            <Button color="primary" onClick={this.createQueue}>Create a Queue</Button>
+                            <Button color="success" onClick={this.createQueue}>Create a Queue</Button>
                             {' '}
                             <Button color="primary" onClick={this.joinQueue}>Join a Queue</Button>
                         </Container>

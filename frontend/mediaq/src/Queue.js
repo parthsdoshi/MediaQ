@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import Search from './Search.js'
+import Search from './Search'
 
 class Queue extends Component {
 

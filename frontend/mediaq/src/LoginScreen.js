@@ -14,6 +14,7 @@ class LoginScreen extends Component {
             displaynameBoxText: '',
             qIDBoxText: '',
             modal: true,
+            showQIDInput: this.props.userAction === 'Create a new queue' ? false : true
         };
         
         this.handleKeyboardKeyPress = this.handleKeyboardKeyPress.bind(this);
@@ -58,12 +59,16 @@ class LoginScreen extends Component {
             <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
                     <ModalHeader toggle={this.modalTurnOff}>{this.props.userAction}</ModalHeader>
                     <ModalBody>
-                        <InputGroup>
+                        <div className="form-group">
                             <Input placeholder="Display Name" onKeyPress={this.handleKeyboardKeyPress} onChange={this.handleTextChangeqID} />
-                        </InputGroup>
-                        <InputGroup>
+                        </div>
+                        
+                        { this.state.showQIDInput && 
+                        <div className="form-group">
                             <Input placeholder="Queue ID" onKeyPress={this.handleKeyboardKeyPress} onChange={this.handleTextChangeDisplayname} />
-                        </InputGroup>
+                        </div>
+                        }
+
                     </ModalBody>
                     <ModalFooter>
                         <Button color="primary" onClick={this.callParent}>Start</Button>
