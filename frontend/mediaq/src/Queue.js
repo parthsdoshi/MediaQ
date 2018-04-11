@@ -14,9 +14,9 @@ class Queue extends Component {
             modal: false,
             video: ''
         };
-        
+                
         this.searchModelToggle = this.searchModelToggle.bind(this);
-        this.loadVideo = this.loadVideo.bind(this);
+        this.loadVideoCallback = this.loadVideoCallback.bind(this);
 
     }
     
@@ -26,10 +26,16 @@ class Queue extends Component {
         });
     }
     
-    loadVideo(videoObject) {
+    loadVideoCallback(videoObject) {
         this.setState({
             modal: false,
             video: videoObject
+        });
+    }
+    
+    setDisplayName(displayName) {
+        this.setState({
+            displayName: displayName
         });
     }
 
@@ -37,30 +43,32 @@ class Queue extends Component {
         return (
             <div>
             <Modal size='lg' isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-                    <ModalHeader toggle={this.searchModelToggle}>Add a new song</ModalHeader>
-                    <ModalBody>
-                        <Search triggerParentUpdate={this.loadVideo}/>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="secondary" onClick={this.searchModelToggle}>Cancel</Button>
-                    </ModalFooter>
-                </Modal>
-                <Table hover>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Play/Pause</th>
-                            <th>Title</th>
-                            <th>Author/Artist</th>
-                            <th>Album</th>
-                            <th>Source</th>
-                            <Button onClick={this.searchModelToggle} color="primary">+</Button>{' '}
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </Table>
-                {this.state.video !== '' && this.state.video}
+                <ModalHeader toggle={this.searchModelToggle}>
+                    Add a new song
+                </ModalHeader>
+                <ModalBody>
+                    <Search loadVideoCallback={this.loadVideoCallback}/>
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="secondary" onClick={this.searchModelToggle}>Cancel</Button>
+                </ModalFooter>
+            </Modal>
+            <Table hover>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Play/Pause</th>
+                        <th>Title</th>
+                        <th>Author/Artist</th>
+                        <th>Album</th>
+                        <th>Source</th>
+                        <Button onClick={this.searchModelToggle} color="primary">+</Button>{' '}
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </Table>
+            {this.state.video !== '' && this.state.video}
             </div>
             );
     }

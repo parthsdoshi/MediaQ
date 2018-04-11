@@ -14,10 +14,14 @@ class App extends Component {
 
         this.state = {
             loggedIn: false,
-            connectionEstablished: false
-        };
+            connectionEstablished: false,
+            displayName: '',
+            qID: ''
+            };
 
         this.loggedInCallback = this.loggedInCallback.bind(this);
+        this.setDisplayNameCallback = this.setDisplayNameCallback.bind(this);
+        
     }
 
     componentDidMount() {
@@ -31,6 +35,13 @@ class App extends Component {
         console.log(groupid);
         this.setState({loggedIn: true});
     }
+    
+    setDisplayNameCallback(displayName, qID) {
+        this.setState({
+            displayName: displayName,
+            qID: qID});
+    }
+
 
     render() {
         const paddingTopStyle = {
@@ -56,13 +67,13 @@ class App extends Component {
         // TODO: use Fade reactstrap component to make below look better if we have time
         return (
             <div className="App">
-                <Header />
-                <div style={paddingTopStyle}>
+                <Header displayName={this.state.displayName} qID={this.state.qID} />
+                    <div style={paddingTopStyle}>
                     {this.state.connectionEstablished &&
                         <div>
                             {!this.state.loggedIn &&
                                 <InitialConnect socket={this.socket}
-                                    loggedInCallback={this.loggedInCallback} />
+                                    setDisplayNameCallback={this.setDisplayNameCallback} />
                             }
                             {this.state.loggedIn &&
                                 <div>

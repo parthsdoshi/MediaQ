@@ -18,6 +18,8 @@ class Search extends Component {
             defaultHeight: 390
         }
         
+        this.loadVideoCallback = this.props.loadVideoCallback;
+        
         this.numberOfResults = 5
 
         this.youtubeCallback = this.youtubeCallback.bind(this);
@@ -102,8 +104,8 @@ class Search extends Component {
     }
 
     addToPlaylist(number) {
-        console.log('Reult clicked ' + number);
-        this.props.triggerParentUpdate(this.getResultEmbedded(number));
+        console.log('Result clicked ' + number);
+        this.loadVideoCallback(this.getResultEmbedded(number));
     }
     
     getResultEmbeddedSpecificSize(number, height, width) {

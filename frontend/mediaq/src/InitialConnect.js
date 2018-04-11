@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import { Jumbotron, Button, Container } from 'reactstrap';
+import LoginScreen from './LoginScreen.js'
 
 class InitialConnect extends Component {
     constructor(props) {
         super(props);
-
-        this.callback = props.loggedInCallback;
+        
+        this.setDisplayNameCallback = this.props.setDisplayNameCallback;
         this.socket = props.socket;
 
         this.state = {
-
+            displayLoginScreen: false,
+            userAction: ''
         };
 
         this.createQueue = this.createQueue.bind(this);
@@ -24,33 +26,28 @@ class InitialConnect extends Component {
     }
 
     createQueue() {
-        // var request = new XMLHttpRequest();
-        // request.onreadystatechange = () => {
-        //     if (request.readyState == 4 && request.status == 200) {
-        //         console.log(request.responseText);
-        //     }
-        // }
-        // request.open("GET", "/create", true);
-
-        // // send null since it's a GET request
-        // request.send(null);
+        this.setState({
+            displayLoginScreen: true,
+            userAction: 'Create a new queue'
+        });
         this.socket.emit('create', {data: ''});
     }
 
     joinQueue() {
-        // var request = new XMLHttpRequest();
-        // request.onreadystatechange = () => {
-        //     if (request.readyState == 4 && request.status == 200) {
-        //         console.log(request.responseText);
-        //     }
-        // }
-        // var requestString = "/join";
-        // requestString += "?" + "queueid=" + 1;
-        // request.open("GET", requestString, true);
-
-        // // send null since it's a GET request
-        // request.send(null);
+        this.setState({
+            displayLoginScreen: true,
+            userAction: 'Join an existing queue'
+        });
         this.socket.emit('join', {data: ''});
+    }
+    
+    hideLoginAndCallParentCallback = (displayName, qID) => {
+        this.setState({
+            displayLoginScreen: false,
+            userAction: ''
+        });
+        this.setDisplayNameCallback(displayName, qID);
+        
     }
 
     render() {
@@ -71,6 +68,9 @@ class InitialConnect extends Component {
                         </Container>
                     </Jumbotron>
                 </Container>
+                {this.state.displayLoginScreen && <LoginScreen 
+                                                    userAction={this.state.userAction}
+                                                    hideLoginAndCallParentCallback={this.hideLoginAndCallParentCallback} />}
             </div>
             );
     }
