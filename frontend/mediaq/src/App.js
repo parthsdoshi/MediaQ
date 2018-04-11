@@ -37,9 +37,29 @@ class App extends Component {
     }
     
     setDisplayNameCallback(displayName, qID) {
+        if(displayName === '') { //user canceled login screen
+            this.setState({
+                loggedIn: false,
+                displayName: '',
+                qID: ''
+            });
+            return;
+        }
+
+        if(qID === '') { // create queue selected
+            this.setState({
+                loggedIn: true,
+                displayName: displayName
+            });
+            return;
+        }
+        
+        // join queue selected
         this.setState({
-            displayName: displayName,
-            qID: qID});
+                loggedIn: true,
+                displayName: displayName,
+                qID: qID
+        });
     }
 
 
@@ -80,7 +100,6 @@ class App extends Component {
                                     <Container>
                                         <Queue />
                                     </Container>
-                                    <Search />
                                 </div>
                             }
                         </div>

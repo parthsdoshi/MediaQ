@@ -192,7 +192,7 @@ class Search extends Component {
         <Container>
         <Row>
         <Col sm={{ size: 'auto', offset: 3 }}>
-            <input type="text" onKeyPress={this.handleKeyboardKeyPress} onChange={this.handleChange} value={this.state.value}/>
+            <input type="text" onKeyPress={this.handleKeyboardKeyPress} onChange={this.handleChange} />
         </Col>
         <Col sm={{ size: 'auto', offset: 0 }}>
             <Button onClick={this.handleSearchButtonPress} color="primary">Search</Button>{' '}

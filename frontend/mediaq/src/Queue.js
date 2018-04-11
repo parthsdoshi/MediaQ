@@ -14,31 +14,21 @@ class Queue extends Component {
             modal: false,
             video: ''
         };
-                
-        this.searchModelToggle = this.searchModelToggle.bind(this);
-        this.loadVideoCallback = this.loadVideoCallback.bind(this);
-
     }
     
-    searchModelToggle() {
+    searchModelToggle = () => {
         this.setState({
             modal: !this.state.modal
         });
     }
     
-    loadVideoCallback(videoObject) {
+    loadVideoCallback = (videoObject) => {
         this.setState({
             modal: false,
             video: videoObject
         });
     }
     
-    setDisplayName(displayName) {
-        this.setState({
-            displayName: displayName
-        });
-    }
-
     render() {
         return (
             <div>
