@@ -40,7 +40,7 @@ class InitialConnect extends Component {
 
     hideLoginAndCallParentCallback = (displayName, qID) => {
         if (this.state.userAction === 'Create a new queue') {
-            this.socket.emit('create', {data: ''});
+            this.socket.emit('create', {data: ['hi', 'hello']});
             console.log('told server to create');
             this.setDisplayNameCallback(displayName);
         } else {
