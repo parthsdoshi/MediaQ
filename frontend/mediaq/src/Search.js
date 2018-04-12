@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { loadYoutubeAPI, executeSearch } from './google_utils';
 import { Media, Button, Container, Row, Col } from 'reactstrap';
-import YouTube from 'react-youtube';
+import { RowData } from './QueueRowEntry.js'
 
 class Search extends Component {
 
@@ -13,9 +13,7 @@ class Search extends Component {
             spotifyResults: {},
             youtubeSearchReady: false,
             youtubeReady: false,
-            searchBoxTextValue: '',
-            defaultWidth: 640,
-            defaultHeight: 390
+            searchBoxTextValue: ''
         }
 
         this.loadVideoCallback = this.props.loadVideoCallback;
@@ -44,6 +42,20 @@ class Search extends Component {
         }
 
     }
+    
+    getResultData = (number) => {
+        var result = new RowData(this.getResultID(number),
+                                    this.getResultTitle(number),
+                                    this.getResultAuthor(number),
+                                    ' - ',
+                                    'YouTube',
+                                    this.getResultThumbnailUrl(number));
+        return result;
+    }
+
+    addToPlaylist = (number) => {
+        this.loadVideoCallback(this.getResultData(number));
+    }
 
     getResultTitle = (number) => {
         if (this.state.youtubeSearchReady && 
@@ -54,6 +66,15 @@ class Search extends Component {
         return null;
     }
 
+    getResultAuthor = (number) => {
+        if (this.state.youtubeSearchReady && 
+            this.state.youtubeResults.items.length > number) {
+            return this.state.youtubeResults.items[number].snippet.channelTitle
+        }
+        console.log('getResultAuthor was called before search results were ready or called with out of bounds element');
+        return null;
+    }
+    
     getResultThumbnailUrl = (number) => {
         if (this.state.youtubeSearchReady && 
             this.state.youtubeResults.items.length > number) {
@@ -82,36 +103,6 @@ class Search extends Component {
 
     logVideoEnd = () => {
         console.log('Your video ended');
-    }
-
-    addToPlaylist = (number) => {
-        console.log('Result clicked ' + number);
-        this.loadVideoCallback(this.getResultEmbedded(number));
-    }
-
-    getResultEmbeddedSpecificSize = (number, height, width) => {
-        if (this.state.youtubeSearchReady && 
-            this.state.youtubeResults.items.length > number) {
-            const opts = {
-                height: height,
-                width: width,
-                playerVars: { // https://developers.google.com/youtube/player_parameters
-                    autoplay: 1,
-                    rel: 0,
-                }
-            };
-            return (<YouTube videoId={this.getResultID(number)}
-                            opts={opts}
-                            onReady={this._onReady}
-                            onEnd={this.logVideoEnd}/>);
-        }
-        console.log('getResultEmbeddedSpecificSize was called before search results were ready or called with out of bounds element');
-        return null;
-    }
-
-    getResultEmbedded = (number) => {
-        return this.getResultEmbeddedSpecificSize(number, 
-            this.state.defaultHeight, this.state.defaultWidth);
     }
 
     getResultMedia = (number) => {
@@ -149,16 +140,6 @@ handleSearchButtonPress = (target) => {
 handleMoreResultsButtonPress = (target) => {
     this.numberOfResults += 5;
     this.handleSearchButtonPress(target);
-}
-
-handlePlusButtonPress = (target) => {
-    this.setState({defaultHeight: this.state.defaultHeight + 50});
-    this.setState({defaultWidth: this.state.defaultWidth + 50});
-}
-
-handleMinusButtonPress = (target) => {
-    this.setState({defaultHeight: this.state.defaultHeight - 50});
-    this.setState({defaultWidth: this.state.defaultWidth - 50});
 }
 
 handleKeyboardKeyPress = (target) => {

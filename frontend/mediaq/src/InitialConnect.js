@@ -55,14 +55,14 @@ class InitialConnect extends Component {
             return;
         }
         if (this.state.userAction === 'Create a new queue') {
-            this.socket.emit('create', {data: ['hi', 'hello']});
+            this.socket.emit('create', {data: displayName});
             this.setDisplayNameCallback(displayName);
             this.setState({
                 displayLoginScreen: false,
                 userAction: ''
             });
         } else {
-            this.socket.emit('join', {data: ''});
+            this.socket.emit('join', {data: [displayName, qID]});
             this.setDisplayNameCallback(displayName);
             this.setQIDCallback(qID);
             this.setState({

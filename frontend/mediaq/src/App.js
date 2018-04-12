@@ -11,7 +11,7 @@ class App extends Component {
         super(props)
 
         this.state = {
-            loggedIn: false,
+            loggedIn: true,
             connectionEstablished: false,
             displayName: '',
             qID: ''
@@ -86,7 +86,7 @@ class App extends Component {
                         {this.state.loggedIn &&
                         <div>
                             <Container>
-                                <Queue />
+                                <Queue socket={this.socket} />
                             </Container>
                         </div>
                         }

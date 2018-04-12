@@ -4,7 +4,8 @@ import Search from './Search';
 import PauseIcon from 'open-iconic/svg/media-pause.svg';
 import PlayIcon from 'open-iconic/svg/media-play.svg';
 import PlusIcon from 'open-iconic/svg/plus.svg';
-import QueueRowEntry from './QueueRowEntry';
+import QueueRowEntry, { RowData } from './QueueRowEntry';
+import { getEmbededVideoComponent } from './google_utils';
 
 class Queue extends Component {
 
@@ -13,36 +14,59 @@ class Queue extends Component {
     constructor(props) {
         super(props);
 
+        this.socket = props.socket;
+
         this.state = {
             searchBoxText: '',
-            modal: false,
-            tableRows: [],
+            addNewSongmodal: false,
+            QueueRowEntries: [],
+            currentlyPlayingIndex: 0, //0 means no video is playing
             video: ''
         };
     }
 
     searchModalToggle = () => {
         this.setState({
-            modal: !this.state.modal
+            addNewSongmodal: !this.state.addNewSongmodal
         });
     }
 
-    loadVideoCallback = (videoObject) => {
-        this.setState({
-            modal: false,
-            video: videoObject
-        });
-    }
     
     insertTableEntry = (tableEntry) => {
-        this.state.tableRows.push(tableEntry);
+        this.state.QueueRowEntries.push(tableEntry);
+    }
+
+    loadVideoCallback = (rowData) => {
+        console.log(rowData);
+        this.socket.emit('addToQueue', {data: rowData});
+        this.setState({
+            addNewSongmodal: false
+        });
+        //todo remove this once server response is added
+        this.insertTableEntry(rowData);
+    }
+    
+    rowEntryPlayButtonClicked = (entryNumber) => {
+        this.setState({
+            currentlyPlayingIndex: entryNumber
+        });
     }
 
     render() {
+        var QueueRowEntries = []
+        for(var i = 0; i < this.state.QueueRowEntries.length; i++) {
+            QueueRowEntries.push(
+                <QueueRowEntry 
+                entryNumber={i+1} 
+                rowData={this.state.QueueRowEntries[i]}
+                currentlyPlayingIndex={this.state.currentlyPlayingIndex}
+                rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked} />
+            );
+        }
         return (
             <div>
                 <Modal size='lg' 
-                    isOpen={this.state.modal} 
+                    isOpen={this.state.addNewSongmodal} 
                     toggle={this.toggle} 
                     className={this.props.className}>
                     <ModalHeader toggle={this.searchModalToggle}>
@@ -75,33 +99,11 @@ class Queue extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>
-                                <Button onClick={this.searchModelToggle} color="primary">
-                                    <img alt="pause" src={PauseIcon} />
-                                </Button>
-                            </td>
-                            <td>In the end</td>
-                            <td>Linkin Park</td>
-                            <td>Album</td>
-                            <td>Youtube</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>
-                                <Button onClick={this.searchModalToggle} color="primary">
-                                    <img alt="play" src={PlayIcon} />
-                                </Button>
-                            </td>
-                            <td>asdfasdfasdf</td>
-                            <td>Linkin Park</td>
-                            <td>Album</td>
-                            <td>Youtube</td>
-                        </tr>
+                    {QueueRowEntries}
                     </tbody>
                 </Table>
-                {this.state.video !== '' && this.state.video}
+                {this.state.currentlyPlayingIndex !== 0 && 
+                    getEmbededVideoComponent(this.state.QueueRowEntries[this.state.currentlyPlayingIndex-1].id)}
             </div>
             );
     }

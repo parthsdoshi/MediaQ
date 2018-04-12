@@ -1,3 +1,6 @@
+import React from 'react';
+import YouTube from 'react-youtube';
+
 /* global gapi */
 // above tells compiler that gapi is global
 
@@ -13,6 +16,19 @@ export function initClient() {
     });
 }
 
+export function getEmbededVideoComponent(id, width=640, height=390) {
+    const opts = {
+        height: height,
+        width: width,
+        playerVars: { // https://developers.google.com/youtube/player_parameters
+            autoplay: 1,
+            rel: 0,
+        }
+    };
+    return (<YouTube videoId={id}
+                    opts={opts} />);
+}
+
 export function loadYoutubeAPI(youtubeCallback) {
 
     const script = document.createElement("script");
@@ -22,7 +38,6 @@ export function loadYoutubeAPI(youtubeCallback) {
         gapi.load('client', () => {
             gapi.load('client:auth2', initClient);
             gapi.client.load('youtube', 'v3', () => {
-                // this.setState({ gapiReady: true });
                 youtubeCallback()
             });
         });
