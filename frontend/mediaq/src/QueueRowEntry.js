@@ -3,7 +3,7 @@ import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'react
 import PauseIcon from 'open-iconic/svg/media-pause.svg';
 import PlayIcon from 'open-iconic/svg/media-play.svg';
 import BufferIcon from 'open-iconic/svg/aperture.svg';
-
+import MediaPlayPauseButton from './MediaPlayPauseButton.js';
 
 import Search from './Search'
 
@@ -23,52 +23,28 @@ class QueueRowEntry extends Component {
     constructor(props) {
         super(props);
         
-        //this.props.entryNumber;
+        //this.props.rowID;
         //this.props.rowData;
         //this.props.currentlyPlayingIndex
         //this.props.playState
         //this.props.rowEntryPlayButtonClicked;
     }
     
-    playButtonClicked = () => {
-        this.props.rowEntryPlayButtonClicked(this.props.entryNumber);
+    playButtonClicked = (buttonID) => {
+        //buttonID is the same as this.props.rowID in this case
+        this.props.rowEntryPlayButtonClicked(this.props.rowID);
     }
 
     render() {
-        var img_alt = '';
-        var src = null;
-        var color = '';
-        if (this.props.currentlyPlayingIndex !== this.props.entryNumber) { //not current video
-            img_alt = 'play';
-            src = PlayIcon;
-            color = 'primary';
-        } else {
-            if (this.props.playState === 1) { //playing -> show pause icon
-                img_alt = 'pause';
-                src = PauseIcon;
-                color = 'warning';
-            } else if (this.props.playState === 2) { //paused -> show play icon
-                img_alt = 'play';
-                src = PlayIcon;
-                color = 'primary';
-            } else if (this.props.playState === 3) { //buffering
-                img_alt = 'buffer';
-                src = BufferIcon;
-                color = 'danger';
-            } else { //-1 unstarted || 0 ended || 5 video cued ??? just show buffer
-                img_alt = 'buffer';
-                src = BufferIcon;
-                color = 'danger';
-            }
-        }
+        // if video is not currently selected video then show play icon because video is paused.
+        var buttonState = this.props.currentlyPlayingIndex !== this.props.rowID ? 2 : this.props.playState;
         return (
             <tr>
-                <th scope="row">{this.props.entryNumber + ':'}</th>
+                <th scope="row">{this.props.rowID + ':'}</th>
                 <td>
-                    <Button onClick={this.playButtonClicked} color={color}>
-                        <img alt={img_alt} 
-                            src={src} />
-                    </Button>
+                    <MediaPlayPauseButton buttonClickedCallback={this.playButtonClicked}
+                                            buttonID={this.props.rowID}
+                                            playState={buttonState}/>
                 </td>
                 <td>{this.props.rowData.title}</td>
                 <td>{this.props.rowData.author}</td>

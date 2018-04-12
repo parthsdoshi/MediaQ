@@ -12,7 +12,7 @@ class App extends Component {
         super(props)
 
         this.state = {
-            loggedIn: true,
+            loggedIn: false,
             connectionEstablished: false,
             displayName: '',
             qID: ''
@@ -93,8 +93,8 @@ class App extends Component {
                         }
                     </div>
                     }
-                <Footer />
                 </div>
+                <Footer />
             </div>
             );
     }

@@ -101,7 +101,7 @@ class Queue extends Component {
         for(var i = 0; i < this.state.QueueRowEntries.length; i++) {
             QueueRowEntries.push(
                 <QueueRowEntry 
-                entryNumber={i+1} 
+                rowID={i+1} 
                 rowData={this.state.QueueRowEntries[i]}
                 playState={this.state.playState}
                 currentlyPlayingIndex={this.state.currentlyPlayingIndex}

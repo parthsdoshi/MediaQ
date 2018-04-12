@@ -16,6 +16,7 @@ import {
 import PopupModal from './PopupModal';
 import PauseIcon from 'open-iconic/svg/media-pause.svg';
 import PlayIcon from 'open-iconic/svg/media-play.svg';
+import MediaPlayPauseButton from './MediaPlayPauseButton.js';
 
 class Header extends Component {
     constructor(props) {
@@ -42,13 +43,13 @@ class Header extends Component {
             position: "fixed",
             left: "0",
             bottom: "0",
-            height: "120px",
+            height: "60px",
             width: "100%",
         }
 
         var phantom = {
           display: 'block',
-          padding: '20px',
+          padding: '0px',
           height: '60px',
           width: '100%',
         }
@@ -62,29 +63,7 @@ class Header extends Component {
                             <Collapse isOpen={this.state.isOpen} navbar>
                                 <Nav className="mx-auto" navbar>
                                     <NavItem>
-                                        <Button onClick={this.toggle} color="warning">
-                                            <img alt="Add to Queue" src={PlayIcon} />
-                                        </Button>
-                                    </NavItem>
-                                    <NavItem>
-                                        <Button onClick={this.toggle} color="primary">
-                                            <img alt="Add to Queue" src={PlayIcon} />
-                                        </Button>
-                                    </NavItem>
-                                    <NavItem>
-                                        <Button onClick={this.toggle} color="primary">
-                                            <img alt="Add to Queue" src={PlayIcon} />
-                                        </Button>
-                                    </NavItem>
-                                    <NavItem>
-                                        <Button onClick={this.toggle} color="danger">
-                                            <img alt="Add to Queue" src={PlayIcon} />
-                                        </Button>
-                                    </NavItem>
-                                    <NavItem>
-                                        <Button onClick={this.toggle} color="primary">
-                                            <img alt="Add to Queue" src={PlayIcon} />
-                                        </Button>
+                                        <MediaPlayPauseButton playState={3} />
                                     </NavItem>
                                 </Nav>
                             </Collapse>
