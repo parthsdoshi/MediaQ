@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Search from './Search';
-import PauseIcon from 'open-iconic/svg/media-pause.svg';
-import PlayIcon from 'open-iconic/svg/media-play.svg';
 import PlusIcon from 'open-iconic/svg/plus.svg';
-import QueueRowEntry, { RowData } from './QueueRowEntry';
+import QueueRowEntry from './QueueRowEntry';
 import { getEmbededVideoComponent } from './google_utils';
 
 class Queue extends Component {
