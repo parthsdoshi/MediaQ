@@ -36,16 +36,18 @@ class Queue extends Component {
             currentlyPlayingYoutubeVideoObject: event.target
         });
     }
-    
-    setYoutubeVideoObjectAPICallback = (event) => {
-        this.setState({
-            currentlyPlayingYoutubeVideoObject: event.target
-        });
-    }
 
     youtubeVideoStateChangedAPICallback = (event) => {
-        //youtubeAPI: 1->playing   2->paused   3->buffering
+        //youtubeAPI: 0->ended 1->playing   2->paused   3->buffering
         var youtubeState = this.state.currentlyPlayingYoutubeVideoObject.getPlayerState();
+        if (youtubeState === 0) { // ended
+            this.setState({
+                playState: this.paused
+            });
+            this.setState(prevState => ({
+                currentlyPlayingIndex: (((prevState.currentlyPlayingIndex) + 1)%(prevState.QueueRowEntries.length + 1))
+            }))
+        }
         if (this.state.playState !== this.playing && youtubeState === this.playing) { // playing
             this.setState({
                 playState: this.playing
