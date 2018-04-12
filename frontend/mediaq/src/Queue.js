@@ -21,19 +21,21 @@ class Queue extends Component {
             addNewSongmodal: false,
             QueueRowEntries: [],
             currentlyPlayingIndex: 0, //0 means no video is playing
-            video: ''
+            currentlyPlayingYoutubeVideoObject: null,
+            playState: 0
         };
+    }
+    
+    setYoutubeVideoObjectAPICallback = (event) => {
+        this.setState({
+            currentlyPlayingYoutubeVideoObject: event.target
+        });
     }
 
     searchModalToggle = () => {
         this.setState({
             addNewSongmodal: !this.state.addNewSongmodal
         });
-    }
-
-    
-    insertTableEntry = (tableEntry) => {
-        this.state.QueueRowEntries.push(tableEntry);
     }
 
     loadVideoCallback = (rowData) => {
@@ -43,13 +45,41 @@ class Queue extends Component {
             addNewSongmodal: false
         });
         //todo remove this once server response is added
-        this.insertTableEntry(rowData);
+        this.setState(prevState => ({
+            QueueRowEntries: [...prevState.QueueRowEntries, rowData]
+        }))
     }
     
     rowEntryPlayButtonClicked = (entryNumber) => {
-        this.setState({
-            currentlyPlayingIndex: entryNumber
-        });
+        if (entryNumber !== this.state.currentlyPlayingIndex) {
+            this.setState({
+                currentlyPlayingIndex: entryNumber,
+                playState: 1
+            });
+        } else {
+            if (this.state.playState == 0) {
+                this.updatePlayState(1);
+                this.setState({
+                    playState: 1
+                });
+            } else if (this.state.playState == 1) {
+                this.updatePlayState(0);
+                this.setState({
+                    playState: 0
+                });
+            }
+        }
+    }
+    
+    updatePlayState = (newPlayState) => {
+        console.log(newPlayState);
+        if (newPlayState == 0) {
+            console.log('pausing');
+            this.state.currentlyPlayingYoutubeVideoObject.pauseVideo();
+        } else if (newPlayState == 1) {
+            console.log('playing');
+            this.state.currentlyPlayingYoutubeVideoObject.playVideo();
+        }
     }
 
     render() {
@@ -59,6 +89,7 @@ class Queue extends Component {
                 <QueueRowEntry 
                 entryNumber={i+1} 
                 rowData={this.state.QueueRowEntries[i]}
+                playState={this.state.playState}
                 currentlyPlayingIndex={this.state.currentlyPlayingIndex}
                 rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked} />
             );
@@ -85,8 +116,8 @@ class Queue extends Component {
                 <Table hover>
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Play/Pause</th>
+                            <th></th>
+                            <th></th>
                             <th>Title</th>
                             <th>Author/Artist</th>
                             <th>Album</th>
@@ -103,7 +134,11 @@ class Queue extends Component {
                     </tbody>
                 </Table>
                 {this.state.currentlyPlayingIndex !== 0 && 
-                    getEmbededVideoComponent(this.state.QueueRowEntries[this.state.currentlyPlayingIndex-1].id)}
+                    getEmbededVideoComponent(this.state.QueueRowEntries[this.state.currentlyPlayingIndex-1].id, 
+                                            this.setYoutubeVideoObjectAPICallback,
+                                            640,
+                                            390,
+                                            true)}
             </div>
             );
     }

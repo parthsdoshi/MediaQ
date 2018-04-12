@@ -16,21 +16,24 @@ export function initClient() {
     });
 }
 
-export function getEmbededVideoComponent(id, width=640, height=390) {
+export function getEmbededVideoComponent(id, onReady, width=640, height=390, disableControls=false) {
     const opts = {
         height: height,
         width: width,
         playerVars: { // https://developers.google.com/youtube/player_parameters
             autoplay: 1,
             rel: 0,
+            showinfo: 0,
+            controls: 0,
+            disablekb: 1,
         }
     };
     return (<YouTube videoId={id}
-                    opts={opts} />);
+                    opts={opts}
+                    onReady={onReady} />);
 }
 
 export function loadYoutubeAPI(youtubeCallback) {
-
     const script = document.createElement("script");
     script.src = "https://apis.google.com/js/api.js";
 

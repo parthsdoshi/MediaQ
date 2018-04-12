@@ -24,7 +24,7 @@ class QueueRowEntry extends Component {
         //this.props.entryNumber;
         //this.props.rowData;
         //this.props.currentlyPlayingIndex
-        
+        //this.props.playState
         //this.props.rowEntryPlayButtonClicked;
     }
     
@@ -35,11 +35,11 @@ class QueueRowEntry extends Component {
     render() {
         return (
             <tr>
-                <th scope="row">{this.props.entryNumber}</th>
+                <th scope="row">{this.props.entryNumber + ':'}</th>
                 <td>
                     <Button onClick={this.playButtonClicked} color="primary">
-                        <img alt={this.props.currentlyPlayingIndex == this.props.entryNumber ? 'pause' : 'play'} 
-                            src={this.props.currentlyPlayingIndex == this.props.entryNumber ? PauseIcon : PlayIcon} />
+                        <img alt={this.props.currentlyPlayingIndex == this.props.entryNumber && this.props.playState === 1 ? 'pause' : 'play'} 
+                            src={this.props.currentlyPlayingIndex == this.props.entryNumber && this.props.playState === 1 ? PauseIcon : PlayIcon} />
                     </Button>
                 </td>
                 <td>{this.props.rowData.title}</td>
