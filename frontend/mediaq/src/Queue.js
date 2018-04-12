@@ -31,6 +31,25 @@ class Queue extends Component {
             currentlyPlayingYoutubeVideoObject: event.target
         });
     }
+    
+    setYoutubeVideoObjectAPICallback = (event) => {
+        this.setState({
+            currentlyPlayingYoutubeVideoObject: event.target
+        });
+    }
+
+    youtubeVideoStateChangedAPICallback = (event) => {
+        if (this.state.currentlyPlayingYoutubeVideoObject.getPlayerState() === 1) { // playing
+            this.setState({
+                playState: 1
+            });
+        }
+        if (this.state.currentlyPlayingYoutubeVideoObject.getPlayerState() === 2) { // paused
+            this.setState({
+                playState: 0
+            });
+        }
+    }
 
     searchModalToggle = () => {
         this.setState({
@@ -53,35 +72,17 @@ class Queue extends Component {
     rowEntryPlayButtonClicked = (entryNumber) => {
         if (entryNumber !== this.state.currentlyPlayingIndex) {
             this.setState({
-                currentlyPlayingIndex: entryNumber,
-                playState: 1
+                currentlyPlayingIndex: entryNumber
             });
         } else {
             if (this.state.playState == 0) {
-                this.updatePlayState(1);
-                this.setState({
-                    playState: 1
-                });
+                this.state.currentlyPlayingYoutubeVideoObject.playVideo();
             } else if (this.state.playState == 1) {
-                this.updatePlayState(0);
-                this.setState({
-                    playState: 0
-                });
+                this.state.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }
     }
     
-    updatePlayState = (newPlayState) => {
-        console.log(newPlayState);
-        if (newPlayState == 0) {
-            console.log('pausing');
-            this.state.currentlyPlayingYoutubeVideoObject.pauseVideo();
-        } else if (newPlayState == 1) {
-            console.log('playing');
-            this.state.currentlyPlayingYoutubeVideoObject.playVideo();
-        }
-    }
-
     render() {
         var QueueRowEntries = []
         for(var i = 0; i < this.state.QueueRowEntries.length; i++) {
@@ -136,6 +137,7 @@ class Queue extends Component {
                 {this.state.currentlyPlayingIndex !== 0 && 
                     getEmbededVideoComponent(this.state.QueueRowEntries[this.state.currentlyPlayingIndex-1].id, 
                                             this.setYoutubeVideoObjectAPICallback,
+                                            this.youtubeVideoStateChangedAPICallback,
                                             640,
                                             390,
                                             true)}

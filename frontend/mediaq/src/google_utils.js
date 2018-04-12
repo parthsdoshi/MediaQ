@@ -16,7 +16,7 @@ export function initClient() {
     });
 }
 
-export function getEmbededVideoComponent(id, onReady, width=640, height=390, disableControls=false) {
+export function getEmbededVideoComponent(id, onReady, onStateChange, width=640, height=390, disableControls=false) {
     const opts = {
         height: height,
         width: width,
@@ -26,11 +26,13 @@ export function getEmbededVideoComponent(id, onReady, width=640, height=390, dis
             showinfo: 0,
             controls: 0,
             disablekb: 1,
+            modestbranding: 1,
         }
     };
     return (<YouTube videoId={id}
                     opts={opts}
-                    onReady={onReady} />);
+                    onReady={onReady}
+                    onStateChange={onStateChange}/>);
 }
 
 export function loadYoutubeAPI(youtubeCallback) {
