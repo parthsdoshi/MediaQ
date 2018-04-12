@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import PauseIcon from 'open-iconic/svg/media-pause.svg';
 import PlayIcon from 'open-iconic/svg/media-play.svg';
+import BufferIcon from 'open-iconic/svg/aperture.svg';
+
 
 import Search from './Search'
 
@@ -33,13 +35,33 @@ class QueueRowEntry extends Component {
     }
 
     render() {
+        var img_alt = '';
+        var src = null;
+        if (this.props.currentlyPlayingIndex !== this.props.entryNumber) { //not current video
+            img_alt = 'play';
+            src = PlayIcon;
+        } else {
+            if (this.props.playState === 1) { //playing -> show pause icon
+                img_alt = 'pause';
+                src = PauseIcon;
+            } else if (this.props.playState === 2) { //paused -> show play icon
+                img_alt = 'play';
+                src = PlayIcon;
+            } else if (this.props.playState === 3) { //buffering
+                img_alt = 'buffer';
+                src = BufferIcon;
+            } else { //-1 unstarted || 0 ended || 5 video cued ??? just show buffer
+                img_alt = 'buffer';
+                src = BufferIcon;
+            }
+        }
         return (
             <tr>
                 <th scope="row">{this.props.entryNumber + ':'}</th>
                 <td>
                     <Button onClick={this.playButtonClicked} color="primary">
-                        <img alt={this.props.currentlyPlayingIndex == this.props.entryNumber && this.props.playState === 1 ? 'pause' : 'play'} 
-                            src={this.props.currentlyPlayingIndex == this.props.entryNumber && this.props.playState === 1 ? PauseIcon : PlayIcon} />
+                        <img alt={img_alt} 
+                            src={src} />
                     </Button>
                 </td>
                 <td>{this.props.rowData.title}</td>

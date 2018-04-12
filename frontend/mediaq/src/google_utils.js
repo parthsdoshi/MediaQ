@@ -16,7 +16,7 @@ export function initClient() {
     });
 }
 
-export function getEmbededVideoComponent(id, onReady, onStateChange, width=640, height=390, disableControls=false) {
+export function getEmbededVideoComponent(id, onReady, onStateChange, width=640, height=390) {
     const opts = {
         height: height,
         width: width,
@@ -24,9 +24,9 @@ export function getEmbededVideoComponent(id, onReady, onStateChange, width=640, 
             autoplay: 1,
             rel: 0,
             showinfo: 0,
-            controls: 0,
-            disablekb: 1,
-            modestbranding: 1,
+//            controls: 0,
+//            disablekb: 1,
+            modestbranding: 0,
         }
     };
     return (<YouTube videoId={id}

@@ -10,11 +10,16 @@ import { getEmbededVideoComponent } from './google_utils';
 class Queue extends Component {
 
     // contact server in this component to grab queue
-
+    
     constructor(props) {
         super(props);
 
         this.socket = props.socket;
+        
+        this.playing = 1;
+        this.paused = 2;
+        this.buffering = 3;
+        
 
         this.state = {
             searchBoxText: '',
@@ -22,7 +27,7 @@ class Queue extends Component {
             QueueRowEntries: [],
             currentlyPlayingIndex: 0, //0 means no video is playing
             currentlyPlayingYoutubeVideoObject: null,
-            playState: 0
+            playState: this.paused
         };
     }
     
@@ -39,14 +44,21 @@ class Queue extends Component {
     }
 
     youtubeVideoStateChangedAPICallback = (event) => {
-        if (this.state.currentlyPlayingYoutubeVideoObject.getPlayerState() === 1) { // playing
+        //youtubeAPI: 1->playing   2->paused   3->buffering
+        var youtubeState = this.state.currentlyPlayingYoutubeVideoObject.getPlayerState();
+        if (this.state.playState !== this.playing && youtubeState === this.playing) { // playing
             this.setState({
-                playState: 1
+                playState: this.playing
             });
         }
-        if (this.state.currentlyPlayingYoutubeVideoObject.getPlayerState() === 2) { // paused
+        if (this.state.playState !== this.paused && youtubeState === this.paused) { // paused
             this.setState({
-                playState: 0
+                playState: this.paused
+            });
+        }
+        if (this.state.playState !== this.buffering && youtubeState === this.buffering) { // buffering
+            this.setState({
+                playState: this.buffering
             });
         }
     }
@@ -75,9 +87,9 @@ class Queue extends Component {
                 currentlyPlayingIndex: entryNumber
             });
         } else {
-            if (this.state.playState == 0) {
+            if (this.state.playState === this.paused) {
                 this.state.currentlyPlayingYoutubeVideoObject.playVideo();
-            } else if (this.state.playState == 1) {
+            } else if (this.state.playState === this.playing || this.state.playState === this.buffering) {
                 this.state.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }
@@ -139,8 +151,7 @@ class Queue extends Component {
                                             this.setYoutubeVideoObjectAPICallback,
                                             this.youtubeVideoStateChangedAPICallback,
                                             640,
-                                            390,
-                                            true)}
+                                            390)}
             </div>
             );
     }
