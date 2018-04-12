@@ -5,6 +5,7 @@ import io from 'socket.io-client'
 import Header from './Header';
 import InitialConnect from './InitialConnect';
 import Queue from './Queue';
+import Footer from './Footer';
 
 class App extends Component {
     constructor(props) {
@@ -92,6 +93,7 @@ class App extends Component {
                         }
                     </div>
                     }
+                <Footer />
                 </div>
             </div>
             );

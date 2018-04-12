@@ -9,22 +9,30 @@ class Search extends Component {
         super(props)
 
         this.state = {
-            youtubeResults: {},
-            spotifyResults: {},
+            youtubeResults: null,
+            spotifyResults: null,
             youtubeSearchReady: false,
-            youtubeReady: false,
+            youtubeReady: (Search.APIHasLoaded === true ? true : false),
             searchBoxTextValue: ''
         }
 
         this.loadVideoCallback = this.props.loadVideoCallback;
 
         this.numberOfResults = 5
-
-        loadYoutubeAPI(this.youtubeCallback)
+        this.loadYoutubeAPIOnlyOnce();
+    }
+    
+    loadYoutubeAPIOnlyOnce = () => {
+        if ( Search.APIHasLoaded !== true ) {
+            loadYoutubeAPI(this.youtubeCallback);
+        } else {
+            console.log("Youtube API already loaded");
+        }
     }
 
     youtubeCallback = () => {
-        console.log("API loaded");
+        console.log("Youtube API loaded");
+        Search.APIHasLoaded = true; // to prevent further instances of this component from loading the API again
         this.setState({youtubeReady: true})
     }
 
@@ -38,6 +46,7 @@ class Search extends Component {
         if( this.state.youtubeReady ){
             executeSearch(searchTag, numberOfResults, this.youtubeSearchCallback);
         } else {
+            console.log('Youtube is not ready');
             return;
         }
 

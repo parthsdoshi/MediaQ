@@ -4,6 +4,7 @@ import Search from './Search';
 import PlusIcon from 'open-iconic/svg/plus.svg';
 import QueueRowEntry from './QueueRowEntry';
 import { getEmbededVideoComponent } from './google_utils';
+import AddNewMediaModal from './AddNewMediaModal.js';
 
 class Queue extends Component {
 
@@ -20,15 +21,14 @@ class Queue extends Component {
         
 
         this.state = {
-            searchBoxText: '',
-            addNewSongmodal: false,
+            showAddNewMediaModal: false,
             QueueRowEntries: [],
             currentlyPlayingIndex: 0, //0 means no video is playing
             currentlyPlayingYoutubeVideoObject: null,
             playState: this.paused
         };
     }
-    
+        
     setYoutubeVideoObjectAPICallback = (event) => {
         this.setState({
             currentlyPlayingYoutubeVideoObject: event.target
@@ -63,23 +63,24 @@ class Queue extends Component {
         }
     }
 
-    searchModalToggle = () => {
-        this.setState({
-            addNewSongmodal: !this.state.addNewSongmodal
-        });
-    }
-
     loadVideoCallback = (rowData) => {
         console.log(rowData);
         this.socket.emit('addToQueue', {data: rowData});
         this.setState({
-            addNewSongmodal: false
+            showAddNewMediaModal: false
         });
         //todo remove this once server response is added
         this.setState(prevState => ({
             QueueRowEntries: [...prevState.QueueRowEntries, rowData]
         }))
     }
+    
+    toggleAddNewMediaModal = () => {
+        this.setState({
+            showAddNewMediaModal: !this.state.showAddNewMediaModal
+        });
+    }
+
     
     rowEntryPlayButtonClicked = (entryNumber) => {
         if (entryNumber !== this.state.currentlyPlayingIndex) {
@@ -109,22 +110,8 @@ class Queue extends Component {
         }
         return (
             <div>
-                <Modal size='lg' 
-                    isOpen={this.state.addNewSongmodal} 
-                    toggle={this.toggle} 
-                    className={this.props.className}>
-                    <ModalHeader toggle={this.searchModalToggle}>
-                        Add a new song
-                    </ModalHeader>
-                    <ModalBody>
-                        <Search loadVideoCallback={this.loadVideoCallback}/>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="secondary" onClick={this.searchModalToggle}>
-                            Cancel
-                        </Button>
-                    </ModalFooter>
-                </Modal>
+                {this.state.showAddNewMediaModal && 
+                    <AddNewMediaModal loadVideoCallback={this.loadVideoCallback} hideMe={this.toggleAddNewMediaModal} />}
                 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
                 <Table hover>
                     <thead>
@@ -136,7 +123,7 @@ class Queue extends Component {
                             <th>Album</th>
                             <th>Source</th>
                             <th>
-                                <Button onClick={this.searchModalToggle} color="primary">
+                                <Button onClick={this.toggleAddNewMediaModal} color="primary">
                                     <img alt="Add to Queue" src={PlusIcon} />
                                 </Button>{' '}
                             </th>
