@@ -60,6 +60,10 @@ class App extends Component {
     }
     
     logoutRequestCallback = () => {
+        this.socket.emit('leave', {
+            'qID': this.state.qID,
+            'displayName': this.state.displayName
+        });
         localStorage.removeItem("qID");
         localStorage.removeItem("displayName");
         localStorage.removeItem('QueueRows');
@@ -68,7 +72,6 @@ class App extends Component {
             displayName: '',
             qID: ''
         };
-
     }
 
     render() {
@@ -108,7 +111,7 @@ class App extends Component {
                         {this.state.loggedIn &&
                         <div>
                             <Container>
-                                <Queue socket={this.socket} />
+                                <Queue socket={this.socket} qID={this.state.qID} />
                             </Container>
                         </div>
                         }

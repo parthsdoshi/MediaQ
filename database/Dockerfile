@@ -1,4 +1,4 @@
-# Use an official Python runtime as a parent image
+# Use an official Redis runtime as a parent image
 FROM redis:latest
 
 # Set the working directory to /app

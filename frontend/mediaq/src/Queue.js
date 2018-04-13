@@ -79,7 +79,10 @@ class Queue extends Component {
 
     loadVideoCallback = (rowData) => {
         console.log(rowData);
-        this.socket.emit('addToQueue', {'rowData': rowData});
+        this.socket.emit('addToQueue', {
+            'rowData': rowData,
+            'qID': this.props.qID
+        });
         this.setState({
             showAddNewMediaModal: false
         });

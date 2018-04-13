@@ -19,17 +19,6 @@ def serve(path):
         else:
             return send_from_directory('/build', 'index.html')
 
-def incr_id():
-    retries = 5
-    while True:
-        try:
-            return database.incr('id')
-        except redis.exceptions.ConnectionError as exc:
-            if retries == 0:
-                raise exc
-            retries -= 1
-            time.sleep(0.5)
-
 def get(key):
     retries = 5
     while True:
@@ -63,6 +52,10 @@ def set(key, value):
 
 @socketio.on('create')
 def handle_create(data):
+    print(data)
+
+    displayName = data['displayName']
+
     random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
 
     while(get(random_id) != None):
@@ -71,7 +64,12 @@ def handle_create(data):
     qID = random_id
     room = qID
 
-    queue_info = {'queue': []}
+    queue_info = {
+            'queue': [],
+            'connected_users': [{
+                'sid': request.sid,
+                'displayName': displayName}]
+            }
     set(qID, json.dumps(queue_info))
 
     join_room(room)
@@ -87,37 +85,60 @@ def handle_join(data):
     room = qID
     displayName = data['displayName']
 
-    queue_info = json.loads(get(qID))
-    print(queue_info)
+    queue_info = get(qID)
 
     if (queue_info == None):
         # TODO: change errco to be a dictionary to keep it consistent
         emit('join', 'ERRCO 1: ROOM DOES NOT EXIST')
         return
 
+    queue_info = json.loads(queue_info)
+    print(queue_info)
+
+    queue_info['connected_users'].append({
+        'sid': request.sid,
+        'displayName': displayName
+        })
+
+    set(qID, json.dumps(queue_info))
+
     join_room(room)
     emit('join', {'displayName': displayName}, room=room, include_self=False)
     emit('join', queue_info)
 
+
 @socketio.on('leave')
 def handle_leave(data):
     print(data)
-    room = data['qID']
+    qID = data['qID']
+    room = qID
     displayName = data['displayName']
+
+    queue_info = get(qID)
+    if (queue_info == None):
+        # TODO: change errco to be a dictionary to keep it consistent
+        emit('join', 'ERRCO 1: ROOM DOES NOT EXIST')
+        return
+
+    queue_info = json.loads(queue_info)
+
+    queue_info['connected_users'].remove({'sid': request.sid, 'displayName': displayName})
+
+    set(qID, json.dumps(queue_info))
+
     # include_self set to True because the website should wait till we've confirmed
     # that the user has been removed...
     emit('leave', {'displayName': displayName}, room=room, include_self=True)
-    leave_room(data['qID'])
+    leave_room(room)
+
 
 @socketio.on('addToQueue')
 def handle_add_to_queue(data):
     print(data)
-    room = ''
-    for val in rooms():
-        if (val != request.sid):
-            room = val
-            break
-    qID = room
+
+    # should probably check if the user exists in that qID
+    qID = data['qID']
+    room = qID
 
     # should probably add some error handling...
     queue_info = json.loads(get(qID))
@@ -126,6 +147,31 @@ def handle_add_to_queue(data):
 
     # should include_self be set to true here?
     emit('addToQueue', data['rowData'], room=room, include_self=True)
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    for room in rooms():
+        if (room != request.sid):
+            queue_info = json.loads(get(room))
+            for connected_user in queue_info['connected_users']:
+                if (connected_user['sid'] == request.sid):
+                    displayName = connected_user['displayName']
+                    emit('leave', {'displayName': displayName}, room=room, include_self=False)
+                    queue_info['connected_users'].remove(connected_user)
+
+            leave_room(room)
+
+
+# should probably not be used since the user already grabs current queue when they join
+@socketio.on('getQueueInfo')
+def handle_get_queue(data):
+    print(data)
+    qID = data['qID']
+    queue_info = json.loads(get(qID))
+    emit('getQueueInfo', queue_info['queue'])
+
+
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=80, debug=False)
