@@ -10,13 +10,23 @@ import Footer from './Footer';
 class App extends Component {
     constructor(props) {
         super(props)
-
-        this.state = {
-            loggedIn: false,
-            connectionEstablished: false,
-            displayName: '',
-            qID: ''
-        };
+        
+        var qIDInLocalstorage = localStorage.getItem('qID');        
+        if (qIDInLocalstorage !== null) {
+            this.state = {
+                loggedIn: true,
+                connectionEstablished: false,
+                displayName: localStorage.getItem('displayName'),
+                qID: qIDInLocalstorage
+            };
+        } else {
+            this.state = {
+                loggedIn: false,
+                connectionEstablished: false,
+                displayName: '',
+                qID: ''
+            };
+        }
 
     }
 
@@ -28,6 +38,7 @@ class App extends Component {
     }
 
     setDisplayNameCallback = (displayName) => {
+        localStorage.setItem('displayName', displayName);
         if(displayName === '') { //user canceled login screen
             return;
         }
@@ -37,6 +48,7 @@ class App extends Component {
     }
 
     setQIDCallback = (qID) => {
+        localStorage.setItem('qID', qID);
         this.setState({
             qID: qID
         });
@@ -46,9 +58,19 @@ class App extends Component {
         this.setState({
             loggedIn: true
         });
+        local
     }
+    
+    logoutRequestCallback = () => {
+        localStorage.removeItem("qID");
+        localStorage.removeItem("displayName");
+        this.setState = {
+            loggedIn: false,
+            displayName: '',
+            qID: ''
+        };
 
-
+    }
 
     render() {
         const paddingTopStyle = {
@@ -74,7 +96,7 @@ class App extends Component {
         // TODO: use Fade reactstrap component to make below look better if we have time
         return (
             <div className="App">
-                <Header displayName={this.state.displayName} qID={this.state.qID} />
+                <Header displayName={this.state.displayName} qID={this.state.qID} logoutRequestCallback={this.logoutRequestCallback} />
                 <div style={paddingTopStyle}>
                     {this.state.connectionEstablished &&
                     <div>

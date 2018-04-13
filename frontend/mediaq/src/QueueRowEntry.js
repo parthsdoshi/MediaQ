@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import PauseIcon from 'open-iconic/svg/media-pause.svg';
-import PlayIcon from 'open-iconic/svg/media-play.svg';
-import BufferIcon from 'open-iconic/svg/aperture.svg';
 import MediaPlayPauseButton from './MediaPlayPauseButton.js';
 
 import Search from './Search'

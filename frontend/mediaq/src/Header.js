@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
     Collapse,
+    Button,
     Navbar,
     NavbarToggler,
     NavbarBrand,
@@ -13,6 +14,7 @@ import {
     DropdownItem,
     Container} from 'reactstrap';
 import PopupModal from './PopupModal';
+import LogoutIcon from 'open-iconic/svg/account-logout.svg';
 
 class Header extends Component {
     constructor(props) {
@@ -22,6 +24,8 @@ class Header extends Component {
             isOpen: false,
             displayQIDModal: true
         };
+        
+        this.logoutRequestCallback = this.props.logoutRequestCallback;
     }
 
     toggle = () => {
@@ -29,8 +33,11 @@ class Header extends Component {
             isOpen: !this.state.isOpen
         });
     }
-
     render() {
+        var icon = {
+          width: '16px',
+          height: '16px'
+        }
         return (
             <div>
                 <Navbar color="light" light expand="md">
@@ -40,11 +47,18 @@ class Header extends Component {
                         <Collapse isOpen={this.state.isOpen} navbar>
                             <Nav className="ml-auto" navbar>
                                 <NavItem>
-                                    <NavLink href="">{this.props.qID}</NavLink>
+                                    <NavLink href="">{'Queue ID:' + this.props.qID}</NavLink>
                                 </NavItem>
                                 <NavItem>
                                     <NavLink href="">
-                                        {this.props.displayName}
+                                        {'Name:' + this.props.displayName}
+                                    </NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink href="">
+                                        <Button onClick={this.logoutRequestCallback} color="primary">
+                                            <img alt="Logout" src={LogoutIcon} style={icon} />
+                                        </Button>
                                     </NavLink>
                                 </NavItem>
                             </Nav>

@@ -6,6 +6,7 @@ import PopupModal from './PopupModal';
 class InitialConnect extends Component {
     constructor(props) {
         super(props);
+        console.log('initialconnect constructor called')
 
         this.setDisplayNameCallback = this.props.setDisplayNameCallback;
         this.setQIDCallback = this.props.setQIDCallback;

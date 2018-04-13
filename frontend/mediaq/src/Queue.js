@@ -12,7 +12,7 @@ class Queue extends Component {
     
     constructor(props) {
         super(props);
-
+        console.log('queue constructor called')
         this.socket = props.socket;
         
         this.playing = 1;
@@ -21,12 +21,26 @@ class Queue extends Component {
         
 
         this.state = {
-            showAddNewMediaModal: false,
             QueueRowEntries: [],
+            showAddNewMediaModal: false,
             currentlyPlayingIndex: 0, //0 means no video is playing
             currentlyPlayingYoutubeVideoObject: null,
             playState: this.paused
         };
+        //localStorage.removeItem("QueueRows");
+    }
+    
+    componentDidMount() {
+        this.loadQueueRowEntriesFromServer();
+    }
+    
+    loadQueueRowEntriesFromServer = () => {
+        var QueueRowsInLocalstorage = localStorage.getItem('QueueRows');        
+        if (QueueRowsInLocalstorage !== null) {
+            this.setState({
+                QueueRowEntries: JSON.parse(QueueRowsInLocalstorage)
+            });
+        }
     }
         
     setYoutubeVideoObjectAPICallback = (event) => {
@@ -70,9 +84,12 @@ class Queue extends Component {
             showAddNewMediaModal: false
         });
         //todo remove this once server response is added
+        
         this.setState(prevState => ({
             QueueRowEntries: [...prevState.QueueRowEntries, rowData]
-        }))
+            }), () => {
+                localStorage.setItem('QueueRows', JSON.stringify(this.state.QueueRowEntries));
+        })
     }
     
     toggleAddNewMediaModal = () => {
