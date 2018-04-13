@@ -148,7 +148,7 @@ class Queue extends Component {
                             <th>
                                 <Button onClick={this.toggleAddNewMediaModal} color="primary">
                                     <img alt="Add to Queue" src={PlusIcon} />
-                                </Button>{' '}
+                                </Button>
                             </th>
                         </tr>
                     </thead>
