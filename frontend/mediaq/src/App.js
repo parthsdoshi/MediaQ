@@ -58,12 +58,12 @@ class App extends Component {
         this.setState({
             loggedIn: true
         });
-        local
     }
     
     logoutRequestCallback = () => {
         localStorage.removeItem("qID");
         localStorage.removeItem("displayName");
+        localStorage.removeItem('QueueRows');
         this.setState = {
             loggedIn: false,
             displayName: '',

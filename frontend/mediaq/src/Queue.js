@@ -35,7 +35,7 @@ class Queue extends Component {
     }
     
     loadQueueRowEntriesFromServer = () => {
-        var QueueRowsInLocalstorage = localStorage.getItem('QueueRows');        
+        var QueueRowsInLocalstorage = localStorage.getItem('QueueRows');
         if (QueueRowsInLocalstorage !== null) {
             this.setState({
                 QueueRowEntries: JSON.parse(QueueRowsInLocalstorage)
