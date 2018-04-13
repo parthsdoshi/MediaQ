@@ -15,7 +15,8 @@ class InitialConnect extends Component {
 
         this.state = {
             displayLoginScreen: false,
-            userAction: '',
+            createQueue: false,
+            joinQueue: false,
             displayQIDModal: false,
             qID: '' //needed to pass to popup modal to show user their QID
         };
@@ -37,14 +38,16 @@ class InitialConnect extends Component {
     createQueue = () => {
         this.setState({
             displayLoginScreen: true,
-            userAction: 'Create a new queue'
+            createQueue: true,
+            joinQueue: false,
         });
     }
 
     joinQueue = () => {
         this.setState({
             displayLoginScreen: true,
-            userAction: 'Join an existing queue'
+            createQueue: false,
+            joinQueue: true,
         });
     }
 
@@ -52,26 +55,29 @@ class InitialConnect extends Component {
         if (displayName === '' && qID === '') { //user clicked cancel
             this.setState({
                 displayLoginScreen: false,
-                userAction: ''
+                createQueue: false,
+                joinQueue: false,
             });
             return;
         }
-        if (this.state.userAction === 'Create a new queue') {
-            this.socket.emit('create', {'displayName': displayName});
-            this.setDisplayNameCallback(displayName);
-            this.setState({
-                displayLoginScreen: false,
-                userAction: ''
-            });
-        } else {
+        if (this.state.joinQueue){
             this.socket.emit('join', {'displayName': displayName, 'qID': qID});
             this.setDisplayNameCallback(displayName);
             this.setQIDCallback(qID);
             this.setState({
                 displayLoginScreen: false,
-                userAction: ''
+                createQueue: false,
+                joinQueue: false,
             });
             this.hideMeCallback();
+        } else if (this.state.createQueue) {
+            this.socket.emit('create', {'displayName': displayName});
+            this.setDisplayNameCallback(displayName);
+            this.setState({
+                displayLoginScreen: false,
+                createQueue: false,
+                joinQueue: false,
+            });
         }
     }
     
@@ -80,8 +86,7 @@ class InitialConnect extends Component {
             displayQIDModal: false
         });
         this.hideMeCallback();
-   }   
-
+   }
 
     render() {
         return (
@@ -114,7 +119,7 @@ class InitialConnect extends Component {
                 </Container>
                 {this.state.displayLoginScreen && 
                 <LoginScreen 
-                    userAction={this.state.userAction}
+                    userAction={this.state.joinQueue ? 'Join an existing queue' : 'Create a new queue'}
                     hideLoginAndCallParentCallback={this.hideLoginAndCallParentCallback} />
                 }
                 {this.state.displayQIDModal && 
