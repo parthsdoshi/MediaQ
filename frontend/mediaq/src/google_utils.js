@@ -26,7 +26,6 @@ export function getEmbededVideoComponent(id, onReady, onStateChange, width=640, 
             showinfo: 0,
 //            controls: 0,
 //            disablekb: 1,
-            modestbranding: 0,
         }
     };
     return (<YouTube videoId={id}

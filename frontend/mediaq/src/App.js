@@ -78,23 +78,6 @@ class App extends Component {
         const paddingTopStyle = {
             paddingTop: 50
         };
-        /*const opts = {
-            height: '390',
-            width: '640',
-            playerVars: { // https://developers.google.com/youtube/player_parameters
-                autoplay: 1
-            }
-        };
-
-        var youtubevideos = []
-        for (var i = 0; i < 1; i++) {
-            youtubevideos.push (
-                <YouTube
-                    videoId="2g811Eo7K8U"
-                    opts={opts}
-                    onReady={this._onReady} />
-                )
-        }*/
         // TODO: use Fade reactstrap component to make below look better if we have time
         return (
             <div className="App">

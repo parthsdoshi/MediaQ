@@ -170,11 +170,13 @@ render() {
                 </Col>
             </Row>
             {youtubeMedia}
-            {this.state.youtubeSearchReady && <Col sm={{ size: 'auto', offset: 0 }}>
-                <Button onClick={this.handleMoreResultsButtonPress} color="primary">
-                    More Results
-                </Button>{' '}
-            </Col>}
+            {this.state.youtubeSearchReady && 
+                <Col sm={{ size: 'auto', offset: 0 }}>
+                    <Button onClick={this.handleMoreResultsButtonPress} color="primary">
+                        More Results
+                    </Button>{' '}
+                </Col>
+            }
 
         </Container>
         );

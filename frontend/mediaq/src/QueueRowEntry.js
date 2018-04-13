@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import MediaPlayPauseButton from './MediaPlayPauseButton.js';
+import { Button } from 'reactstrap';
+import MinusIcon from 'open-iconic/svg/minus.svg';
 
+import MediaPlayPauseButton from './MediaPlayPauseButton.js';
 
 export function RowData(id, title, author, album, source, thumbnail) {
     this.id = id;
@@ -45,6 +47,12 @@ class QueueRowEntry extends Component {
                 <td>{this.props.rowData.author}</td>
                 <td>{this.props.rowData.album}</td>
                 <td>{this.props.rowData.source}</td>
+                <td>
+                    <Button color="danger">
+                        <img alt="Remove to Queue" src={MinusIcon} />
+                    </Button>
+                </td>
+
             </tr>
         );
     }

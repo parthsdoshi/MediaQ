@@ -104,12 +104,15 @@ class Queue extends Component {
     rowEntryPlayButtonClicked = (entryNumber) => {
         if (entryNumber !== this.state.currentlyPlayingIndex) {
             this.setState({
-                currentlyPlayingIndex: entryNumber
+                currentlyPlayingIndex: entryNumber,
+                playState: this.buffering
             });
+        } else if (this.state.currentlyPlayingYoutubeVideoObject === null) {
+            // youtube haven't given back the object yet
         } else {
-            if (this.state.playState === this.paused) {
+            if (this.state.playState === this.paused || this.state.playState === this.buffering) {
                 this.state.currentlyPlayingYoutubeVideoObject.playVideo();
-            } else if (this.state.playState === this.playing || this.state.playState === this.buffering) {
+            } else if (this.state.playState === this.playing) {
                 this.state.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }
@@ -145,7 +148,7 @@ class Queue extends Component {
                             <th>
                                 <Button onClick={this.toggleAddNewMediaModal} color="primary">
                                     <img alt="Add to Queue" src={PlusIcon} />
-                                </Button>{' '}
+                                </Button>
                             </th>
                         </tr>
                     </thead>
