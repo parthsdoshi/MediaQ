@@ -118,7 +118,7 @@ class Search extends Component {
         if (this.state.youtubeSearchReady && 
             this.state.youtubeResults.items.length > number) {
             return (
-                <Media>
+                <Media key={number}>
                     <Media left href="#">
                         <Media object 
                             src={this.getResultThumbnailUrl(number)} 

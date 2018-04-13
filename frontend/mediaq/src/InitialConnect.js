@@ -22,10 +22,11 @@ class InitialConnect extends Component {
 
         this.socket.on('create', (data) => {
             console.log(data);
-            this.setQIDCallback(data);
+            let qID = data['qID'];
+            this.setQIDCallback(qID);
             this.setState({
                 displayQIDModal: true,
-                qID: data
+                qID: qID
             });
         });
         this.socket.on('join', (data) => {
@@ -56,14 +57,14 @@ class InitialConnect extends Component {
             return;
         }
         if (this.state.userAction === 'Create a new queue') {
-            this.socket.emit('create', {data: displayName});
+            this.socket.emit('create', {'displayName': displayName});
             this.setDisplayNameCallback(displayName);
             this.setState({
                 displayLoginScreen: false,
                 userAction: ''
             });
         } else {
-            this.socket.emit('join', {data: [displayName, qID]});
+            this.socket.emit('join', {'displayName': displayName, 'qID': qID});
             this.setDisplayNameCallback(displayName);
             this.setQIDCallback(qID);
             this.setState({

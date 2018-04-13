@@ -27,7 +27,6 @@ class App extends Component {
                 qID: ''
             };
         }
-
     }
 
     componentDidMount() {
@@ -39,7 +38,7 @@ class App extends Component {
 
     setDisplayNameCallback = (displayName) => {
         localStorage.setItem('displayName', displayName);
-        if(displayName === '') { //user canceled login screen
+        if(displayName === '') { //user cancelled login screen
             return;
         }
         this.setState({

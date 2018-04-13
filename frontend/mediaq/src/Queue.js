@@ -79,7 +79,7 @@ class Queue extends Component {
 
     loadVideoCallback = (rowData) => {
         console.log(rowData);
-        this.socket.emit('addToQueue', {data: rowData});
+        this.socket.emit('addToQueue', {'rowData': rowData});
         this.setState({
             showAddNewMediaModal: false
         });
@@ -118,12 +118,13 @@ class Queue extends Component {
         for(var i = 0; i < this.state.QueueRowEntries.length; i++) {
             QueueRowEntries.push(
                 <QueueRowEntry 
-                rowID={i+1} 
-                rowData={this.state.QueueRowEntries[i]}
-                playState={this.state.playState}
-                currentlyPlayingIndex={this.state.currentlyPlayingIndex}
-                rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked} />
-            );
+                    key={i}
+                    rowID={i+1} 
+                    rowData={this.state.QueueRowEntries[i]}
+                    playState={this.state.playState}
+                    currentlyPlayingIndex={this.state.currentlyPlayingIndex}
+                    rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked} />
+                );
         }
         return (
             <div>
