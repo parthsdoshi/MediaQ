@@ -8,7 +8,14 @@ import {
     Nav,
     NavItem,
     NavLink,
-    Container} from 'reactstrap';
+    Container,
+    UncontrolledDropdown,
+    DropdownToggle,
+    DropdownMenu,
+    DropdownItem,
+    Popover,
+    PopoverHeader,
+    PopoverBody } from 'reactstrap';
 import LogoutIcon from 'open-iconic/svg/account-logout.svg';
 
 class Header extends Component {
@@ -17,10 +24,9 @@ class Header extends Component {
 
         this.state = {
             isOpen: false,
-            displayQIDModal: true
+            displayQIDModal: true,
+            popoverOpen: false
         };
-        
-        this.logoutRequestCallback = this.props.logoutRequestCallback;
     }
 
     toggle = () => {
@@ -28,10 +34,39 @@ class Header extends Component {
             isOpen: !this.state.isOpen
         });
     }
+
+    togglePopover = () => {
+        console.log('wtf')
+        this.setState({
+            popoverOpen: !this.state.popoverOpen
+        });
+    }
+
+    test = () => {
+        console.log("hi")
+    }
+
+    copyQIDToClipboard = () => {
+        var textarea = document.createElement("textarea");
+        textarea.textContent = this.props.qID;
+        textarea.style.position = "fixed";  // Prevent scrolling to bottom of page in MS Edge.
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand("copy");  // Security exception may be thrown by some browsers.
+        } catch (ex) {
+            console.warn("Copy to clipboard failed.", ex);
+            return false
+        } finally {
+            document.body.removeChild(textarea);
+        }
+        this.togglePopover();
+    }
+
     render() {
         var icon = {
-          width: '16px',
-          height: '16px'
+            width: '16px',
+            height: '16px'
         }
         return (
             <div>
@@ -41,28 +76,40 @@ class Header extends Component {
                         <NavbarToggler onClick={this.toggle} />
                         <Collapse isOpen={this.state.isOpen} navbar>
                             <Nav className="ml-auto" navbar>
+                                {this.props.qID !== "" && this.props.displayName !== "" &&
                                 <NavItem>
-                                    <NavLink href="">{'Queue ID:' + this.props.qID}</NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink href="">
-                                        {'Name:' + this.props.displayName}
+                                    <NavLink id="QIDPopover" onClick={this.copyQIDToClipboard} href="#">
+                                        {'Queue ID: ' + this.props.qID}
                                     </NavLink>
+                                    <Popover placement="bottom" isOpen={this.state.popoverOpen} target="QIDPopover" toggle={this.togglePopover}>
+                                        <PopoverHeader>Copied Queue ID!</PopoverHeader>
+                                    </Popover>
                                 </NavItem>
-                                <NavItem>
-                                    <NavLink href="">
-                                        <Button onClick={this.logoutRequestCallback} color="primary">
-                                            <img alt="Logout" src={LogoutIcon} style={icon} />
-                                        </Button>
-                                    </NavLink>
-                                </NavItem>
+                                }
+                                {this.props.qID !== "" && this.props.displayName !== "" &&
+                                <UncontrolledDropdown nav inNavbar>
+                                    <DropdownToggle nav caret>
+                                        {this.props.displayName}
+                                    </DropdownToggle>
+                                    <DropdownMenu right>
+                                        <DropdownItem onClick={this.props.logoutRequestCallback} >
+                                            <NavLink href="#">
+                                                <img alt="Logout" src={LogoutIcon} style={icon} />
+                                                <div style={{marginLeft: 20, display: 'inline'}}>
+                                                    Logout
+                                                </div>
+                                            </NavLink>
+                                        </DropdownItem>
+                                    </DropdownMenu>
+                                </UncontrolledDropdown>
+                                }
                             </Nav>
                         </Collapse>
                     </Container>
                 </Navbar>
             </div>
             );
-    }
+}
 }
 
 export default Header;

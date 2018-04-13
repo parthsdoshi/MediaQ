@@ -8,20 +8,12 @@ import {
     Container } from 'reactstrap';
 import MediaPlayPauseButton from './MediaPlayPauseButton.js';
 
-class Header extends Component {
+class Footer extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            isOpen: false,
-            displayQIDModal: true
         };
-    }
-
-    toggle = () => {
-        this.setState({
-            isOpen: !this.state.isOpen
-        });
     }
 
     render() {
@@ -48,15 +40,12 @@ class Header extends Component {
                 <div style={phantom} />
                 <div style={style}>
                     <Navbar color="light" light expand="md">
-                        <Container>
-                            <NavbarBrand>Media Control Panel</NavbarBrand>
-                            <Collapse isOpen={this.state.isOpen} navbar>
-                                <Nav className="mx-auto" navbar>
-                                    <NavItem>
-                                        <MediaPlayPauseButton playState={3} />
-                                    </NavItem>
-                                </Nav>
-                            </Collapse>
+                        <Container fluid>
+                            <Nav className="mx-auto" navbar>
+                                <NavItem>
+                                    <MediaPlayPauseButton playState={2} />
+                                </NavItem>
+                            </Nav>
                         </Container>
                     </Navbar>
                 </div>
@@ -65,4 +54,4 @@ class Header extends Component {
     }
 }
 
-export default Header;
+export default Footer;
