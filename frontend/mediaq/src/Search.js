@@ -42,7 +42,7 @@ class Search extends Component {
     }
 
     searchYoutube = (searchTag, numberOfResults) => {
-        this.setState({youtubeSearch: false});
+        this.setState({youtubeSearchReady: false});
         if( this.state.youtubeReady ){
             executeSearch(searchTag, numberOfResults, this.youtubeSearchCallback);
         } else {
@@ -93,25 +93,12 @@ class Search extends Component {
         return null;
     }
 
-    getResultThumbnailTag = (number) => {
-        if (this.state.youtubeSearchReady && 
-            this.state.youtubeResults.items.length > number) {
-            return (<img alt="thumbnail" src={this.getResultThumbnailUrl(number)} />);
-        }
-        console.log('getResultThumbnailTag was called before search results were ready or called with out of bounds element');
-        return null;
-    }
-
     getResultID = (number) => {
         if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
             return this.state.youtubeResults.items[number].id.videoId
         }
         console.log('getResultID was called before search results were ready or called with out of bounds element');
         return null;
-    }
-
-    logVideoEnd = () => {
-        console.log('Your video ended');
     }
 
     getResultMedia = (number) => {

@@ -2,20 +2,10 @@ import React, { Component } from 'react';
 import {
     Collapse,
     Navbar,
-    NavbarToggler,
     NavbarBrand,
     Nav,
     NavItem,
-    NavLink,
-    UncontrolledDropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-    Container,
-    Button} from 'reactstrap';
-import PopupModal from './PopupModal';
-import PauseIcon from 'open-iconic/svg/media-pause.svg';
-import PlayIcon from 'open-iconic/svg/media-play.svg';
+    Container } from 'reactstrap';
 import MediaPlayPauseButton from './MediaPlayPauseButton.js';
 
 class Header extends Component {

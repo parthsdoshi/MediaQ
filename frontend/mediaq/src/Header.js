@@ -8,12 +8,7 @@ import {
     Nav,
     NavItem,
     NavLink,
-    UncontrolledDropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
     Container} from 'reactstrap';
-import PopupModal from './PopupModal';
 import LogoutIcon from 'open-iconic/svg/account-logout.svg';
 
 class Header extends Component {

@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import MediaPlayPauseButton from './MediaPlayPauseButton.js';
 
-import Search from './Search'
 
 export function RowData(id, title, author, album, source, thumbnail) {
     this.id = id;

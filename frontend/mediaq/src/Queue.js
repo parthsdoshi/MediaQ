@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import Search from './Search';
+import { Table, Button } from 'reactstrap';
 import PlusIcon from 'open-iconic/svg/plus.svg';
 import QueueRowEntry from './QueueRowEntry';
 import { getEmbededVideoComponent } from './google_utils';
@@ -158,8 +157,8 @@ class Queue extends Component {
                     getEmbededVideoComponent(this.state.QueueRowEntries[this.state.currentlyPlayingIndex-1].id, 
                                             this.setYoutubeVideoObjectAPICallback,
                                             this.youtubeVideoStateChangedAPICallback,
-                                            640,
-                                            390)}
+                                            64*3,
+                                            39*3)}
             </div>
             );
     }
