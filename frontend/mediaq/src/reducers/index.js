@@ -1,6 +1,6 @@
 const initialState = {
   playState: 2,
-  youtubeVideoObject: null
+  youtubeVideoObject: {}
 };
 
 const rootReducer = (state = initialState, action) => {
