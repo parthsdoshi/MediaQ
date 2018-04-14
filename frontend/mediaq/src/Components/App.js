@@ -7,10 +7,6 @@ import InitialConnect from './InitialConnect';
 import Queue from './Queue';
 import Footer from './Footer';
 
-import { Provider } from "react-redux";
-import store from "./store/index";
-window.store = store;
-
 class App extends Component {
     constructor(props) {
         super(props);
@@ -85,7 +81,6 @@ class App extends Component {
     render() {
         // TODO: use Fade reactstrap component to make below look better if we have time
         return (
-            <Provider store={store}>
             <div className="App">
                 <Header displayName={this.state.displayName} qID={this.state.qID} logoutRequestCallback={this.logoutRequestCallback} />
                 <div style={this.paddingTopStyle}>
@@ -109,7 +104,6 @@ class App extends Component {
                 </div>
                 <Footer />
             </div>
-            </Provider>
             );
     }
 }

@@ -8,8 +8,8 @@ import {
     Container } from 'reactstrap';
 import MediaPlayPauseButton from './MediaPlayPauseButton.js';
 
-import {connect} from 'react-redux';
-import { changePlayState } from "./actions/index";
+import { connect } from 'react-redux';
+import { changePlayState } from "../actions/index";
 
 class Footer extends Component {
     constructor(props) {

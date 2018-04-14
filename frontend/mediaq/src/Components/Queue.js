@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Table, Button } from 'reactstrap';
-import PlusIcon from 'open-iconic/svg/plus.svg';
-import QueueRowEntry from './QueueRowEntry';
-import { getEmbededVideoComponent } from './google_utils';
-import AddNewMediaModal from './AddNewMediaModal.js';
 import {connect} from 'react-redux';
-import {changePlayStateAction, changeYoutubeVideoObjectAction} from "./actions/index";
+import PlusIcon from 'open-iconic/svg/plus.svg';
+
+import QueueRowEntry from './QueueRowEntry';
+import { getEmbededVideoComponent } from '../utils/google_utils';
+import AddNewMediaModal from './AddNewMediaModal.js';
+import {changePlayStateAction, changeYoutubeVideoObjectAction} from "../actions/index";
 
 class Queue extends Component {
 

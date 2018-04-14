@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { loadYoutubeAPI, executeSearch } from './google_utils';
+import { loadYoutubeAPI, executeSearch } from './../utils/google_utils';
 import { Media, Button, Container, Row, Col } from 'reactstrap';
 
 import { RowData } from './QueueRowEntry.js'
