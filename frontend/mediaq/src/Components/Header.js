@@ -18,6 +18,8 @@ import {
     PopoverBody } from 'reactstrap';
 import LogoutIcon from 'open-iconic/svg/account-logout.svg';
 
+import MediaQIcon from '../logo.svg';
+
 class Header extends Component {
     constructor(props) {
         super(props);
@@ -68,7 +70,10 @@ class Header extends Component {
             <div>
                 <Navbar color="light" light expand="md">
                     <Container>
-                        <NavbarBrand href="/">MediaQ</NavbarBrand>
+                        <NavbarBrand href="/">
+                            <img alt="MediaQ" src={MediaQIcon} width="10%" height="10%" />
+                            MediaQ
+                        </NavbarBrand>
                         <NavbarToggler onClick={this.toggle} />
                         <Collapse isOpen={this.state.isOpen} navbar>
                             <Nav className="ml-auto" navbar>
