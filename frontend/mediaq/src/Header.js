@@ -33,21 +33,17 @@ class Header extends Component {
         this.setState({
             isOpen: !this.state.isOpen
         });
-    }
+    };
 
     togglePopover = () => {
-        console.log('wtf')
         this.setState({
             popoverOpen: !this.state.popoverOpen
         });
-    }
+    };
 
-    test = () => {
-        console.log("hi")
-    }
-
+    //don't look at this its ugly. it copies qID to clipboard.
     copyQIDToClipboard = () => {
-        var textarea = document.createElement("textarea");
+        let textarea = document.createElement("textarea");
         textarea.textContent = this.props.qID;
         textarea.style.position = "fixed";  // Prevent scrolling to bottom of page in MS Edge.
         document.body.appendChild(textarea);
@@ -61,13 +57,13 @@ class Header extends Component {
             document.body.removeChild(textarea);
         }
         this.togglePopover();
-    }
+    };
 
     render() {
-        var icon = {
+        let icon = {
             width: '16px',
             height: '16px'
-        }
+        };
         return (
             <div>
                 <Navbar color="light" light expand="md">

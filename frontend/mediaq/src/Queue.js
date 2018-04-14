@@ -4,6 +4,8 @@ import PlusIcon from 'open-iconic/svg/plus.svg';
 import QueueRowEntry from './QueueRowEntry';
 import { getEmbededVideoComponent } from './google_utils';
 import AddNewMediaModal from './AddNewMediaModal.js';
+import {connect} from 'react-redux';
+import {changePlayStateAction, changeYoutubeVideoObjectAction} from "./actions/index";
 
 class Queue extends Component {
 
@@ -17,14 +19,12 @@ class Queue extends Component {
         this.playing = 1;
         this.paused = 2;
         this.buffering = 3;
-        
 
         this.state = {
             QueueRowEntries: [],
             showAddNewMediaModal: false,
             currentlyPlayingIndex: 0, //0 means no video is playing
-            currentlyPlayingYoutubeVideoObject: null,
-            playState: this.paused
+            //currentlyPlayingYoutubeVideoObject: null,
         };
         //localStorage.removeItem("QueueRows");
     }
@@ -43,36 +43,29 @@ class Queue extends Component {
     }
         
     setYoutubeVideoObjectAPICallback = (event) => {
-        this.setState({
-            currentlyPlayingYoutubeVideoObject: event.target
-        });
+        // this.setState({
+        //     currentlyPlayingYoutubeVideoObject: event.target
+        // });
+        this.props.changeYoutubeVideoObject(event.target);
     }
 
     youtubeVideoStateChangedAPICallback = (event) => {
         //youtubeAPI: 0->ended 1->playing   2->paused   3->buffering
-        var youtubeState = this.state.currentlyPlayingYoutubeVideoObject.getPlayerState();
+        var youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
         if (youtubeState === 0) { // ended
-            this.setState({
-                playState: this.paused
-            });
+            this.props.changePlayState(this.paused);
             this.setState(prevState => ({
                 currentlyPlayingIndex: (((prevState.currentlyPlayingIndex) + 1)%(prevState.QueueRowEntries.length + 1))
             }))
         }
-        if (this.state.playState !== this.playing && youtubeState === this.playing) { // playing
-            this.setState({
-                playState: this.playing
-            });
+        if (this.props.playState !== this.playing && youtubeState === this.playing) { // playing
+            this.props.changePlayState(this.playing);
         }
-        if (this.state.playState !== this.paused && youtubeState === this.paused) { // paused
-            this.setState({
-                playState: this.paused
-            });
+        if (this.props.playState !== this.paused && youtubeState === this.paused) { // paused
+            this.props.changePlayState(this.paused);
         }
-        if (this.state.playState !== this.buffering && youtubeState === this.buffering) { // buffering
-            this.setState({
-                playState: this.buffering
-            });
+        if (this.props.playState !== this.buffering && youtubeState === this.buffering) { // buffering
+            this.props.changePlayState(this.buffering);
         }
     }
 
@@ -102,18 +95,19 @@ class Queue extends Component {
 
     
     rowEntryPlayButtonClicked = (entryNumber) => {
+        console.log(this.props.playState);
         if (entryNumber !== this.state.currentlyPlayingIndex) {
             this.setState({
-                currentlyPlayingIndex: entryNumber,
-                playState: this.buffering
+                currentlyPlayingIndex: entryNumber
             });
-        } else if (this.state.currentlyPlayingYoutubeVideoObject === null) {
+            this.props.changePlayState(this.buffering);
+        } else if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             // youtube haven't given back the object yet
         } else {
-            if (this.state.playState === this.paused || this.state.playState === this.buffering) {
-                this.state.currentlyPlayingYoutubeVideoObject.playVideo();
-            } else if (this.state.playState === this.playing) {
-                this.state.currentlyPlayingYoutubeVideoObject.pauseVideo()
+            if (this.props.playState === this.paused || this.props.playState === this.buffering) {
+                this.props.currentlyPlayingYoutubeVideoObject.playVideo();
+            } else if (this.props.playState === this.playing) {
+                this.props.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }
     }
@@ -126,7 +120,7 @@ class Queue extends Component {
                     key={i}
                     rowID={i+1} 
                     rowData={this.state.QueueRowEntries[i]}
-                    playState={this.state.playState}
+                    playState={this.props.playState}
                     currentlyPlayingIndex={this.state.currentlyPlayingIndex}
                     rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked} />
                 );
@@ -168,4 +162,21 @@ class Queue extends Component {
 
 }
 
-export default Queue
+const mapStateToProps = state => {
+    return {
+        playState : state.playState,
+        currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        changePlayState : playState => dispatch(changePlayStateAction(playState)),
+        changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObjectAction(youtubeVideoObject))
+    }
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Queue)

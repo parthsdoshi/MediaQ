@@ -50,7 +50,7 @@ export function loadYoutubeAPI(youtubeCallback) {
 }
 
 function removeEmptyParams(params) {
-    for (var p in params) {
+    for (let p in params) {
         if (!params[p] || params[p] === 'undefined') {
             delete params[p];
         }
@@ -66,7 +66,7 @@ function executeRequest(request, youtubeSearchCallback) {
 
 function buildApiRequest(requestMethod, path, params, youtubeSearchCallback) {
     params = removeEmptyParams(params);
-    var request = gapi.client.request({
+    let request = gapi.client.request({
         'method': requestMethod,
         'path': path,
         'params': params
@@ -75,7 +75,7 @@ function buildApiRequest(requestMethod, path, params, youtubeSearchCallback) {
 }
 
 export function executeSearch(searchtag, numberOfResults, youtubeSearchCallback) {
-    console.log('Youtube API called with ' + searchtag)
+    console.log('Youtube API called with ' + searchtag);
     buildApiRequest('GET',
         '/youtube/v3/search',
         {'maxResults': numberOfResults,

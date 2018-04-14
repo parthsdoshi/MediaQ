@@ -7,11 +7,15 @@ import InitialConnect from './InitialConnect';
 import Queue from './Queue';
 import Footer from './Footer';
 
+import { Provider } from "react-redux";
+import store from "./store/index";
+window.store = store;
+
 class App extends Component {
     constructor(props) {
-        super(props)
+        super(props);
         
-        var qIDInLocalstorage = localStorage.getItem('qID');        
+        let qIDInLocalstorage = localStorage.getItem('qID');
         if (qIDInLocalstorage !== null) {
             this.state = {
                 loggedIn: true,
@@ -48,20 +52,20 @@ class App extends Component {
         this.setState({
             displayName: displayName
         });
-    }
+    };
 
     setQIDCallback = (qID) => {
         localStorage.setItem('qID', qID);
         this.setState({
             qID: qID
         });
-    }
+    };
     
     hideInitialConnectCallback = () => {
         this.setState({
             loggedIn: true
         });
-    }
+    };
     
     logoutRequestCallback = () => {
         this.socket.emit('leave', {
@@ -71,16 +75,17 @@ class App extends Component {
         localStorage.removeItem("qID");
         localStorage.removeItem("displayName");
         localStorage.removeItem('QueueRows');
-        this.setState = {
+        this.setState({
             loggedIn: false,
             displayName: '',
             qID: ''
-        };
-    }
+        });
+    };
 
     render() {
         // TODO: use Fade reactstrap component to make below look better if we have time
         return (
+            <Provider store={store}>
             <div className="App">
                 <Header displayName={this.state.displayName} qID={this.state.qID} logoutRequestCallback={this.logoutRequestCallback} />
                 <div style={this.paddingTopStyle}>
@@ -104,6 +109,7 @@ class App extends Component {
                 </div>
                 <Footer />
             </div>
+            </Provider>
             );
     }
 }
