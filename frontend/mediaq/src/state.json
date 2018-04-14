@@ -1,0 +1,23 @@
+{
+    selectedMedia: {
+        playState: 2,
+        mediaId: //some timestamp to identify current media
+    },
+    entities: {
+        users: {
+            '10.168.2.1': {displayName: 'Parth', sid: '10.168.2.1'},
+            '102.183.2.2': {displayName: 'Abdul', sid: '102.183.2.2'},
+            '8.234.9.8': {displayName: 'Colin', sid: '8.234.9.8'}
+        },
+        queue: {
+            '11237948': {rowData},
+            '23489899': {rowData},
+            '48910293': {rowData}
+        }
+    },
+    visibleQueue: [
+        '11237948',
+        '23489899',
+        '48910293'
+    ]
+}
