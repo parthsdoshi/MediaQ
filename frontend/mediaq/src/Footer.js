@@ -14,10 +14,9 @@ class Footer extends Component {
 
         this.state = {
         };
-    }
 
-    render() {
-        var style = {
+
+        this.style = {
             backgroundColor: "#F8F8F8",
             borderTop: "1px solid #E7E7E7",
             textAlign: "center",
@@ -29,16 +28,19 @@ class Footer extends Component {
             width: "100%",
         }
 
-        var phantom = {
+        this.phantom = {
           display: 'block',
           padding: '0px',
           height: '60px',
           width: '100%',
         }
+    }
+
+    render() {
         return (
             <div>
-                <div style={phantom} />
-                <div style={style}>
+                <div style={this.phantom} />
+                <div style={this.style}>
                     <Navbar color="light" light expand="md">
                         <Container fluid>
                             <Nav className="mx-auto" navbar>

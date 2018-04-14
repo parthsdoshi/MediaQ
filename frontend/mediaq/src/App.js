@@ -27,6 +27,10 @@ class App extends Component {
                 qID: ''
             };
         }
+
+        this.paddingTopStyle = {
+            paddingTop: 50
+        };
     }
 
     componentDidMount() {
@@ -75,14 +79,11 @@ class App extends Component {
     }
 
     render() {
-        const paddingTopStyle = {
-            paddingTop: 50
-        };
         // TODO: use Fade reactstrap component to make below look better if we have time
         return (
             <div className="App">
                 <Header displayName={this.state.displayName} qID={this.state.qID} logoutRequestCallback={this.logoutRequestCallback} />
-                <div style={paddingTopStyle}>
+                <div style={this.paddingTopStyle}>
                     {this.state.connectionEstablished &&
                     <div>
                         {!this.state.loggedIn &&
