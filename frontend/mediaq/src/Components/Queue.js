@@ -6,7 +6,10 @@ import PlusIcon from 'open-iconic/svg/plus.svg';
 import QueueRowEntry from './QueueRowEntry';
 import { getEmbededVideoComponent } from '../utils/google_utils';
 import AddNewMediaModal from './AddNewMediaModal.js';
-import {changePlayStateAction, changeYoutubeVideoObjectAction} from "../actions/index";
+import {changePlayStateAction,
+    changeYoutubeVideoObjectAction,
+    addToQueue,
+    setQueue} from "../actions/index";
 
 class Queue extends Component {
 
@@ -14,7 +17,6 @@ class Queue extends Component {
     
     constructor(props) {
         super(props);
-        console.log('queue constructor called')
         this.socket = props.socket;
         
         this.playing = 1;
@@ -22,12 +24,9 @@ class Queue extends Component {
         this.buffering = 3;
 
         this.state = {
-            QueueRowEntries: [],
             showAddNewMediaModal: false,
             currentlyPlayingIndex: 0, //0 means no video is playing
-            //currentlyPlayingYoutubeVideoObject: null,
         };
-        //localStorage.removeItem("QueueRows");
     }
     
     componentDidMount() {
@@ -35,28 +34,26 @@ class Queue extends Component {
     }
     
     loadQueueRowEntriesFromServer = () => {
-        var QueueRowsInLocalstorage = localStorage.getItem('QueueRows');
+        let QueueRowsInLocalstorage = localStorage.getItem('QueueRows');
         if (QueueRowsInLocalstorage !== null) {
-            this.setState({
-                QueueRowEntries: JSON.parse(QueueRowsInLocalstorage)
-            });
+            this.props.setQueue(JSON.parse(QueueRowsInLocalstorage));
         }
-    }
+    };
         
     setYoutubeVideoObjectAPICallback = (event) => {
         // this.setState({
         //     currentlyPlayingYoutubeVideoObject: event.target
         // });
         this.props.changeYoutubeVideoObject(event.target);
-    }
+    };
 
     youtubeVideoStateChangedAPICallback = (event) => {
         //youtubeAPI: 0->ended 1->playing   2->paused   3->buffering
-        var youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
+        let youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
         if (youtubeState === 0) { // ended
             this.props.changePlayState(this.paused);
             this.setState(prevState => ({
-                currentlyPlayingIndex: (((prevState.currentlyPlayingIndex) + 1)%(prevState.QueueRowEntries.length + 1))
+                currentlyPlayingIndex: (((prevState.currentlyPlayingIndex) + 1)%(this.props.QueueRowEntries.length + 1))
             }))
         }
         if (this.props.playState !== this.playing && youtubeState === this.playing) { // playing
@@ -68,7 +65,7 @@ class Queue extends Component {
         if (this.props.playState !== this.buffering && youtubeState === this.buffering) { // buffering
             this.props.changePlayState(this.buffering);
         }
-    }
+    };
 
     loadVideoCallback = (rowData) => {
         console.log(rowData);
@@ -80,19 +77,14 @@ class Queue extends Component {
             showAddNewMediaModal: false
         });
         //todo remove this once server response is added
-        
-        this.setState(prevState => ({
-            QueueRowEntries: [...prevState.QueueRowEntries, rowData]
-            }), () => {
-                localStorage.setItem('QueueRows', JSON.stringify(this.state.QueueRowEntries));
-        })
-    }
+        this.props.addToQueue(rowData);
+    };
     
     toggleAddNewMediaModal = () => {
         this.setState({
             showAddNewMediaModal: !this.state.showAddNewMediaModal
         });
-    }
+    };
 
     
     rowEntryPlayButtonClicked = (entryNumber) => {
@@ -115,12 +107,12 @@ class Queue extends Component {
     
     render() {
         var QueueRowEntries = []
-        for(var i = 0; i < this.state.QueueRowEntries.length; i++) {
+        for(var i = 0; i < this.props.QueueRowEntries.length; i++) {
             QueueRowEntries.push(
                 <QueueRowEntry 
                     key={i}
                     rowID={i+1} 
-                    rowData={this.state.QueueRowEntries[i]}
+                    rowData={this.props.QueueRowEntries[i]}
                     playState={this.props.playState}
                     currentlyPlayingIndex={this.state.currentlyPlayingIndex}
                     rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked} />
@@ -152,7 +144,7 @@ class Queue extends Component {
                     </tbody>
                 </Table>
                 {this.state.currentlyPlayingIndex !== 0 && 
-                    getEmbededVideoComponent(this.state.QueueRowEntries[this.state.currentlyPlayingIndex-1].id, 
+                    getEmbededVideoComponent(this.props.QueueRowEntries[this.state.currentlyPlayingIndex-1].id,
                                             this.setYoutubeVideoObjectAPICallback,
                                             this.youtubeVideoStateChangedAPICallback,
                                             64*3,
@@ -166,16 +158,19 @@ class Queue extends Component {
 const mapStateToProps = state => {
     return {
         playState : state.playState,
-        currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject
+        currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject,
+        QueueRowEntries: state.QueueRowEntries
     }
-}
+};
 
 const mapDispatchToProps = dispatch => {
     return {
         changePlayState : playState => dispatch(changePlayStateAction(playState)),
-        changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObjectAction(youtubeVideoObject))
+        changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObjectAction(youtubeVideoObject)),
+        addToQueue: rowData => dispatch(addToQueue(rowData)),
+        setQueue: newQueue => dispatch(setQueue(newQueue))
     }
-}
+};
 
 export default connect(
     mapStateToProps,

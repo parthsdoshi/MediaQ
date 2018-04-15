@@ -125,7 +125,7 @@ class InitialConnect extends Component {
                 {this.state.displayQIDModal && 
                 <PopupModal modelWantsToCloseCallback={this.hideQIDModal} 
                     title={'Your new Queue ID: ' + this.state.qID} 
-                    body={'Give the Queue ID "' + this.state.qID + '" to your friends to join your queue'}/>}
+                    body={'Your Queue ID is "' + this.state.qID + '" save it and give it to friends to join your queue'}/>}
             </div>
             );
     }
