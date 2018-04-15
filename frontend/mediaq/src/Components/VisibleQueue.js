@@ -1,10 +1,11 @@
-import Queue from './Queue';
-import { changeMediaStateAction, initiateSearchAction } from "../actions/index";
 import { connect } from 'react-redux';
 
-const getVisibleQueue = (queue, visibleQueue) => {
+import Queue from './Queue';
+import { changeMediaStateAction, initiateSearchAction } from "../actions/index";
+
+const getVisibleQueue = (queue, visibleQueue, selectedMedia) => {
     let ret = [];
-    for (item of visibleQueue) {
+    for (let item of visibleQueue) {
         let itemObj = {};
         itemObj.rowData = queue[item];
         itemObj.mediaId = item;

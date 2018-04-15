@@ -21,7 +21,7 @@ const rootReducer = (state = initialState, action) => {
       }};
     case "INITIATE_SEARCH":
       return {...state, showSearchModal: true};
-    case "CLOSE_SEARCH":
+    case "HIDE_SEARCH":
       return {...state, showSearchModal: false};
     /* case "CHANGE_PLAY_STATE":
       return { ...state, playState: action.payload.playState };

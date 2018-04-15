@@ -25,3 +25,10 @@ export const initiateSearchAction = () => ({
         
     }
 });
+
+export const hideSearchAction = () => ({
+    type: "HIDE_SEARCH",
+    payload: {
+        
+    }
+});
