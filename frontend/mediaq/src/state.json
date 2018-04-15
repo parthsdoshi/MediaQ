@@ -13,7 +13,8 @@
             '11237948': {rowData},
             '23489899': {rowData},
             '48910293': {rowData}
-        }
+        },
+        qID: ''
     },
     visibleQueue: [
         '11237948',

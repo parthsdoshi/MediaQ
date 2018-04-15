@@ -10,3 +10,18 @@ export const changeYoutubeVideoObjectAction = youtubeVideoObject => ({
     type: "CHANGE_YOUTUBE_VIDEO_OBJECT",
     payload: {youtubeVideoObject: youtubeVideoObject}
 });
+
+export const changeMediaStateAction = (mediaId, playState) => ({
+    type: "CHANGE_SELECTED_MEDIA",
+    payload: {
+        mediaId: mediaId,
+        playState: playState
+    }
+});
+
+export const initiateSearchAction = () => ({
+    type: "INITIATE_SEARCH",
+    payload: {
+        
+    }
+});

@@ -16,7 +16,7 @@ export function initClient() {
     });
 }
 
-export function getEmbededVideoComponent(id, onReady, onStateChange, width=640, height=390) {
+export function getEmbeddedVideoComponent(id, onReady, onStateChange, width=640, height=390) {
     const opts = {
         height: height,
         width: width,
