@@ -1,45 +1,48 @@
 import React, { Component } from 'react';
 import { Table, Button } from 'reactstrap';
-import {connect} from 'react-redux';
 import PlusIcon from 'open-iconic/svg/plus.svg';
+import { connect } from 'react-redux';
 
 import QueueRowEntry from './QueueRowEntry';
 import { getEmbededVideoComponent } from '../utils/google_utils';
 import AddNewMediaModal from './AddNewMediaModal.js';
+
 import {changePlayStateAction,
     changeYoutubeVideoObjectAction,
     addToQueue,
-    setQueue} from "../actions/index";
+    setQueue,
+    setCurrentlyPlayingIndex,
+    incrementCurrentlyPlayingIndex} from "../actions/index";
 
 class Queue extends Component {
 
     // contact server in this component to grab queue
-    
+
     constructor(props) {
         super(props);
         this.socket = props.socket;
-        
+
+        this.ended = 0;
         this.playing = 1;
         this.paused = 2;
         this.buffering = 3;
 
         this.state = {
             showAddNewMediaModal: false,
-            currentlyPlayingIndex: 0, //0 means no video is playing
         };
     }
-    
+
     componentDidMount() {
         this.loadQueueRowEntriesFromServer();
     }
-    
+
     loadQueueRowEntriesFromServer = () => {
         let QueueRowsInLocalstorage = localStorage.getItem('QueueRows');
         if (QueueRowsInLocalstorage !== null) {
             this.props.setQueue(JSON.parse(QueueRowsInLocalstorage));
         }
     };
-        
+
     setYoutubeVideoObjectAPICallback = (event) => {
         // this.setState({
         //     currentlyPlayingYoutubeVideoObject: event.target
@@ -50,11 +53,9 @@ class Queue extends Component {
     youtubeVideoStateChangedAPICallback = (event) => {
         //youtubeAPI: 0->ended 1->playing   2->paused   3->buffering
         let youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
-        if (youtubeState === 0) { // ended
+        if (youtubeState === this.ended) { // ended
             this.props.changePlayState(this.paused);
-            this.setState(prevState => ({
-                currentlyPlayingIndex: (((prevState.currentlyPlayingIndex) + 1)%(this.props.QueueRowEntries.length + 1))
-            }))
+            this.props.incrementCurrentlyPlayingIndex();
         }
         if (this.props.playState !== this.playing && youtubeState === this.playing) { // playing
             this.props.changePlayState(this.playing);
@@ -76,23 +77,20 @@ class Queue extends Component {
         this.setState({
             showAddNewMediaModal: false
         });
-        //todo remove this once server response is added
         this.props.addToQueue(rowData);
     };
-    
+
     toggleAddNewMediaModal = () => {
         this.setState({
             showAddNewMediaModal: !this.state.showAddNewMediaModal
         });
     };
 
-    
+
     rowEntryPlayButtonClicked = (entryNumber) => {
         console.log(this.props.playState);
-        if (entryNumber !== this.state.currentlyPlayingIndex) {
-            this.setState({
-                currentlyPlayingIndex: entryNumber
-            });
+        if (entryNumber !== this.props.currentlyPlayingIndex) {
+            this.props.setCurrentlyPlayingIndex(entryNumber);
             this.props.changePlayState(this.buffering);
         } else if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             // youtube haven't given back the object yet
@@ -103,24 +101,24 @@ class Queue extends Component {
                 this.props.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }
-    }
-    
+    };
+
     render() {
-        var QueueRowEntries = []
-        for(var i = 0; i < this.props.QueueRowEntries.length; i++) {
+        let QueueRowEntries = [];
+        for(let i = 0; i < this.props.QueueRowEntries.length; i++) {
             QueueRowEntries.push(
-                <QueueRowEntry 
+                <QueueRowEntry
                     key={i}
-                    rowID={i+1} 
+                    rowID={i+1}
                     rowData={this.props.QueueRowEntries[i]}
                     playState={this.props.playState}
-                    currentlyPlayingIndex={this.state.currentlyPlayingIndex}
+                    currentlyPlayingIndex={this.props.currentlyPlayingIndex}
                     rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked} />
                 );
         }
         return (
             <div>
-                {this.state.showAddNewMediaModal && 
+                {this.state.showAddNewMediaModal &&
                     <AddNewMediaModal loadVideoCallback={this.loadVideoCallback} hideMe={this.toggleAddNewMediaModal} />}
                 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
                 <Table hover>
@@ -143,8 +141,8 @@ class Queue extends Component {
                     {QueueRowEntries}
                     </tbody>
                 </Table>
-                {this.state.currentlyPlayingIndex !== 0 && 
-                    getEmbededVideoComponent(this.props.QueueRowEntries[this.state.currentlyPlayingIndex-1].id,
+                {this.props.currentlyPlayingIndex !== 0 &&
+                    getEmbededVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,
                                             this.setYoutubeVideoObjectAPICallback,
                                             this.youtubeVideoStateChangedAPICallback,
                                             64*3,
@@ -157,9 +155,12 @@ class Queue extends Component {
 
 const mapStateToProps = state => {
     return {
+        socket: state.socket,
+        qID: state.qID,
         playState : state.playState,
         currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject,
-        QueueRowEntries: state.QueueRowEntries
+        QueueRowEntries: state.QueueRowEntries,
+        currentlyPlayingIndex: state.currentlyPlayingIndex
     }
 };
 
@@ -168,7 +169,9 @@ const mapDispatchToProps = dispatch => {
         changePlayState : playState => dispatch(changePlayStateAction(playState)),
         changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObjectAction(youtubeVideoObject)),
         addToQueue: rowData => dispatch(addToQueue(rowData)),
-        setQueue: newQueue => dispatch(setQueue(newQueue))
+        setQueue: newQueue => dispatch(setQueue(newQueue)),
+        setCurrentlyPlayingIndex: newIndex => dispatch(setCurrentlyPlayingIndex(newIndex)),
+        incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
     }
 };
 

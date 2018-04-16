@@ -17,29 +17,30 @@ import {
     PopoverHeader,
     PopoverBody } from 'reactstrap';
 import LogoutIcon from 'open-iconic/svg/account-logout.svg';
+import { connect } from 'react-redux';
 
 import MediaQIcon from '../logo.svg';
+import { logout } from "../actions";
 
 class Header extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            isOpen: false,
-            displayQIDModal: true,
-            popoverOpen: false
+            collapseIsOpen: false,
+            QIDClipboardPopover: false
         };
     }
 
     toggle = () => {
         this.setState({
-            isOpen: !this.state.isOpen
+            collapseIsOpen: !this.state.collapseIsOpen
         });
     };
 
-    togglePopover = () => {
+    toggleQIDClipboardPopover = () => {
         this.setState({
-            popoverOpen: !this.state.popoverOpen
+            QIDClipboardPopover: !this.state.QIDClipboardPopover
         });
     };
 
@@ -58,7 +59,7 @@ class Header extends Component {
         } finally {
             document.body.removeChild(textarea);
         }
-        this.togglePopover();
+        this.toggleQIDClipboardPopover();
     };
 
     render() {
@@ -75,14 +76,15 @@ class Header extends Component {
                             MediaQ
                         </NavbarBrand>
                         <NavbarToggler onClick={this.toggle} />
-                        <Collapse isOpen={this.state.isOpen} navbar>
+                        <Collapse isOpen={this.state.collapseIsOpen} navbar>
                             <Nav className="ml-auto" navbar>
                                 {this.props.qID !== "" && this.props.displayName !== "" &&
                                 <NavItem>
                                     <NavLink id="QIDPopover" onClick={this.copyQIDToClipboard} href="#">
                                         {'Queue ID: ' + this.props.qID}
                                     </NavLink>
-                                    <Popover placement="bottom" isOpen={this.state.popoverOpen} target="QIDPopover" toggle={this.togglePopover}>
+                                    <Popover placement="bottom" isOpen={this.state.QIDClipboardPopover}
+                                             target="QIDPopover" toggle={this.toggleQIDClipboardPopover}>
                                         <PopoverHeader>Copied Queue ID!</PopoverHeader>
                                     </Popover>
                                 </NavItem>
@@ -93,7 +95,7 @@ class Header extends Component {
                                         {this.props.displayName}
                                     </DropdownToggle>
                                     <DropdownMenu right>
-                                        <DropdownItem onClick={this.props.logoutRequestCallback} >
+                                        <DropdownItem onClick={this.props.logout} >
                                             <NavLink href="#">
                                                 <img alt="Logout" src={LogoutIcon} style={icon} />
                                                 <div style={{marginLeft: 20, display: 'inline'}}>
@@ -113,4 +115,20 @@ class Header extends Component {
 }
 }
 
-export default Header;
+const mapStateToProps = state => {
+    return {
+        displayName : state.displayName,
+        qID: state.qID
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        logout : () => dispatch(logout())
+    }
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Header)
