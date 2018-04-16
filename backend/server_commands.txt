@@ -1,0 +1,23 @@
+'create': Create a new queue - {displayName: ''}
+
+'join': Join an existing queue - {displayName: '', qID: ''}
+    - will send back an error if queue does not exist - 'ERRCO 1: ROOM DOES NOT EXIST'
+    - if successful
+        - send back to person who called it entire queue
+        - to everyone else in the queue - {displayName: 'display name of whoever just joined'}
+
+'leave': Leave an existing queue - {displayName: '', qID: ''}
+    - will send back an error if queue does not exist - 'ERRCO 1: ROOM DOES NOT EXIST'
+    - if successful
+        - to everyone else in the queue - {displayName: 'display name of whoever just left'}
+
+'addToQueue': Add some media to the queue - {rowData: {}, qID: ''}
+    - will send to EVERYONE including the one who sent addToQueue - {rowData: {}}
+        - should probably do some actual error handling
+        - also look into optimistic updates...
+
+'getQueueInfo': Get everything in the current queue - {qID: ''}
+    - will send back to only the socket which called it - {queue: []}
+
+SERVER WILL BE CHANGED EVENTUALLY TO NOT STORE QUEUE AS AN ARRAY
+    - will be indexed by timestamps

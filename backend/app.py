@@ -117,7 +117,7 @@ def handle_leave(data):
     queue_info = get(qID)
     if (queue_info == None):
         # TODO: change errco to be a dictionary to keep it consistent
-        emit('join', 'ERRCO 1: ROOM DOES NOT EXIST')
+        emit('leave', 'ERRCO 1: ROOM DOES NOT EXIST')
         return
 
     queue_info = json.loads(queue_info)
