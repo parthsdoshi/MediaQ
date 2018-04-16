@@ -20,6 +20,7 @@ const initialState = {
 const rootReducer = (state = initialState, action) => {
     switch (action.type) {
         case types.SET_SOCKET:
+            localStorage.setItem('socket', action.payload.socket);
             return { ...state, socket: action.payload.socket};
         case types.LOGIN:
             localStorage.setItem('displayName', state.displayName);
@@ -38,6 +39,13 @@ const rootReducer = (state = initialState, action) => {
             localStorage.removeItem("displayName");
             state.socket.emit('leave', {'displayName': state.displayName, 'qID': state.qID});
             return { ...initialState, socket: state.socket };
+        case types.RESOLVE_BROWSER_CLOSE:
+            if (state.loggedIn) {
+                localStorage.setItem('displayName', state.displayName);
+                localStorage.setItem('qID', state.qID);
+                state.socket.emit('leave', {'displayName': state.displayName, 'qID': state.qID});
+            }
+            return { ...state };
         case types.ADD_NEW_USER:
             return { ...state, userList: [...state.userList, action.payload.newUser] };
         case types.REMOVE_USER:

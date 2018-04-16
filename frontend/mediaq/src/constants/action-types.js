@@ -1,6 +1,7 @@
 export const SET_SOCKET = "SET_SOCKET";
 export const LOGIN = "LOGIN";
 export const LOGOUT = "LOGOUT";
+export const RESOLVE_BROWSER_CLOSE = "RESOLVE_BROWSER_CLOSE";
 
 export const SET_USER_LIST = "SET_USER_LIST";
 export const ADD_NEW_USER = "ADD_NEW_USER";

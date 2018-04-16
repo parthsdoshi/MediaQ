@@ -47,6 +47,12 @@ export const logout = () => {
     };
 };
 
+export const resolveBrowserClose = () => {
+    return {
+        type: types.RESOLVE_BROWSER_CLOSE
+    };
+};
+
 export const addNewUser = newUser => {
     return {
         type: types.ADD_NEW_USER,

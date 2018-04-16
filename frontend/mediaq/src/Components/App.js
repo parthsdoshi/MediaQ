@@ -6,17 +6,15 @@ import Header from './Header';
 import InitialConnect from './InitialConnect';
 import Queue from './Queue';
 import Footer from './Footer';
-import { login, setDisplayName, setQID } from "../actions";
+import { login, resolveBrowserClose } from "../actions";
 
 class App extends Component {
 
     componentDidMount() {
         window.onbeforeunload = confirmExit;
-        function confirmExit()
-        {
-            if (this.props.loggedIn) {
-                this.props.socket.emit('leave', {'displayName': 'master3243', 'qID': 'HKXX'});
-            }
+        let resolveBrowserClose = this.props.resolveBrowserClose;
+        function confirmExit() {
+            resolveBrowserClose();
         }
     }
 
@@ -52,16 +50,13 @@ const mapStateToProps = state => {
     return {
         socket: state.socket,
         loggedIn: state.loggedIn,
-        displayName: state.displayName,
-        qID: state.qID
     }
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        setDisplayName: displayName => dispatch(setDisplayName(displayName)),
-        setQID : qID => dispatch(setQID(qID)),
         login: () => dispatch(login()),
+        resolveBrowserClose: () => dispatch(resolveBrowserClose()),
     }
 };
 
