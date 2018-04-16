@@ -9,13 +9,20 @@ import {
     setQID,
     login,
     setQIDPopupDisplayStatus,
-    setIncorrectQIDPopupDisplayStatus
+    setIncorrectQIDPopupDisplayStatus,
 } from "../actions";
 
 class InitialConnect extends Component {
     constructor(props) {
         super(props);
-        console.log('initialconnect constructor called');
+
+        let displayNameInStorage = localStorage.getItem('displayName');
+        let qIDInStorage = localStorage.getItem('qID');
+        if (displayNameInStorage !== null && qIDInStorage !== null) {
+            this.props.socket.emit('join', {'displayName': displayNameInStorage, 'qID': qIDInStorage});
+            this.props.setDisplayName(displayNameInStorage);
+            this.props.setQID(qIDInStorage);
+        }
 
         this.state = {
             displayLoginScreen: false,
@@ -77,6 +84,8 @@ class InitialConnect extends Component {
 
     hideIncorrectQIDModal = () => {
         this.props.setIncorrectQIDPopupDisplayStatus(false);
+        this.props.setQID('');
+        this.props.setDisplayName('');
     };
 
     render() {

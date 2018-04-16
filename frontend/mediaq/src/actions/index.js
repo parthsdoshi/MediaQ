@@ -14,7 +14,6 @@ export const login = () => {
 };
 
 export const setDisplayName = displayName => {
-    localStorage.setItem('displayName', displayName);
     return {
         type: types.SET_DISPLAY_NAME,
         payload: {displayName: displayName}
@@ -22,7 +21,6 @@ export const setDisplayName = displayName => {
 };
 
 export const setQID = qID => {
-    localStorage.setItem('qID', qID);
     return {
         type: types.SET_QID,
         payload: {qID: qID}
@@ -44,11 +42,29 @@ export const setIncorrectQIDPopupDisplayStatus = newDisplayStatus => {
 };
 
 export const logout = () => {
-    localStorage.removeItem("qID");
-    localStorage.removeItem("displayName");
-    localStorage.removeItem('QueueRows');
     return {
         type: types.LOGOUT
+    };
+};
+
+export const addNewUser = newUser => {
+    return {
+        type: types.ADD_NEW_USER,
+        payload: {newUser: newUser}
+    };
+};
+
+export const removeUser = userToRemove => {
+    return {
+        type: types.REMOVE_USER,
+        payload: {userToRemove: userToRemove}
+    };
+};
+
+export const setUserList = userList => {
+    return {
+        type: types.SET_USER_LIST,
+        payload: {userList: userList}
     };
 };
 

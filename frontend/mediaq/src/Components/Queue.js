@@ -10,7 +10,6 @@ import AddNewMediaModal from './AddNewMediaModal.js';
 import {changePlayStateAction,
     changeYoutubeVideoObjectAction,
     addToQueue,
-    setQueue,
     setCurrentlyPlayingIndex,
     incrementCurrentlyPlayingIndex} from "../actions/index";
 
@@ -32,21 +31,7 @@ class Queue extends Component {
         };
     }
 
-    componentDidMount() {
-        this.loadQueueRowEntriesFromServer();
-    }
-
-    loadQueueRowEntriesFromServer = () => {
-        let QueueRowsInLocalstorage = localStorage.getItem('QueueRows');
-        if (QueueRowsInLocalstorage !== null) {
-            this.props.setQueue(JSON.parse(QueueRowsInLocalstorage));
-        }
-    };
-
     setYoutubeVideoObjectAPICallback = (event) => {
-        // this.setState({
-        //     currentlyPlayingYoutubeVideoObject: event.target
-        // });
         this.props.changeYoutubeVideoObject(event.target);
     };
 
@@ -77,7 +62,8 @@ class Queue extends Component {
         this.setState({
             showAddNewMediaModal: false
         });
-        this.props.addToQueue(rowData);
+        //todo make an optimistic server response and add it to queue immediately, then when server responds ignore it
+        //this.props.addToQueue(rowData);
     };
 
     toggleAddNewMediaModal = () => {
@@ -168,8 +154,7 @@ const mapDispatchToProps = dispatch => {
     return {
         changePlayState : playState => dispatch(changePlayStateAction(playState)),
         changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObjectAction(youtubeVideoObject)),
-        addToQueue: rowData => dispatch(addToQueue(rowData)),
-        setQueue: newQueue => dispatch(setQueue(newQueue)),
+//        addToQueue: rowData => dispatch(addToQueue(rowData)),
         setCurrentlyPlayingIndex: newIndex => dispatch(setCurrentlyPlayingIndex(newIndex)),
         incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
     }

@@ -6,8 +6,19 @@ import Header from './Header';
 import InitialConnect from './InitialConnect';
 import Queue from './Queue';
 import Footer from './Footer';
+import { login, setDisplayName, setQID } from "../actions";
 
 class App extends Component {
+
+    componentDidMount() {
+        window.onbeforeunload = confirmExit;
+        function confirmExit()
+        {
+            if (this.props.loggedIn) {
+                this.props.socket.emit('leave', {'displayName': 'master3243', 'qID': 'HKXX'});
+            }
+        }
+    }
 
     render() {
         let paddingTopStyle = {
@@ -17,18 +28,20 @@ class App extends Component {
         return (
             <div className="App">
                 <Header />
+                {this.props.socket !== null &&
                 <div style={paddingTopStyle}>
                     {!this.props.loggedIn &&
-                    <InitialConnect />
+                    <InitialConnect/>
                     }
                     {this.props.loggedIn &&
                     <div>
                         <Container>
-                            <Queue />
+                            <Queue/>
                         </Container>
                     </div>
                     }
                 </div>
+                }
                 <Footer />
             </div>
             );
@@ -37,10 +50,22 @@ class App extends Component {
 
 const mapStateToProps = state => {
     return {
-        loggedIn : state.loggedIn,
+        socket: state.socket,
+        loggedIn: state.loggedIn,
+        displayName: state.displayName,
+        qID: state.qID
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        setDisplayName: displayName => dispatch(setDisplayName(displayName)),
+        setQID : qID => dispatch(setQID(qID)),
+        login: () => dispatch(login()),
     }
 };
 
 export default connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
 )(App)

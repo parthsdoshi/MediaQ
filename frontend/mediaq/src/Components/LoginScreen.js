@@ -7,7 +7,7 @@ class LoginScreen extends Component {
     // contact server in this component to grab queue
 
     constructor(props) {
-        super(props)
+        super(props);
 
         this.hideLoginAndCallParentCallback = this.props.hideLoginAndCallParentCallback;
 

@@ -10,6 +10,7 @@ import {
     NavLink,
     Container,
     UncontrolledDropdown,
+    Dropdown,
     DropdownToggle,
     DropdownMenu,
     DropdownItem,
@@ -28,13 +29,20 @@ class Header extends Component {
 
         this.state = {
             collapseIsOpen: false,
-            QIDClipboardPopover: false
+            QIDClipboardPopover: false,
+            userListDropdown: false
         };
     }
 
     toggle = () => {
         this.setState({
             collapseIsOpen: !this.state.collapseIsOpen
+        });
+    };
+
+    toggleUserListDropdown = () => {
+        this.setState({
+            userListDropdown: !this.state.userListDropdown
         });
     };
 
@@ -67,6 +75,9 @@ class Header extends Component {
             width: '16px',
             height: '16px'
         };
+        let userList = this.props.userList.map((object, i) =>
+            <DropdownItem disabled key={i}>{object.displayName}</DropdownItem>);
+
         return (
             <div>
                 <Navbar color="light" light expand="md">
@@ -78,6 +89,16 @@ class Header extends Component {
                         <NavbarToggler onClick={this.toggle} />
                         <Collapse isOpen={this.state.collapseIsOpen} navbar>
                             <Nav className="ml-auto" navbar>
+                                {this.props.qID !== "" && this.props.displayName !== "" &&
+                                <UncontrolledDropdown nav inNavbar>
+                                    <DropdownToggle nav caret>
+                                        {'User List (' + this.props.userList.length + ')'}
+                                    </DropdownToggle>
+                                    <DropdownMenu right>
+                                        {userList}
+                                    </DropdownMenu>
+                                </UncontrolledDropdown>
+                                }
                                 {this.props.qID !== "" && this.props.displayName !== "" &&
                                 <NavItem>
                                     <NavLink id="QIDPopover" onClick={this.copyQIDToClipboard} href="#">
@@ -118,7 +139,8 @@ class Header extends Component {
 const mapStateToProps = state => {
     return {
         displayName : state.displayName,
-        qID: state.qID
+        qID: state.qID,
+        userList: state.userList
     }
 };
 
