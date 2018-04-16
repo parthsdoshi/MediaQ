@@ -3,7 +3,7 @@
 'join': Join an existing queue - {displayName: '', qID: ''}
     - will send back an error if queue does not exist - 'ERRCO 1: ROOM DOES NOT EXIST'
     - if successful
-        - send back to person who called it entire queue
+        - send back to person who called it entire queue - {queue: []}
         - to everyone else in the queue - {displayName: 'display name of whoever just joined'}
 
 'leave': Leave an existing queue - {displayName: '', qID: ''}
