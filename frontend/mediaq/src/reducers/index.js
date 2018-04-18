@@ -61,11 +61,23 @@ const rootReducer = (state = initialState, action) => {
             return { ...state, userList: action.payload.userList };
         case types.SET_CURRENTLY_PLAYING_INDEX:
             return { ...state, currentlyPlayingIndex: action.payload.newIndex };
+        case types.DECREMENT_CURRENTLY_PLAYING_INDEX:
+            let prevIndex = (state.currentlyPlayingIndex - 1) % (state.QueueRowEntries.length + 1);
+            return { ...state, currentlyPlayingIndex: prevIndex };
         case types.INCREMENT_CURRENTLY_PLAYING_INDEX:
-            let newIndex = (state.currentlyPlayingIndex + 1) % (state.QueueRowEntries.length + 1);
-            return { ...state, currentlyPlayingIndex: newIndex };
+            let nextIndex = (state.currentlyPlayingIndex + 1) % (state.QueueRowEntries.length + 1);
+            return { ...state, currentlyPlayingIndex: nextIndex };
         case types.CHANGE_PLAY_STATE:
             return { ...state, playState: action.payload.playState };
+        case types.SEEK_SECONDS_AHEAD:
+            if (state.youtubeVideoObject === null) {
+                // youtube haven't given back the object yet
+            } else {
+                const current_time = state.youtubeVideoObject.getCurrentTime();
+                const allow_seek_ahead = true;
+                state.youtubeVideoObject.seekTo(current_time + action.payload.seconds, allow_seek_ahead);
+            }
+            return { ...state };
         case types.CHANGE_YOUTUBE_VIDEO_OBJECT:
             return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };
         case types.ADD_TO_QUEUE:

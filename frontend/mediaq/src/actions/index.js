@@ -81,6 +81,12 @@ export const setCurrentlyPlayingIndex = newIndex => {
     };
 };
 
+export const decrementCurrentlyPlayingIndex = () => {
+    return {
+        type: types.DECREMENT_CURRENTLY_PLAYING_INDEX
+    };
+};
+
 export const incrementCurrentlyPlayingIndex = () => {
     return {
         type: types.INCREMENT_CURRENTLY_PLAYING_INDEX
@@ -91,6 +97,13 @@ export const changePlayStateAction = playState => {
     return {
         type: types.CHANGE_PLAY_STATE,
         payload: {playState: playState}
+    };
+};
+
+export const seekSecondsAhead = seconds => {
+    return {
+        type: types.SEEK_SECONDS_AHEAD,
+        payload: {seconds: seconds}
     };
 };
 

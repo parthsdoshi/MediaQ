@@ -1,15 +1,26 @@
 import React, { Component } from 'react';
 import {
+    Button,
     Collapse,
     Navbar,
     NavbarBrand,
     Nav,
     NavItem,
     Container } from 'reactstrap';
+import { connect } from 'react-redux';
+
+import SeekAheadIcon from 'open-iconic/svg/media-skip-forward.svg';
+import SeekBehindIcon from 'open-iconic/svg/media-skip-backward.svg';
+import PrevMediaIcon from 'open-iconic/svg/media-step-backward.svg';
+import NextMediaIcon from 'open-iconic/svg/media-step-forward.svg';
+
+import {
+    seekSecondsAhead,
+    decrementCurrentlyPlayingIndex,
+    incrementCurrentlyPlayingIndex
+} from "../actions/index";
 import MediaPlayPauseButton from './MediaPlayPauseButton.js';
 
-import { connect } from 'react-redux';
-import { changePlayState } from "../actions/index";
 
 class Footer extends Component {
     constructor(props) {
@@ -49,7 +60,15 @@ class Footer extends Component {
                 this.props.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }
-    }
+    };
+
+    seekBehindButtonClicked = () => {
+        this.props.seekSecondsAhead(-5);
+    };
+
+    seekAheadButtonClicked = () => {
+        this.props.seekSecondsAhead(5);
+    };
 
 
     render() {
@@ -61,9 +80,33 @@ class Footer extends Component {
                         <Container fluid>
                             <Nav className="mx-auto" navbar>
                                 <NavItem>
+                                    <Button onClick={this.props.decrementCurrentlyPlayingIndex} color={'primary'}>
+                                        <img alt={'prev_media'}
+                                             src={PrevMediaIcon} />
+                                    </Button>
+                                </NavItem>
+                                <NavItem>
+                                    <Button onClick={this.seekBehindButtonClicked} color={'primary'}>
+                                        <img alt={'seek_behind'}
+                                             src={SeekBehindIcon} />
+                                    </Button>
+                                </NavItem>
+                                <NavItem>
                                     <MediaPlayPauseButton playState={this.props.playState}
                                                           buttonID={-1}
                                                           buttonClickedCallback={this.playButtonClicked} />
+                                </NavItem>
+                                <NavItem>
+                                    <Button onClick={this.seekAheadButtonClicked} color={'primary'}>
+                                        <img alt={'seek_ahead'}
+                                             src={SeekAheadIcon} />
+                                    </Button>
+                                </NavItem>
+                                <NavItem>
+                                    <Button onClick={this.props.incrementCurrentlyPlayingIndex} color={'primary'}>
+                                        <img alt={'next_media'}
+                                             src={NextMediaIcon} />
+                                    </Button>
                                 </NavItem>
                             </Nav>
                         </Container>
@@ -80,16 +123,15 @@ const mapStateToProps = state => {
         playState : state.playState,
         currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject
     }
-}
+};
 
 const mapDispatchToProps = dispatch => {
     return {
-        changePlayState : (playState) => dispatch({
-            type : 'CHANGE_PLAY_STATE',
-            payload: {playState: playState}
-        })
+        seekSecondsAhead: seconds => dispatch(seekSecondsAhead(seconds)),
+        decrementCurrentlyPlayingIndex: () => dispatch(decrementCurrentlyPlayingIndex()),
+        incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
     }
-}
+};
 
 export default connect(
     mapStateToProps,
