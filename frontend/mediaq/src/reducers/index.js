@@ -96,6 +96,7 @@ const rootReducer = (state = initialState, action) => {
             return { ...state, volumeLevel: action.payload.newVolumeLevel };
         case types.TOGGLE_SHUFFLE:
             const newShuffleMode = state.shuffleMode === 0 ? 1 : 0;
+            console.log(newShuffleMode);
             return { ...state, shuffleMode: newShuffleMode };
         case types.CHANGE_YOUTUBE_VIDEO_OBJECT:
             return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };

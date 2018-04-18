@@ -22,7 +22,8 @@ import {
     seekSecondsAhead,
     decrementCurrentlyPlayingIndex,
     incrementCurrentlyPlayingIndex,
-    setVolume
+    setVolume,
+    toggleShuffle
 } from "../actions/index";
 import MediaPlayPauseButton from './MediaPlayPauseButton.js';
 
@@ -134,7 +135,8 @@ class Footer extends Component {
                                         <div className='value'>{this.props.volumeLevel}</div></div>
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
-                                    <Button onClick={console.log} color={'primary'}>
+                                    <Button onClick={this.props.toggleShuffle} color={'primary'}
+                                            active={this.props.shuffleMode === 1}>
                                         <img alt={'shuffle'}
                                              src={ShuffleIcon} />
                                     </Button>
@@ -154,7 +156,8 @@ const mapStateToProps = state => {
         playState : state.playState,
         currentlyPlayingIndex: state.currentlyPlayingIndex,
         currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject,
-        volumeLevel: state.volumeLevel
+        volumeLevel: state.volumeLevel,
+        shuffleMode: state.shuffleMode
     }
 };
 
@@ -163,7 +166,8 @@ const mapDispatchToProps = dispatch => {
         seekSecondsAhead: seconds => dispatch(seekSecondsAhead(seconds)),
         decrementCurrentlyPlayingIndex: () => dispatch(decrementCurrentlyPlayingIndex()),
         incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
-        setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel))
+        setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
+        toggleShuffle: () => dispatch(toggleShuffle())
     }
 };
 
