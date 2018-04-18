@@ -143,7 +143,7 @@ class Queue extends Component {
                     </tbody>
                 </Table>
                 {this.props.currentlyPlayingIndex !== 0 &&
-                    <div className="text-center"> 
+                    <div className="text-center">
                         {getEmbededVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,
                                             this.setYoutubeVideoObjectAPICallback,
                                             this.youtubeVideoStateChangedAPICallback,

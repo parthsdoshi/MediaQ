@@ -43,7 +43,10 @@ class MediaPlayPauseButton extends Component {
         }
         return (
             <Button onClick={this.playButtonClicked} color={color}>
-            <img alt={img_alt} 
+            <img alt={img_alt} style={{
+                fill: 'blue',
+                stroke: 'blue'
+            }}
                 src={src} />
             </Button>
         );
