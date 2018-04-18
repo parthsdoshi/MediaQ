@@ -134,7 +134,7 @@ class Footer extends Component {
                                         <div className='value'>{this.props.volumeLevel}</div></div>
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
-                                    <Button onClick={console.log} color={'primary'}> 
+                                    <Button onClick={console.log} color={'primary'}>
                                         <img alt={'shuffle'}
                                              src={ShuffleIcon} />
                                     </Button>

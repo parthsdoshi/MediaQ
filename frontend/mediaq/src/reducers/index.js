@@ -13,6 +13,7 @@ const initialState = {
     playState: 2,
     currentlyPlayingIndex: 0, //0 means no video is playing
     volumeLevel: 100,
+    shuffleMode: 0,
     youtubeVideoObject: null,
     QueueRowEntries: [],
 
@@ -93,6 +94,9 @@ const rootReducer = (state = initialState, action) => {
                 state.youtubeVideoObject.setVolume(action.payload.newVolumeLevel);
             }
             return { ...state, volumeLevel: action.payload.newVolumeLevel };
+        case types.TOGGLE_SHUFFLE:
+            const newShuffleMode = state.shuffleMode === 0 ? 1 : 0;
+            return { ...state, shuffleMode: newShuffleMode };
         case types.CHANGE_YOUTUBE_VIDEO_OBJECT:
             return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };
         case types.ADD_TO_QUEUE:

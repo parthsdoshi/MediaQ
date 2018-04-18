@@ -114,6 +114,11 @@ export const setVolume = newVolumeLevel => {
     };
 };
 
+export const toggleShuffle = () => {
+    return {
+        type: types.TOGGLE_SHUFFLE
+    };
+};
 
 export const changeYoutubeVideoObjectAction = youtubeVideoObject => {
     return {
