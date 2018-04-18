@@ -33,12 +33,20 @@ class Queue extends Component {
     }
 
     setYoutubeVideoObjectAPICallback = (event) => {
+        console.log('youtube video called on ready callback');
         this.props.changeYoutubeVideoObject(event.target);
         this.props.setVolume(this.props.volumeLevel);
     };
 
     youtubeVideoStateChangedAPICallback = (event) => {
         //youtubeAPI: 0->ended 1->playing   2->paused   3->buffering
+        if (this.props.currentlyPlayingYoutubeVideoObject === null) {
+            //this might happen when we set the currentobject to null because of a media change
+            //but when switching from one youtube video to another, youtube doesnt call onReady callback
+            //it calls this, thus set the video object to the current object then handle similarly to normal calls.
+            this.props.changeYoutubeVideoObject(event.target);
+            this.props.setVolume(this.props.volumeLevel);
+        }
         const youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
         if (youtubeState === this.ended) { // ended
             this.props.changePlayState(this.paused);
@@ -82,7 +90,6 @@ class Queue extends Component {
 
 
     rowEntryPlayButtonClicked = (entryNumber) => {
-        console.log(this.props.playState);
         if (entryNumber !== this.props.currentlyPlayingIndex) {
             this.props.setCurrentlyPlayingIndex(entryNumber);
             this.props.changePlayState(this.buffering);

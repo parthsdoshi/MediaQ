@@ -62,6 +62,7 @@ const rootReducer = (state = initialState, action) => {
         case types.SET_USER_LIST:
             return { ...state, userList: action.payload.userList };
         case types.SET_CURRENTLY_PLAYING_INDEX:
+            //todo dont hardcode 2
             return { ...state, currentlyPlayingIndex: action.payload.newIndex, playState: 2, youtubeVideoObject: null };
         case types.DECREMENT_CURRENTLY_PLAYING_INDEX:
             let prevIndex = state.currentlyPlayingIndex - 1;
