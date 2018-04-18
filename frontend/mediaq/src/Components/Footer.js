@@ -95,13 +95,13 @@ class Footer extends Component {
                                     <Button onClick={this.props.decrementCurrentlyPlayingIndex} color={'primary'}>
                                         <img alt={'prev_media'}
                                              src={PrevMediaIcon} />
-                                    </Button>{' '}
+                                    </Button>
                                 </NavItem>
                                 <NavItem style={paddingRight}>
                                     <Button onClick={this.seekBehindButtonClicked} color={'primary'}>
                                         <img alt={'seek_behind'}
                                              src={SeekBehindIcon} />
-                                    </Button>{' '}
+                                    </Button>
                                 </NavItem>
                                 <NavItem style={paddingRight}>
                                     <MediaPlayPauseButton playState={this.props.playState}
@@ -112,13 +112,13 @@ class Footer extends Component {
                                     <Button onClick={this.seekAheadButtonClicked} color={'primary'}>
                                         <img alt={'seek_ahead'}
                                              src={SeekAheadIcon} />
-                                    </Button>{' '}
+                                    </Button>
                                 </NavItem>
                                 <NavItem style={paddingRight}>
                                     <Button onClick={this.props.incrementCurrentlyPlayingIndex} color={'primary'}>
                                         <img alt={'next_media'}
                                              src={NextMediaIcon} />
-                                    </Button>{' '}
+                                    </Button>
                                 </NavItem>
                                 <NavItem style={{paddingLeft: 20, width:150}}>
                                     <div className='slider-horizontal'>
