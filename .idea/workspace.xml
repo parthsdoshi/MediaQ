@@ -3,7 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="d6b1d09f-1d7a-4b63-bb8a-6c075a5fce78" name="Default" comment="Make logout not reload page.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mediaq/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mediaq/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mediaq/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mediaq/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/mediaq/src/Components/Footer.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mediaq/src/Components/Footer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mediaq/src/Components/Queue.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mediaq/src/Components/Queue.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/mediaq/src/actions/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mediaq/src/actions/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/mediaq/src/constants/action-types.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mediaq/src/constants/action-types.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/mediaq/src/reducers/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mediaq/src/reducers/index.js" afterDir="false" />
@@ -23,8 +26,8 @@
       <file leaf-file-name="action-types.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/constants/action-types.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="15" column="52" selection-start-line="15" selection-start-column="52" selection-end-line="15" selection-end-column="52" />
+            <state relative-caret-position="340">
+              <caret line="20" selection-start-line="20" selection-end-line="20" />
             </state>
           </provider>
         </entry>
@@ -32,8 +35,8 @@
       <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/actions/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="318">
-              <caret line="89" column="43" selection-start-line="89" selection-start-column="13" selection-end-line="89" selection-end-column="43" />
+            <state relative-caret-position="462">
+              <caret line="115" lean-forward="true" selection-start-line="115" selection-end-line="115" />
             </state>
           </provider>
         </entry>
@@ -41,8 +44,8 @@
       <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/reducers/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="65" column="63" selection-start-line="65" selection-start-column="63" selection-end-line="65" selection-end-column="63" />
+            <state relative-caret-position="421">
+              <caret line="72" selection-start-line="72" selection-end-line="72" />
             </state>
           </provider>
         </entry>
@@ -54,18 +57,6 @@
               <caret line="58" column="44" selection-start-line="58" selection-start-column="44" selection-end-line="58" selection-end-column="44" />
               <folding>
                 <element signature="e#0#33#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="App.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/App.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="14" column="64" selection-start-line="14" selection-start-column="64" selection-end-line="14" selection-end-column="64" />
-              <folding>
-                <element signature="e#0#41#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -98,8 +89,35 @@
       <file leaf-file-name="Footer.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/Footer.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-578">
-              <caret line="20" selection-start-line="20" selection-end-line="20" />
+            <state relative-caret-position="139">
+              <caret line="59" column="56" selection-start-line="59" selection-start-column="56" selection-end-line="59" selection-end-column="56" />
+              <folding>
+                <element signature="e#0#41#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Queue.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/Queue.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="370">
+              <caret line="138" column="82" lean-forward="true" selection-start-line="138" selection-start-column="82" selection-end-line="138" selection-end-column="82" />
+              <folding>
+                <element signature="e#0#41#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="QueueRowEntry.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/QueueRowEntry.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="472">
+              <caret line="53" column="22" selection-start-line="49" selection-start-column="19" selection-end-line="53" selection-end-column="22" />
+              <folding>
+                <element signature="e#0#41#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -108,7 +126,7 @@
         <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/MediaPlayPauseButton.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="51">
-              <caret line="3" column="54" lean-forward="true" selection-start-line="3" selection-start-column="54" selection-end-line="3" selection-end-column="54" />
+              <caret line="3" column="54" selection-start-line="3" selection-start-column="54" selection-end-line="3" selection-end-column="54" />
             </state>
           </provider>
         </entry>
@@ -150,8 +168,8 @@
       <find>setDisplayName</find>
       <find>props</find>
       <find>addToQueue</find>
-      <find>hideLoginAndCallParentCallback</find>
       <find>changePlayState</find>
+      <find>hideLoginAndCallParentCallback</find>
       <find>changePlay</find>
       <find>incrementCurrentlyPlayingIndex</find>
     </findStrings>
@@ -179,10 +197,11 @@
         <option value="$PROJECT_DIR$/frontend/mediaq/src/Components/InitialConnect.js" />
         <option value="$PROJECT_DIR$/frontend/mediaq/src/sockets/index.js" />
         <option value="$PROJECT_DIR$/frontend/mediaq/src/Components/App.js" />
-        <option value="$PROJECT_DIR$/frontend/mediaq/src/Components/Queue.js" />
+        <option value="$PROJECT_DIR$/frontend/mediaq/src/Components/QueueRowEntry.js" />
         <option value="$PROJECT_DIR$/frontend/mediaq/src/constants/action-types.js" />
-        <option value="$PROJECT_DIR$/frontend/mediaq/src/reducers/index.js" />
         <option value="$PROJECT_DIR$/frontend/mediaq/src/actions/index.js" />
+        <option value="$PROJECT_DIR$/frontend/mediaq/src/Components/Queue.js" />
+        <option value="$PROJECT_DIR$/frontend/mediaq/src/reducers/index.js" />
         <option value="$PROJECT_DIR$/frontend/mediaq/src/Components/Footer.js" />
       </list>
     </option>
@@ -287,7 +306,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="SearchEverywhereHistoryKey" value="getLocatStorage&#9;null&#9;null&#10;handleMoreResultsButtonPress&#9;null&#9;null&#10;handleSearchButtonPress&#9;null&#9;null&#10;settings&#9;ACTION&#9;ShowSettings&#10;youtube&#9;null&#9;null&#10;youtue-react&#9;null&#9;null" />
+    <property name="SearchEverywhereHistoryKey" value="paddingleft&#9;null&#9;null&#10;getLocatStorage&#9;null&#9;null&#10;handleMoreResultsButtonPress&#9;null&#9;null&#10;handleSearchButtonPress&#9;null&#9;null&#10;settings&#9;ACTION&#9;ShowSettings&#10;youtube&#9;null&#9;null&#10;youtue-react&#9;null&#9;null" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.prettier" value="true" />
@@ -428,12 +447,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1523671081701</updated>
-      <workItem from="1523671088215" duration="67121000" />
+      <workItem from="1523671088215" duration="72531000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="67121000" />
+    <option name="totallyTimeSpent" value="72531000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1389" height="837" extended-state="6" />
@@ -630,25 +649,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/QueueRowEntry.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-27">
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/Search.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="16" column="34" lean-forward="true" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/AddNewMediaModal.js">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -706,13 +706,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/LoginScreen.js">
+    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/MediaPlayPauseButton.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="51">
+          <caret line="3" column="54" selection-start-line="3" selection-start-column="54" selection-end-line="3" selection-end-column="54" />
         </state>
       </provider>
     </entry>
@@ -726,17 +723,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/MediaPlayPauseButton.js">
+    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/LoginScreen.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="54" lean-forward="true" selection-start-line="3" selection-start-column="54" selection-end-line="3" selection-end-column="54" />
+        <state relative-caret-position="153">
+          <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/Queue.js">
+    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/QueueRowEntry.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="41" column="38" selection-start-line="41" selection-start-column="23" selection-end-line="41" selection-end-column="38" />
+        <state relative-caret-position="472">
+          <caret line="53" column="22" selection-start-line="49" selection-start-column="19" selection-end-line="53" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/Search.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="245">
+          <caret line="119" column="36" lean-forward="true" selection-start-line="119" selection-start-column="36" selection-end-line="119" selection-end-column="60" />
           <folding>
             <element signature="e#0#41#0" expanded="true" />
           </folding>
@@ -745,29 +755,42 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/constants/action-types.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="52" selection-start-line="15" selection-start-column="52" selection-end-line="15" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/reducers/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="65" column="63" selection-start-line="65" selection-start-column="63" selection-end-line="65" selection-end-column="63" />
+        <state relative-caret-position="340">
+          <caret line="20" selection-start-line="20" selection-end-line="20" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/actions/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="318">
-          <caret line="89" column="43" selection-start-line="89" selection-start-column="13" selection-end-line="89" selection-end-column="43" />
+        <state relative-caret-position="462">
+          <caret line="115" lean-forward="true" selection-start-line="115" selection-end-line="115" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/Queue.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="370">
+          <caret line="138" column="82" lean-forward="true" selection-start-line="138" selection-start-column="82" selection-end-line="138" selection-end-column="82" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/reducers/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="421">
+          <caret line="72" selection-start-line="72" selection-end-line="72" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/frontend/mediaq/src/Components/Footer.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-578">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
+        <state relative-caret-position="139">
+          <caret line="59" column="56" selection-start-line="59" selection-start-column="56" selection-end-line="59" selection-end-column="56" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

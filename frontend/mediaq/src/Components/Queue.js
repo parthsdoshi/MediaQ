@@ -12,6 +12,7 @@ import {changePlayStateAction,
     addToQueue,
     setCurrentlyPlayingIndex,
     incrementCurrentlyPlayingIndex} from "../actions/index";
+import {setVolume} from "../actions";
 
 class Queue extends Component {
 
@@ -33,11 +34,12 @@ class Queue extends Component {
 
     setYoutubeVideoObjectAPICallback = (event) => {
         this.props.changeYoutubeVideoObject(event.target);
+        this.props.setVolume(this.props.volumeLevel);
     };
 
     youtubeVideoStateChangedAPICallback = (event) => {
         //youtubeAPI: 0->ended 1->playing   2->paused   3->buffering
-        let youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
+        const youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
         if (youtubeState === this.ended) { // ended
             this.props.changePlayState(this.paused);
             this.props.incrementCurrentlyPlayingIndex();
@@ -50,6 +52,12 @@ class Queue extends Component {
         }
         if (this.props.playState !== this.buffering && youtubeState === this.buffering) { // buffering
             this.props.changePlayState(this.buffering);
+        }
+
+        //volume
+        const volumeLevel = this.props.currentlyPlayingYoutubeVideoObject.getVolume();
+        if (volumeLevel !== this.props.volumeLevel) {
+            this.props.setVolume(volumeLevel);
         }
     };
 
@@ -131,8 +139,8 @@ class Queue extends Component {
                     getEmbededVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,
                                             this.setYoutubeVideoObjectAPICallback,
                                             this.youtubeVideoStateChangedAPICallback,
-                                            64*3,
-                                            39*3)}
+                                            64*9,
+                                            39*9)}
             </div>
             );
     }
@@ -146,7 +154,8 @@ const mapStateToProps = state => {
         playState : state.playState,
         currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject,
         QueueRowEntries: state.QueueRowEntries,
-        currentlyPlayingIndex: state.currentlyPlayingIndex
+        currentlyPlayingIndex: state.currentlyPlayingIndex,
+        volumeLevel: state.volumeLevel
     }
 };
 
@@ -157,6 +166,7 @@ const mapDispatchToProps = dispatch => {
 //        addToQueue: rowData => dispatch(addToQueue(rowData)),
         setCurrentlyPlayingIndex: newIndex => dispatch(setCurrentlyPlayingIndex(newIndex)),
         incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
+        setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel))
     }
 };
 

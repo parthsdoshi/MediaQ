@@ -9,8 +9,10 @@ const initialState = {
     displayQIDPopup: false,
     displayIncorrectQIDPopup: false,
 
+    //todo dont hardcode 2
     playState: 2,
     currentlyPlayingIndex: 0, //0 means no video is playing
+    volumeLevel: 100,
     youtubeVideoObject: null,
     QueueRowEntries: [],
 
@@ -60,13 +62,18 @@ const rootReducer = (state = initialState, action) => {
         case types.SET_USER_LIST:
             return { ...state, userList: action.payload.userList };
         case types.SET_CURRENTLY_PLAYING_INDEX:
-            return { ...state, currentlyPlayingIndex: action.payload.newIndex };
+            return { ...state, currentlyPlayingIndex: action.payload.newIndex, playState: 2, youtubeVideoObject: null };
         case types.DECREMENT_CURRENTLY_PLAYING_INDEX:
-            let prevIndex = (state.currentlyPlayingIndex - 1) % (state.QueueRowEntries.length + 1);
-            return { ...state, currentlyPlayingIndex: prevIndex };
+            let prevIndex = state.currentlyPlayingIndex - 1;
+            //todo dont hardcode 2
+            return { ...state, currentlyPlayingIndex: prevIndex, playState: 2, youtubeVideoObject: null };
         case types.INCREMENT_CURRENTLY_PLAYING_INDEX:
-            let nextIndex = (state.currentlyPlayingIndex + 1) % (state.QueueRowEntries.length + 1);
-            return { ...state, currentlyPlayingIndex: nextIndex };
+            let nextIndex = state.currentlyPlayingIndex + 1;
+            if (nextIndex === state.QueueRowEntries.length + 1) {
+                nextIndex = 0;
+            }
+            //todo dont hardcode 2
+            return { ...state, currentlyPlayingIndex: nextIndex, playState: 2, youtubeVideoObject: null };
         case types.CHANGE_PLAY_STATE:
             return { ...state, playState: action.payload.playState };
         case types.SEEK_SECONDS_AHEAD:
@@ -78,6 +85,13 @@ const rootReducer = (state = initialState, action) => {
                 state.youtubeVideoObject.seekTo(current_time + action.payload.seconds, allow_seek_ahead);
             }
             return { ...state };
+        case types.SET_VOLUME:
+            if (state.youtubeVideoObject === null) {
+                // youtube haven't given back the object yet
+            } else if (state.youtubeVideoObject.getVolume() !== action.payload.newVolumeLevel) {
+                state.youtubeVideoObject.setVolume(action.payload.newVolumeLevel);
+            }
+            return { ...state, volumeLevel: action.payload.newVolumeLevel };
         case types.CHANGE_YOUTUBE_VIDEO_OBJECT:
             return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };
         case types.ADD_TO_QUEUE:

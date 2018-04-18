@@ -107,6 +107,14 @@ export const seekSecondsAhead = seconds => {
     };
 };
 
+export const setVolume = newVolumeLevel => {
+    return {
+        type: types.SET_VOLUME,
+        payload: {newVolumeLevel: newVolumeLevel}
+    };
+};
+
+
 export const changeYoutubeVideoObjectAction = youtubeVideoObject => {
     return {
         type: types.CHANGE_YOUTUBE_VIDEO_OBJECT,

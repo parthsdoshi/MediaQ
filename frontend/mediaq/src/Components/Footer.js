@@ -9,6 +9,9 @@ import {
     Container } from 'reactstrap';
 import { connect } from 'react-redux';
 
+import Slider from 'react-rangeslider'
+import 'react-rangeslider/lib/index.css';
+
 import SeekAheadIcon from 'open-iconic/svg/media-skip-forward.svg';
 import SeekBehindIcon from 'open-iconic/svg/media-skip-backward.svg';
 import PrevMediaIcon from 'open-iconic/svg/media-step-backward.svg';
@@ -17,7 +20,8 @@ import NextMediaIcon from 'open-iconic/svg/media-step-forward.svg';
 import {
     seekSecondsAhead,
     decrementCurrentlyPlayingIndex,
-    incrementCurrentlyPlayingIndex
+    incrementCurrentlyPlayingIndex,
+    setVolume
 } from "../actions/index";
 import MediaPlayPauseButton from './MediaPlayPauseButton.js';
 
@@ -51,6 +55,10 @@ class Footer extends Component {
     }
 
     playButtonClicked = (entryNumber) => {
+        if (this.props.currentlyPlayingIndex === 0) {
+            //no media is playing and play button is pressed, play first in queue
+            this.props.incrementCurrentlyPlayingIndex();
+        }
         if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             // youtube haven't given back the object yet
         } else {
@@ -70,8 +78,12 @@ class Footer extends Component {
         this.props.seekSecondsAhead(5);
     };
 
+    handleChangeVolumeSlider = (value) => {
+        this.props.setVolume(value);
+    };
 
     render() {
+        const paddingRight = {paddingLeft: 2};
         return (
             <div>
                 <div style={this.phantom} />
@@ -79,34 +91,45 @@ class Footer extends Component {
                     <Navbar color="light" light expand="md">
                         <Container fluid>
                             <Nav className="mx-auto" navbar>
-                                <NavItem>
+                                <NavItem style={paddingRight}>
                                     <Button onClick={this.props.decrementCurrentlyPlayingIndex} color={'primary'}>
                                         <img alt={'prev_media'}
                                              src={PrevMediaIcon} />
-                                    </Button>
+                                    </Button>{' '}
                                 </NavItem>
-                                <NavItem>
+                                <NavItem style={paddingRight}>
                                     <Button onClick={this.seekBehindButtonClicked} color={'primary'}>
                                         <img alt={'seek_behind'}
                                              src={SeekBehindIcon} />
-                                    </Button>
+                                    </Button>{' '}
                                 </NavItem>
-                                <NavItem>
+                                <NavItem style={paddingRight}>
                                     <MediaPlayPauseButton playState={this.props.playState}
                                                           buttonID={-1}
                                                           buttonClickedCallback={this.playButtonClicked} />
                                 </NavItem>
-                                <NavItem>
+                                <NavItem style={paddingRight}>
                                     <Button onClick={this.seekAheadButtonClicked} color={'primary'}>
                                         <img alt={'seek_ahead'}
                                              src={SeekAheadIcon} />
-                                    </Button>
+                                    </Button>{' '}
                                 </NavItem>
-                                <NavItem>
+                                <NavItem style={paddingRight}>
                                     <Button onClick={this.props.incrementCurrentlyPlayingIndex} color={'primary'}>
                                         <img alt={'next_media'}
                                              src={NextMediaIcon} />
-                                    </Button>
+                                    </Button>{' '}
+                                </NavItem>
+                                <NavItem style={{paddingLeft: 20, width:150}}>
+                                    <div className='slider-horizontal'>
+                                        <Slider
+                                            min={0}
+                                            max={100}
+                                            value={this.props.volumeLevel}
+                                            orientation='horizontal'
+                                            onChange={this.handleChangeVolumeSlider}
+                                        />
+                                        <div className='value'>{this.props.volumeLevel}</div></div>
                                 </NavItem>
                             </Nav>
                         </Container>
@@ -121,7 +144,9 @@ class Footer extends Component {
 const mapStateToProps = state => {
     return {
         playState : state.playState,
-        currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject
+        currentlyPlayingIndex: state.currentlyPlayingIndex,
+        currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject,
+        volumeLevel: state.volumeLevel
     }
 };
 
@@ -130,6 +155,7 @@ const mapDispatchToProps = dispatch => {
         seekSecondsAhead: seconds => dispatch(seekSecondsAhead(seconds)),
         decrementCurrentlyPlayingIndex: () => dispatch(decrementCurrentlyPlayingIndex()),
         incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
+        setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel))
     }
 };
 
