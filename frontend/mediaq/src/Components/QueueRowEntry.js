@@ -47,11 +47,11 @@ class QueueRowEntry extends Component {
                 <td>{this.props.rowData.author}</td>
                 <td>{this.props.rowData.album}</td>
                 <td>{this.props.rowData.source}</td>
-                <td>
-                    <Button color="danger">
-                        <img alt="Remove to Queue" src={MinusIcon} />
-                    </Button>
-                </td>
+                {/*<td>*/}
+                    {/*<Button color="danger">*/}
+                        {/*<img alt="Remove to Queue" src={MinusIcon} />*/}
+                    {/*</Button>*/}
+                {/*</td>*/}
 
             </tr>
         );
