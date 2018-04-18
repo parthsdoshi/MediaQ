@@ -20,6 +20,21 @@ const initialState = {
     userList: []
 };
 
+function getNextPlayingIndexShuffled(state) {
+    const current = state.currentlyPlayingIndex;
+    const max = state.QueueRowEntries.length;
+    if (current <= 0 || current > max) {//trivial
+        return Math.floor(Math.random() * max) + 1;
+    }
+    if (max <= 1) {//cannot be done, return default value
+        return initialState.currentlyPlayingIndex;
+    }
+
+    const random = Math.floor(Math.random() * (max - 1)) + 1; // random number from 1 to max-1
+    // return conditions splits choices to 1 2 3 ... current-2 current-1 current+1 current+2 ... max-1 max
+    return random >= current ? random+1 : random;
+}
+
 const rootReducer = (state = initialState, action) => {
     switch (action.type) {
         case types.SET_SOCKET:
@@ -67,12 +82,18 @@ const rootReducer = (state = initialState, action) => {
             return { ...state, currentlyPlayingIndex: action.payload.newIndex, playState: 2, youtubeVideoObject: null };
         case types.DECREMENT_CURRENTLY_PLAYING_INDEX:
             let prevIndex = state.currentlyPlayingIndex - 1;
+            if (state.shuffleMode === 1) {
+                prevIndex = getNextPlayingIndexShuffled(state)
+            }
             //todo dont hardcode 2
             return { ...state, currentlyPlayingIndex: prevIndex, playState: 2, youtubeVideoObject: null };
         case types.INCREMENT_CURRENTLY_PLAYING_INDEX:
             let nextIndex = state.currentlyPlayingIndex + 1;
             if (nextIndex === state.QueueRowEntries.length + 1) {
                 nextIndex = 0;
+            }
+            if (state.shuffleMode === 1) {
+                nextIndex = getNextPlayingIndexShuffled(state)
             }
             //todo dont hardcode 2
             return { ...state, currentlyPlayingIndex: nextIndex, playState: 2, youtubeVideoObject: null };
