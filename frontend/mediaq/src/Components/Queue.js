@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom'
 import { Table, Button } from 'reactstrap';
 
 import PlusIcon from 'open-iconic/svg/plus.svg';
@@ -26,6 +27,18 @@ class Queue extends Component {
             showAddNewMediaModal: false,
         };
     }
+
+    //scroll if video position changes
+    componentDidUpdate = (prevProps, prevState, snapshot) => {
+        if (prevProps.currentlyPlayingIndex !== this.props.currentlyPlayingIndex) {
+            this.scrollToEmbeddedVideo();
+        }
+    };
+
+    scrollToEmbeddedVideo = () => {
+        const tesNode = ReactDOM.findDOMNode(this.refs.embeddedVideo);
+        window.scrollTo(0, tesNode.offsetTop);
+    };
 
     setYoutubeVideoObjectAPICallback = (event) => {
         console.log('youtube video called on ready callback');
@@ -89,12 +102,12 @@ class Queue extends Component {
         //this.props.addToQueue(rowData);
     };
 
+
     toggleAddNewMediaModal = () => {
         this.setState({
             showAddNewMediaModal: !this.state.showAddNewMediaModal
         });
     };
-
 
     rowEntryPlayButtonClicked = (entryNumber) => {
         if (entryNumber !== this.props.currentlyPlayingIndex) {
@@ -125,7 +138,7 @@ class Queue extends Component {
                 );
             if (this.props.currentlyPlayingIndex === i + 1) {
                 QueueRowEntries.push(
-                    <tr>
+                    <tr ref="embeddedVideo">
                         <td></td>
                         <td></td>
                         <td>
