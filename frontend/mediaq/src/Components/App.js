@@ -37,11 +37,11 @@ class App extends Component {
                         <Container>
                             <Queue/>
                         </Container>
+                        <Footer />
                     </div>
                     }
                 </div>
                 }
-                <Footer />
             </div>
             );
     }

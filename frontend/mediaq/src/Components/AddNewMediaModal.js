@@ -5,27 +5,21 @@ import Search from './Search';
 
 class AddNewMediaModal extends Component {
 
-    constructor(props) {
-        super(props);
-        this.hideMe = this.props.hideMe;
-        this.loadVideoCallback = this.props.loadVideoCallback;
-        
-    }
-        
     render() {
         return (
             <Modal size='lg' 
                 isOpen={true} 
-                toggle={this.hideMe} 
+                toggle={this.props.hideMe}
                 className={this.props.className}>
-                <ModalHeader toggle={this.hideMe}>
+                <ModalHeader toggle={this.props.hideMe}>
                     Add a new song
                 </ModalHeader>
                 <ModalBody>
-                    <Search loadVideoCallback={this.loadVideoCallback}/>
+                    <Search loadVideoCallback={this.props.loadVideoCallback}
+                            loadPlaylistCallback={this.props.loadPlaylistCallback}/>
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="secondary" onClick={this.hideMe}>
+                    <Button color="secondary" onClick={this.props.hideMe}>
                         Cancel
                     </Button>
                 </ModalFooter>

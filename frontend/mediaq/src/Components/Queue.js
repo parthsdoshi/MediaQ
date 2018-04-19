@@ -64,7 +64,6 @@ class Queue extends Component {
     };
 
     loadVideoCallback = (rowData) => {
-        console.log(rowData);
         this.socket.emit('addToQueue', {
             'rowData': rowData,
             'qID': this.props.qID
@@ -72,6 +71,20 @@ class Queue extends Component {
         this.setState({
             showAddNewMediaModal: false
         });
+        //todo make an optimistic server response and add it to queue immediately, then when server responds ignore it
+        //this.props.addToQueue(rowData);
+    };
+
+    loadPlaylistCallback = (rowDatas) => {
+        this.setState({
+            showAddNewMediaModal: false
+        });
+        for (let i = 0; i < rowDatas.length; i++) {
+            this.socket.emit('addToQueue', {
+                'rowData': rowDatas[i],
+                'qID': this.props.qID
+            });
+        }
         //todo make an optimistic server response and add it to queue immediately, then when server responds ignore it
         //this.props.addToQueue(rowData);
     };
@@ -110,11 +123,31 @@ class Queue extends Component {
                     currentlyPlayingIndex={this.props.currentlyPlayingIndex}
                     rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked} />
                 );
+            if (this.props.currentlyPlayingIndex === i + 1) {
+                QueueRowEntries.push(
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            {getEmbededVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,
+                                this.setYoutubeVideoObjectAPICallback,
+                                this.youtubeVideoStateChangedAPICallback,
+                                64*9,
+                                39*9)}
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </ tr>
+                );
+            }
         }
         return (
             <div>
                 {this.state.showAddNewMediaModal &&
-                    <AddNewMediaModal loadVideoCallback={this.loadVideoCallback} hideMe={this.toggleAddNewMediaModal} />}
+                    <AddNewMediaModal loadVideoCallback={this.loadVideoCallback}
+                                      hideMe={this.toggleAddNewMediaModal}
+                                      loadPlaylistCallback={this.loadPlaylistCallback}/>}
                 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
                 <Table hover>
                     <thead>
@@ -136,15 +169,15 @@ class Queue extends Component {
                     {QueueRowEntries}
                     </tbody>
                 </Table>
-                {this.props.currentlyPlayingIndex !== 0 &&
-                    <div className="text-center">
-                        {getEmbededVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,
-                                            this.setYoutubeVideoObjectAPICallback,
-                                            this.youtubeVideoStateChangedAPICallback,
-                                            64*9,
-                                            39*9)}
-                     </ div>
-                }
+                {/*{this.props.currentlyPlayingIndex !== 0 &&*/}
+                    {/*<div className="text-center">*/}
+                        {/*{getEmbededVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,*/}
+                                            {/*this.setYoutubeVideoObjectAPICallback,*/}
+                                            {/*this.youtubeVideoStateChangedAPICallback,*/}
+                                            {/*64*9,*/}
+                                            {/*39*9)}*/}
+                     {/*</ div>*/}
+                {/*}*/}
             </div>
             );
     }

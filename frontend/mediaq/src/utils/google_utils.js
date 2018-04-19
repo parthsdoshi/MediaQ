@@ -74,8 +74,29 @@ function buildApiRequest(requestMethod, path, params, youtubeSearchCallback) {
     executeRequest(request, youtubeSearchCallback);
 }
 
+export function executePlaylistSearch(playlistID, youtubeSearchCallback) {
+    console.log('Youtube API playlist called with ' + playlistID);
+    buildApiRequest('GET',
+        '/youtube/v3/playlistItems',
+        {'part': 'snippet',
+        'playlistId': playlistID,
+        'maxResults': 50},
+        youtubeSearchCallback);
+}
+
+export function executePlaylistSearchNextPage(playlistID, nextPageToken, youtubeSearchCallback) {
+    console.log('Youtube API playlist next page called with ' + nextPageToken);
+    buildApiRequest('GET',
+        '/youtube/v3/playlistItems',
+        {'part': 'snippet',
+            'playlistId': playlistID,
+            'pageToken': nextPageToken,
+            'maxResults': 50},
+        youtubeSearchCallback);
+}
+
 export function executeSearch(searchtag, numberOfResults, youtubeSearchCallback) {
-    console.log('Youtube API called with ' + searchtag);
+    console.log('Youtube API search called with ' + searchtag);
     buildApiRequest('GET',
         '/youtube/v3/search',
         {'maxResults': numberOfResults,

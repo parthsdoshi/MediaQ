@@ -9,8 +9,6 @@ class LoginScreen extends Component {
     constructor(props) {
         super(props);
 
-        this.hideLoginAndCallParentCallback = this.props.hideLoginAndCallParentCallback;
-
         this.state = {
             displaynameBoxText: '',
             qIDBoxText: '',
@@ -41,7 +39,7 @@ class LoginScreen extends Component {
         this.setState({
             modal: false
         });
-        this.hideLoginAndCallParentCallback('', '');
+        this.props.hideLoginAndCallParentCallback('', '');
     };
 
     callParent = () => {
@@ -66,7 +64,7 @@ class LoginScreen extends Component {
         this.setState({
             modal: false
         });
-        this.hideLoginAndCallParentCallback(this.state.displaynameBoxText, this.state.qIDBoxText);
+        this.props.hideLoginAndCallParentCallback(this.state.displaynameBoxText, this.state.qIDBoxText);
     };
 
     hideWarning = () => {
