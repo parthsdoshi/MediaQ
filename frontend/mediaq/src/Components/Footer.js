@@ -22,14 +22,11 @@ import {
     toggleShuffle } from "../actions/index";
 
 import MediaPlayPauseButton from './MediaPlayPauseButton';
+import * as youtubeStates from '../constants/youtube';
 
 class Footer extends Component {
     constructor(props) {
         super(props);
-
-        this.playing = 1;
-        this.paused = 2;
-        this.buffering = 3;
 
         this.style = {
             backgroundColor: "#F8F8F8",
@@ -59,9 +56,9 @@ class Footer extends Component {
         if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             // youtube haven't given back the object yet
         } else {
-            if (this.props.playState === this.paused || this.props.playState === this.buffering) {
+            if (this.props.playState === youtubeStates.PAUSED || this.props.playState === youtubeStates.BUFFERING) {
                 this.props.currentlyPlayingYoutubeVideoObject.playVideo();
-            } else if (this.props.playState === this.playing) {
+            } else if (this.props.playState === youtubeStates.PLAYING) {
                 this.props.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }
@@ -81,6 +78,7 @@ class Footer extends Component {
 
     render() {
         const paddingLeft = {paddingLeft: 2};
+        const volumeSlider = {paddingLeft: 20, width:150};
         return (
             <div>
                 <div style={this.phantom} />
@@ -88,6 +86,15 @@ class Footer extends Component {
                     <Navbar color="light" light expand="md">
                         <Container fluid>
                             <Nav className="mx-auto" navbar>
+                                <NavItem style={paddingLeft}>
+                                    <Button onClick={this.props.toggleShuffle} color={'primary'}
+                                            active={this.props.shuffleMode}
+                                            style={{backgroundColor:this.props.shuffleMode ?
+                                                    'blue':''}}>
+                                        <img alt={'shuffle'}
+                                             src={ShuffleIcon} />
+                                    </Button>
+                                </NavItem>
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={this.props.decrementCurrentlyPlayingIndex} color={'primary'}>
                                         <img alt={'prev_media'}
@@ -117,7 +124,7 @@ class Footer extends Component {
                                              src={NextMediaIcon} />
                                     </Button>
                                 </NavItem>
-                                <NavItem style={{paddingLeft: 20, width:150}}>
+                                <NavItem style={volumeSlider}>
                                     <div className='slider-horizontal'>
                                         <link rel="stylesheet" href="https://unpkg.com/react-rangeslider/umd/rangeslider.min.css" />
                                         <Slider
@@ -128,13 +135,6 @@ class Footer extends Component {
                                             onChange={this.handleChangeVolumeSlider}
                                         />
                                         <div className='value'>{this.props.volumeLevel}</div></div>
-                                </NavItem>
-                                <NavItem style={paddingLeft}>
-                                    <Button onClick={this.props.toggleShuffle} color={'primary'}
-                                            active={this.props.shuffleMode}>
-                                        <img alt={'shuffle'}
-                                             src={ShuffleIcon} />
-                                    </Button>
                                 </NavItem>
                             </Nav>
                         </Container>

@@ -126,7 +126,7 @@ class Queue extends Component {
                             <th>Album</th>
                             <th>Source</th>
                             <th>
-                                <Button onClick={this.toggleAddNewMediaModal} color="primary">
+                                <Button onClick={this.toggleAddNewMediaModal} color="primary"  className="rounded-circle">
                                     <img alt="Add to Queue" src={PlusIcon} />
                                 </Button>
                             </th>
