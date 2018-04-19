@@ -1,4 +1,5 @@
 import * as types from "../constants/action-types";
+import * as youtubeStates from "../constants/youtube";
 
 const initialState = {
     socket: null,
@@ -9,11 +10,10 @@ const initialState = {
     displayQIDPopup: false,
     displayIncorrectQIDPopup: false,
 
-    //todo dont hardcode 2
-    playState: 2,
+    playState: youtubeStates.PAUSED,
     currentlyPlayingIndex: 0, //0 means no video is playing
     volumeLevel: 100,
-    shuffleMode: 0,
+    shuffleMode: false,
     youtubeVideoObject: null,
     QueueRowEntries: [],
 
@@ -78,25 +78,25 @@ const rootReducer = (state = initialState, action) => {
         case types.SET_USER_LIST:
             return { ...state, userList: action.payload.userList };
         case types.SET_CURRENTLY_PLAYING_INDEX:
-            //todo dont hardcode 2
-            return { ...state, currentlyPlayingIndex: action.payload.newIndex, playState: 2, youtubeVideoObject: null };
+            return { ...state, currentlyPlayingIndex: action.payload.newIndex,
+                playState: youtubeStates.PAUSED, youtubeVideoObject: null };
         case types.DECREMENT_CURRENTLY_PLAYING_INDEX:
             let prevIndex = state.currentlyPlayingIndex - 1;
-            if (state.shuffleMode === 1) {
+            if (state.shuffleMode) {
                 prevIndex = getNextPlayingIndexShuffled(state)
             }
-            //todo dont hardcode 2
-            return { ...state, currentlyPlayingIndex: prevIndex, playState: 2, youtubeVideoObject: null };
+            return { ...state, currentlyPlayingIndex: prevIndex,
+                playState: youtubeStates.PAUSED, youtubeVideoObject: null };
         case types.INCREMENT_CURRENTLY_PLAYING_INDEX:
             let nextIndex = state.currentlyPlayingIndex + 1;
             if (nextIndex === state.QueueRowEntries.length + 1) {
                 nextIndex = 0;
             }
-            if (state.shuffleMode === 1) {
+            if (state.shuffleMode) {
                 nextIndex = getNextPlayingIndexShuffled(state)
             }
-            //todo dont hardcode 2
-            return { ...state, currentlyPlayingIndex: nextIndex, playState: 2, youtubeVideoObject: null };
+            return { ...state, currentlyPlayingIndex: nextIndex,
+                playState: youtubeStates.PAUSED, youtubeVideoObject: null };
         case types.CHANGE_PLAY_STATE:
             return { ...state, playState: action.payload.playState };
         case types.SEEK_SECONDS_AHEAD:
@@ -116,9 +116,7 @@ const rootReducer = (state = initialState, action) => {
             }
             return { ...state, volumeLevel: action.payload.newVolumeLevel };
         case types.TOGGLE_SHUFFLE:
-            const newShuffleMode = state.shuffleMode === 0 ? 1 : 0;
-            console.log(newShuffleMode);
-            return { ...state, shuffleMode: newShuffleMode };
+            return { ...state, shuffleMode: !state.shuffleMode };
         case types.CHANGE_YOUTUBE_VIDEO_OBJECT:
             return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };
         case types.ADD_TO_QUEUE:

@@ -1,32 +1,27 @@
 import React, { Component } from 'react';
 import {
     Button,
-    Collapse,
     Navbar,
-    NavbarBrand,
     Nav,
     NavItem,
     Container } from 'reactstrap';
-import { connect } from 'react-redux';
 
 import Slider from 'react-rangeslider'
-//import 'react-rangeslider/lib/index.css';
-
 import SeekAheadIcon from 'open-iconic/svg/media-skip-forward.svg';
 import SeekBehindIcon from 'open-iconic/svg/media-skip-backward.svg';
 import PrevMediaIcon from 'open-iconic/svg/media-step-backward.svg';
 import NextMediaIcon from 'open-iconic/svg/media-step-forward.svg';
 import ShuffleIcon from 'open-iconic/svg/random.svg';
 
+import { connect } from 'react-redux';
 import {
     seekSecondsAhead,
     decrementCurrentlyPlayingIndex,
     incrementCurrentlyPlayingIndex,
     setVolume,
-    toggleShuffle
-} from "../actions/index";
-import MediaPlayPauseButton from './MediaPlayPauseButton.js';
+    toggleShuffle } from "../actions/index";
 
+import MediaPlayPauseButton from './MediaPlayPauseButton';
 
 class Footer extends Component {
     constructor(props) {
@@ -136,7 +131,7 @@ class Footer extends Component {
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={this.props.toggleShuffle} color={'primary'}
-                                            active={this.props.shuffleMode === 1}>
+                                            active={this.props.shuffleMode}>
                                         <img alt={'shuffle'}
                                              src={ShuffleIcon} />
                                     </Button>

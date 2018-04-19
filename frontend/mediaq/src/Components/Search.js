@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { loadYoutubeAPI, executeSearch } from './../utils/google_utils';
 import { Media, Button, Container, Row, Col } from 'reactstrap';
 
-import { RowData } from './QueueRowEntry.js'
+import { RowData } from './QueueRowEntry'
+import * as youtubeStates from "../constants/youtube";
+import { loadYoutubeAPI, executeSearch } from '../utils/google_utils';
 
 class Search extends Component {
 
@@ -11,7 +12,6 @@ class Search extends Component {
 
         this.state = {
             youtubeResults: null,
-            spotifyResults: null,
             youtubeSearchReady: false,
             youtubeReady: (Search.APIHasLoaded === true),
             searchBoxTextValue: ''
@@ -19,7 +19,7 @@ class Search extends Component {
 
         this.loadVideoCallback = props.loadVideoCallback;
 
-        this.numberOfResults = 5;
+        this.numberOfResults = youtubeStates.INITIAL_NUMBER_OF_RESULTS;
         this.loadYoutubeAPIOnlyOnce();
     }
     
@@ -141,12 +141,13 @@ handleSearchButtonPress = (target) => {
 };
 
 handleMoreResultsButtonPress = (target) => {
-    this.numberOfResults += 5;
+    this.numberOfResults += youtubeStates.INCREMENT_NUMBER_OF_RESULTS;
     this.handleSearchButtonPress(target);
 };
 
 handleKeyboardKeyPress = (target) => {
-    if(target.charCode === 13){
+    const ENTER_BUTTON = 13;
+    if(target.charCode === ENTER_BUTTON){
         this.searchYoutube(this.state.searchBoxTextValue);
     }
 };

@@ -1,42 +1,37 @@
 import React, { Component } from 'react';
 import { Button } from 'reactstrap';
+
 import PauseIcon from 'open-iconic/svg/media-pause.svg';
 import PlayIcon from 'open-iconic/svg/media-play.svg';
 import BufferIcon from 'open-iconic/svg/aperture.svg';
 
+import * as youtubeStates from "../constants/youtube";
+
 class MediaPlayPauseButton extends Component {
 
-    // contact server in this component to grab queue
-
-    constructor(props) {
-        super(props);
-        //this.props.buttonClickedCallback
-        //this.props.buttonID
-        //this.props.playState
-        
-    }
-    
     playButtonClicked = () => {
         this.props.buttonClickedCallback(this.props.buttonID);
-    }
+    };
 
     render() {
-        var img_alt = '';
-        var src = null;
-        var color = '';
-        if (this.props.playState === 1) { //playing -> show pause icon
+        let img_alt = '';
+        let src = null;
+        let color = '';
+        if (this.props.playState === youtubeStates.PLAYING) {
             img_alt = 'pause';
             src = PauseIcon;
             color = 'warning';
-        } else if (this.props.playState === 2) { //paused -> show play icon
+        } else if (this.props.playState === youtubeStates.PAUSED) {
             img_alt = 'play';
             src = PlayIcon;
             color = 'primary';
-        } else if (this.props.playState === 3) { //buffering
+        } else if (this.props.playState === youtubeStates.BUFFERING) {
             img_alt = 'buffer';
             src = BufferIcon;
             color = 'danger';
-        } else { //-1 unstarted || 0 ended || 5 video cued ??? just show buffer
+        } else {
+            //don't know what to do, just show buffering
+            console.log('this.props.playState unknown value encountered ' + this.props.playState);
             img_alt = 'buffer';
             src = BufferIcon;
             color = 'danger';

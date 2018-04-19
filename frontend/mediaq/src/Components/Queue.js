@@ -1,31 +1,26 @@
 import React, { Component } from 'react';
 import { Table, Button } from 'reactstrap';
+
 import PlusIcon from 'open-iconic/svg/plus.svg';
+
 import { connect } from 'react-redux';
-
-import QueueRowEntry from './QueueRowEntry';
-import { getEmbededVideoComponent } from '../utils/google_utils';
-import AddNewMediaModal from './AddNewMediaModal.js';
-
-import {changePlayStateAction,
-    changeYoutubeVideoObjectAction,
+import * as youtubeStates from "../constants/youtube";
+import { changePlayState,
+    changeYoutubeVideoObject,
     addToQueue,
     setCurrentlyPlayingIndex,
-    incrementCurrentlyPlayingIndex} from "../actions/index";
-import {setVolume} from "../actions";
+    incrementCurrentlyPlayingIndex,
+    setVolume } from "../actions";
+
+import AddNewMediaModal from './AddNewMediaModal';
+import QueueRowEntry from './QueueRowEntry';
+import { getEmbededVideoComponent } from '../utils/google_utils';
 
 class Queue extends Component {
-
-    // contact server in this component to grab queue
 
     constructor(props) {
         super(props);
         this.socket = props.socket;
-
-        this.ended = 0;
-        this.playing = 1;
-        this.paused = 2;
-        this.buffering = 3;
 
         this.state = {
             showAddNewMediaModal: false,
@@ -39,7 +34,6 @@ class Queue extends Component {
     };
 
     youtubeVideoStateChangedAPICallback = (event) => {
-        //youtubeAPI: 0->ended 1->playing   2->paused   3->buffering
         if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             //this might happen when we set the currentobject to null because of a media change
             //but when switching from one youtube video to another, youtube doesnt call onReady callback
@@ -48,18 +42,18 @@ class Queue extends Component {
             this.props.setVolume(this.props.volumeLevel);
         }
         const youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
-        if (youtubeState === this.ended) { // ended
-            this.props.changePlayState(this.paused);
+        if (youtubeState === youtubeStates.ENDED) { // ended
+            this.props.changePlayState(youtubeStates.PAUSED);
             this.props.incrementCurrentlyPlayingIndex();
         }
-        if (this.props.playState !== this.playing && youtubeState === this.playing) { // playing
-            this.props.changePlayState(this.playing);
+        if (this.props.playState !== youtubeStates.PLAYING && youtubeState === youtubeStates.PLAYING) {
+            this.props.changePlayState(youtubeStates.PLAYING);
         }
-        if (this.props.playState !== this.paused && youtubeState === this.paused) { // paused
-            this.props.changePlayState(this.paused);
+        if (this.props.playState !== youtubeStates.PAUSED && youtubeState === youtubeStates.PAUSED) {
+            this.props.changePlayState(youtubeStates.PAUSED);
         }
-        if (this.props.playState !== this.buffering && youtubeState === this.buffering) { // buffering
-            this.props.changePlayState(this.buffering);
+        if (this.props.playState !== youtubeStates.BUFFERING && youtubeState === youtubeStates.BUFFERING) {
+            this.props.changePlayState(youtubeStates.BUFFERING);
         }
 
         //volume
@@ -92,13 +86,13 @@ class Queue extends Component {
     rowEntryPlayButtonClicked = (entryNumber) => {
         if (entryNumber !== this.props.currentlyPlayingIndex) {
             this.props.setCurrentlyPlayingIndex(entryNumber);
-            this.props.changePlayState(this.buffering);
+            this.props.changePlayState(youtubeStates.BUFFERING);
         } else if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             // youtube haven't given back the object yet
         } else {
-            if (this.props.playState === this.paused || this.props.playState === this.buffering) {
+            if (this.props.playState === youtubeStates.PAUSED || this.props.playState === youtubeStates.BUFFERING) {
                 this.props.currentlyPlayingYoutubeVideoObject.playVideo();
-            } else if (this.props.playState === this.playing) {
+            } else if (this.props.playState === youtubeStates.PLAYING) {
                 this.props.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }
@@ -171,8 +165,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        changePlayState : playState => dispatch(changePlayStateAction(playState)),
-        changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObjectAction(youtubeVideoObject)),
+        changePlayState : playState => dispatch(changePlayState(playState)),
+        changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObject(youtubeVideoObject)),
 //        addToQueue: rowData => dispatch(addToQueue(rowData)),
         setCurrentlyPlayingIndex: newIndex => dispatch(setCurrentlyPlayingIndex(newIndex)),
         incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),

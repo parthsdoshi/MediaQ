@@ -1,27 +1,26 @@
 import React, { Component } from 'react';
 import {
     Collapse,
-    Button,
-    Navbar,
-    NavbarToggler,
-    NavbarBrand,
-    Nav,
-    NavItem,
-    NavLink,
     Container,
-    UncontrolledDropdown,
-    Dropdown,
     DropdownToggle,
     DropdownMenu,
     DropdownItem,
+    UncontrolledDropdown,
+    Navbar,
+    NavbarBrand,
+    NavbarToggler,
+    Nav,
+    NavItem,
+    NavLink,
     Popover,
-    PopoverHeader,
-    PopoverBody } from 'reactstrap';
+    PopoverHeader } from 'reactstrap';
+
 import LogoutIcon from 'open-iconic/svg/account-logout.svg';
+
 import { connect } from 'react-redux';
+import { logout } from "../actions";
 
 import MediaQIcon from '../logo.svg';
-import { logout } from "../actions";
 
 class Header extends Component {
     constructor(props) {
@@ -30,19 +29,12 @@ class Header extends Component {
         this.state = {
             collapseIsOpen: false,
             QIDClipboardPopover: false,
-            userListDropdown: false
         };
     }
 
     toggle = () => {
         this.setState({
             collapseIsOpen: !this.state.collapseIsOpen
-        });
-    };
-
-    toggleUserListDropdown = () => {
-        this.setState({
-            userListDropdown: !this.state.userListDropdown
         });
     };
 

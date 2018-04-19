@@ -93,7 +93,7 @@ export const incrementCurrentlyPlayingIndex = () => {
     };
 };
 
-export const changePlayStateAction = playState => {
+export const changePlayState = playState => {
     return {
         type: types.CHANGE_PLAY_STATE,
         payload: {playState: playState}
@@ -120,7 +120,7 @@ export const toggleShuffle = () => {
     };
 };
 
-export const changeYoutubeVideoObjectAction = youtubeVideoObject => {
+export const changeYoutubeVideoObject = youtubeVideoObject => {
     return {
         type: types.CHANGE_YOUTUBE_VIDEO_OBJECT,
         payload: {youtubeVideoObject: youtubeVideoObject}

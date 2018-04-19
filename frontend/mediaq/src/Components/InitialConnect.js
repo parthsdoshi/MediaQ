@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import { Jumbotron, Button, Container } from 'reactstrap';
-import { connect } from 'react-redux';
 
-import LoginScreen from './LoginScreen.js'
-import PopupModal from './PopupModal';
+import { connect } from 'react-redux';
 import {
     setDisplayName,
     setQID,
     login,
     setQIDPopupDisplayStatus,
-    setIncorrectQIDPopupDisplayStatus,
-} from "../actions";
+    setIncorrectQIDPopupDisplayStatus } from "../actions";
+
+import LoginScreen from './LoginScreen'
+import PopupModal from './PopupModal';
 
 class InitialConnect extends Component {
     constructor(props) {

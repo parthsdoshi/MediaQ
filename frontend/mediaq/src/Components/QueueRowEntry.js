@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { Button } from 'reactstrap';
+
 import MinusIcon from 'open-iconic/svg/minus.svg';
 
-import MediaPlayPauseButton from './MediaPlayPauseButton.js';
+import MediaPlayPauseButton from './MediaPlayPauseButton';
+import * as youtubeStates from '../constants/youtube';
 
 export function RowData(id, title, author, album, source, thumbnail) {
     this.id = id;
@@ -15,26 +17,15 @@ export function RowData(id, title, author, album, source, thumbnail) {
 
 class QueueRowEntry extends Component {
 
-    // contact server in this component to grab queue
-
-    constructor(props) {
-        super(props);
-        
-        //this.props.rowID;
-        //this.props.rowData;
-        //this.props.currentlyPlayingIndex
-        //this.props.playState
-        //this.props.rowEntryPlayButtonClicked;
-    }
-    
     playButtonClicked = (buttonID) => {
         //buttonID is the same as this.props.rowID in this case
         this.props.rowEntryPlayButtonClicked(this.props.rowID);
-    }
+    };
 
     render() {
         // if video is not currently selected video then show play icon because video is paused.
-        var buttonState = this.props.currentlyPlayingIndex !== this.props.rowID ? 2 : this.props.playState;
+        let buttonState = this.props.currentlyPlayingIndex !== this.props.rowID ?
+            youtubeStates.PAUSED: this.props.playState;
         return (
             <tr>
                 <th scope="row">{this.props.rowID + ':'}</th>

@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Container } from 'reactstrap';
-import { connect } from 'react-redux';
 
+import { connect } from 'react-redux';
+import { login, resolveBrowserClose } from "../actions";
+
+import Footer from './Footer';
 import Header from './Header';
 import InitialConnect from './InitialConnect';
 import Queue from './Queue';
-import Footer from './Footer';
-import { login, resolveBrowserClose } from "../actions";
 
 class App extends Component {
 
