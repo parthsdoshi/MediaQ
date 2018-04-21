@@ -1,5 +1,6 @@
 import React from 'react';
 import YouTube from 'react-youtube';
+import {RowData} from "./rowData";
 
 /* global gapi */
 // above tells compiler that gapi is global
@@ -74,17 +75,62 @@ function buildApiRequest(requestMethod, path, params, youtubeSearchCallback) {
     executeRequest(request, youtubeSearchCallback);
 }
 
-export function executePlaylistSearch(playlistID, youtubeSearchCallback) {
+//playlist functions
+const playlistRecursiveHelperInitial = { runningResults: [], playlistID: '', resultCallback: null };
+let playlistRecursiveHelper = { ...playlistRecursiveHelperInitial };
+
+export function getPlaylistVideos(playlistID, youtubeSearchCallback) {
+    playlistRecursiveHelper = { ...playlistRecursiveHelperInitial,
+        playlistID: playlistID, resultCallback: youtubeSearchCallback };
+    executePlaylistSearch(playlistID, getPlaylistVideosCallback);
+}
+
+function getPlaylistVideosCallback(response) {
+    if (response.error !== undefined) {
+        const returnFunction = playlistRecursiveHelper.resultCallback;
+        playlistRecursiveHelper = { ...playlistRecursiveHelperInitial }; //clear variables
+        returnFunction(null);
+    }
+    for (let i = 0; i < response.items.length; i++) {
+        playlistRecursiveHelper.runningResults.push(getPlaylistResultData(response, i));
+    }
+    if (response.nextPageToken !== undefined) {
+        executePlaylistSearchNextPage(playlistRecursiveHelper.playlistID,
+            response.nextPageToken, getPlaylistVideosCallback);
+    } else {
+        const returnFunction = playlistRecursiveHelper.resultCallback;
+        const results = playlistRecursiveHelper.runningResults;
+        playlistRecursiveHelper = { ...playlistRecursiveHelperInitial }; //clear variables
+        returnFunction(results);
+    }
+}
+
+function getPlaylistResultData (playlistData, number) {
+    let thumbnail = '';
+    if (playlistData.items[number].snippet.thumbnails !== undefined) {
+        thumbnail = playlistData.items[number].snippet.thumbnails.default.url
+    }
+    return new RowData(
+        playlistData.items[number].snippet.resourceId.videoId,
+        playlistData.items[number].snippet.title,
+        ' Playlist ',
+        ' - ',
+        'YouTube',
+        thumbnail);
+}
+
+function executePlaylistSearch(playlistID, callback) {
     console.log('Youtube API playlist called with ' + playlistID);
     buildApiRequest('GET',
         '/youtube/v3/playlistItems',
         {'part': 'snippet',
-        'playlistId': playlistID,
-        'maxResults': 50},
-        youtubeSearchCallback);
+            'playlistId': playlistID,
+            'maxResults': 50},
+        callback);
+
 }
 
-export function executePlaylistSearchNextPage(playlistID, nextPageToken, youtubeSearchCallback) {
+function executePlaylistSearchNextPage(playlistID, nextPageToken, callback) {
     console.log('Youtube API playlist next page called with ' + nextPageToken);
     buildApiRequest('GET',
         '/youtube/v3/playlistItems',
@@ -92,8 +138,10 @@ export function executePlaylistSearchNextPage(playlistID, nextPageToken, youtube
             'playlistId': playlistID,
             'pageToken': nextPageToken,
             'maxResults': 50},
-        youtubeSearchCallback);
+        callback);
 }
+
+//end playlist functions
 
 export function executeSearch(searchtag, numberOfResults, youtubeSearchCallback) {
     console.log('Youtube API search called with ' + searchtag);

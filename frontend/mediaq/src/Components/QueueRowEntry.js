@@ -6,15 +6,6 @@ import MinusIcon from 'open-iconic/svg/minus.svg';
 import MediaPlayPauseButton from './MediaPlayPauseButton';
 import * as youtubeStates from '../constants/youtube';
 
-export function RowData(id, title, author, album, source, thumbnail) {
-    this.id = id;
-    this.title = title;
-    this.author = author;
-    this.album = album;
-    this.source = source;
-    this.thumbnail = thumbnail;
-}
-
 class QueueRowEntry extends Component {
 
     playButtonClicked = (buttonID) => {

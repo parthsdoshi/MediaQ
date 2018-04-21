@@ -69,3 +69,6 @@ build
 # redis database files
 dump.rdb
 data.aof
+
+# Webstorm files
+.idea/

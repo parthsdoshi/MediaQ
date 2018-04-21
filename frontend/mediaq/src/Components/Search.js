@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { Media, Button, Container, Row, Col } from 'reactstrap';
 
-import { RowData } from './QueueRowEntry'
+import { RowData } from '../utils/rowData'
 import * as youtubeStates from "../constants/youtube";
 import {
     loadYoutubeAPI,
     executeSearch,
-    executePlaylistSearch,
-    executePlaylistSearchNextPage } from '../utils/google_utils';
+    getPlaylistVideos } from '../utils/google_utils';
 import PopupModal from "./PopupModal";
 
 class Search extends Component {
@@ -56,57 +55,21 @@ class Search extends Component {
         this.setState({youtubeResults: response, youtubeSearchReady: true})
     };
 
-    //playlist functions
-    importYoutubePlaylist = (playlistID, recursiveCallBoolean) => {
+    importYoutubePlaylist = (playlistID) => {
         this.setState({youtubeSearchReady: false});
-        if( this.state.youtubeReady ){
-            //save results in here before recursive call for next token
-            if (!recursiveCallBoolean) {
-                this.allPlaylistResults = [];
-                this.playlistID = playlistID;
-                executePlaylistSearch(playlistID, this.importYoutubePlaylistCallback);
-            } else {
-                //playlistID here is actually nextpagetoken because recursion.
-                //todo this is ugly make it clean
-                executePlaylistSearchNextPage(this.playlistID, playlistID, this.importYoutubePlaylistCallback)
-            }
-        } else {
+        if( !this.state.youtubeReady ){
             console.log('Youtube is not ready');
+            return;
         }
+        getPlaylistVideos(playlistID, this.importYoutubePlaylistCallback);
     };
 
     importYoutubePlaylistCallback = (response) => {
-        console.log(response);
-        if (response.error !== undefined) {
+        if (response == null) {
             this.setState({searchFailed: true});
             return;
         }
-        for (let i = 0; i < response.items.length; i++) {
-            this.allPlaylistResults.push(this.getPlaylistResultData(i, response));
-        }
-        if (response.nextPageToken !== undefined) {
-            this.importYoutubePlaylist(response.nextPageToken, true);
-            return;
-        }
-        //clear the variable because recursive call is done
-        const result = this.allPlaylistResults;
-        this.allPlaylistResults = null;
-        this.playlistID = null;
-        this.props.loadPlaylistCallback(result);
-    };
-
-    getPlaylistResultData = (number, playlistData) => {
-        let thumbnail = '';
-        if (playlistData.items[number].snippet.thumbnails !== undefined) {
-            thumbnail = playlistData.items[number].snippet.thumbnails.default.url
-        }
-        return new RowData(
-            playlistData.items[number].snippet.resourceId.videoId,
-            playlistData.items[number].snippet.title,
-            ' Playlist ',
-            ' - ',
-            'YouTube',
-            thumbnail);
+        this.props.loadPlaylistCallback(response);
     };
 
     getResultData = (number) => {
@@ -230,21 +193,15 @@ class Search extends Component {
                             body={'Youtube did not respond with a valid result.'} />
                 }
                 <Row>
-                    <Col sm={{ size: 2, offset: 3 }}>
                         <input type="text"
                             onKeyPress={this.handleKeyboardKeyPress}
                             onChange={this.handleChange} />
-                    </Col>
-                    <Col sm={{ size: 1 }}>
                         <Button onClick={this.handleSearchButtonPress} color="primary" >
                             Search
                         </Button>
-                    </Col>
-                    <Col sm={{ size: 1 }}>
                         <Button onClick={this.handlePlaylistButtonPress} color="primary" >
                             Import Playlist
                         </Button>
-                    </Col>
                 </Row>
                 <hr className="my-2" />
                 {youtubeMedia}

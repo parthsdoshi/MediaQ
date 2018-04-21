@@ -21,6 +21,7 @@ class Queue extends Component {
 
     constructor(props) {
         super(props);
+
         this.socket = props.socket;
 
         this.state = {
