@@ -148,11 +148,11 @@ class Footer extends Component {
 
 const mapStateToProps = state => {
     return {
-        playState : state.playState,
-        currentlyPlayingIndex: state.currentlyPlayingIndex,
-        currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject,
-        volumeLevel: state.volumeLevel,
-        shuffleMode: state.shuffleMode
+        playState : state.semiRoot.playState,
+        currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex,
+        currentlyPlayingYoutubeVideoObject: state.semiRoot.youtubeVideoObject,
+        volumeLevel: state.semiRoot.volumeLevel,
+        shuffleMode: state.semiRoot.shuffleMode
     }
 };
 

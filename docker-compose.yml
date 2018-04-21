@@ -1,6 +1,7 @@
 version: '3'
 services:
     frontend:
+        restart: always
         build: ./frontend
         volumes:
             - ./frontend/mediaq/build:/app/build

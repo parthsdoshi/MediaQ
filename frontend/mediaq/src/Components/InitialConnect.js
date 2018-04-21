@@ -141,10 +141,10 @@ class InitialConnect extends Component {
 
 const mapStateToProps = state => {
     return {
-        qID : state.qID,
-        socket: state.socket,
-        displayQIDPopup: state.displayQIDPopup,
-        displayIncorrectQIDPopup: state.displayIncorrectQIDPopup
+        socket: state.socket.socket,
+        qID : state.semiRoot.qID,
+        displayQIDPopup: state.semiRoot.displayQIDPopup,
+        displayIncorrectQIDPopup: state.semiRoot.displayIncorrectQIDPopup
     }
 };
 

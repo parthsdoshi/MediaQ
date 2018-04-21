@@ -45,7 +45,7 @@ class Queue extends Component {
     };
 
     setYoutubeVideoObjectAPICallback = (event) => {
-        console.log('youtube video called on ready callback');
+        console.log('youtube video called on ready callback: ');
         this.props.changeYoutubeVideoObject(event.target);
         this.props.setVolume(this.props.volumeLevel);
     };
@@ -203,13 +203,13 @@ class Queue extends Component {
 
 const mapStateToProps = state => {
     return {
-        socket: state.socket,
-        qID: state.qID,
-        playState : state.playState,
-        currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject,
-        QueueRowEntries: state.QueueRowEntries,
-        currentlyPlayingIndex: state.currentlyPlayingIndex,
-        volumeLevel: state.volumeLevel
+        socket: state.socket.socket,
+        qID: state.semiRoot.qID,
+        playState : state.semiRoot.playState,
+        currentlyPlayingYoutubeVideoObject: state.semiRoot.youtubeVideoObject,
+        QueueRowEntries: state.semiRoot.QueueRowEntries,
+        currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex,
+        volumeLevel: state.semiRoot.volumeLevel
     }
 };
 

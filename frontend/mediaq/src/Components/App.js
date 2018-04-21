@@ -49,8 +49,8 @@ class App extends Component {
 
 const mapStateToProps = state => {
     return {
-        socket: state.socket,
-        loggedIn: state.loggedIn,
+        socket: state.socket.socket,
+        loggedIn: state.semiRoot.loggedIn,
     }
 };
 

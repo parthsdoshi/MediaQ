@@ -130,9 +130,9 @@ class Header extends Component {
 
 const mapStateToProps = state => {
     return {
-        displayName : state.displayName,
-        qID: state.qID,
-        userList: state.userList
+        displayName : state.semiRoot.displayName,
+        qID: state.semiRoot.qID,
+        userList: state.semiRoot.userList
     }
 };
 
