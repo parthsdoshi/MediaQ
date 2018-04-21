@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
 import { Table, Button } from 'reactstrap';
-
 import PlusIcon from 'open-iconic/svg/plus.svg';
 
 import { connect } from 'react-redux';
+
 import * as youtubeStates from "../constants/youtube";
 import { changePlayState,
     changeYoutubeVideoObject,

@@ -1,12 +1,24 @@
 import React, { Component } from 'react';
 import { Media, Button, Container, Row, Col } from 'reactstrap';
 
+import { connect } from 'react-redux';
+
 import * as youtubeStates from "../constants/youtube";
 import {
     loadYoutubeAPI,
     getSearchResults,
     getPlaylistVideos } from '../utils/google_utils';
+import {
+    generateRowDataFromPlaylistResults,
+    generateRowDataFromYoutubeSearchResults } from '../utils/rowData';
 import PopupModal from "./PopupModal";
+import {
+    changePlayState,
+    changeYoutubeVideoObject,
+    incrementCurrentlyPlayingIndex,
+    setCurrentlyPlayingIndex,
+    setVolume
+} from "../actions";
 
 class Search extends Component {
 
@@ -54,7 +66,12 @@ class Search extends Component {
     };
 
     youtubeSearchCallback = (results) => {
-        console.log('google utils returned: ' + results);
+        if (results == null) {
+            this.setState({searchResultsInvalid: true});
+            return;
+        }
+        results = generateRowDataFromYoutubeSearchResults(results, this.props.displayName);
+        console.log('search results created: ' + results);
         this.setState({youtubeResults: results, displaySearchResults: true})
     };
 
@@ -69,11 +86,12 @@ class Search extends Component {
     };
 
     importYoutubePlaylistCallback = (results) => {
-        console.log('google utils returned: ' + results);
         if (results == null) {
             this.setState({searchResultsInvalid: true});
             return;
         }
+        results = generateRowDataFromPlaylistResults(results, this.props.displayName);
+        console.log('playlist results created: ' + results);
         this.props.loadPlaylistCallback(results);
     };
 
@@ -181,4 +199,12 @@ class Search extends Component {
     }
 }
 
-export default Search
+const mapStateToProps = state => {
+    return {
+        displayName: state.semiRoot.displayName,
+    }
+};
+
+export default connect(
+    mapStateToProps
+)(Search)

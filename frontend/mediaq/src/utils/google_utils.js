@@ -119,32 +119,15 @@ export function getSearchResults(searchtag, numberOfResults, youtubeSearchCallba
 
 function getSearchResultsCallback(response) {
     if (response.error !== undefined) {
-        const tempReturnFunction = resultCallback;
-        resultCallback = null;
-        tempReturnFunction(null);
-    }
-    let resulst = [];
-    for (let i = 0; i < response.items.length; i++) {
-        resulst.push(getResultData(response, i));
+        response = null; // return null because youtube returned error
     }
     const tempReturnFunction = resultCallback;
-    resultCallback = null;
-    tempReturnFunction(resulst);
-}
-
-function getResultData(data, number) {
-    return new RowData(
-        data.items[number].id.videoId,
-        data.items[number].snippet.title,
-        data.items[number].snippet.channelTitle,
-        ' - ',
-        'YouTube',
-        data.items[number].snippet.thumbnails.default.url);
+    resultCallback = null; // clear global variable before returning
+    tempReturnFunction(response);
 }
 
 //playlist functions
 const playlistRecursiveHelperInitial = { runningResults: [], playlistID: '', resultCallback: null };
-
 let playlistRecursiveHelper = { ...playlistRecursiveHelperInitial };
 
 export function getPlaylistVideos(playlistID, youtubeSearchCallback) {
@@ -159,9 +142,7 @@ function getPlaylistVideosCallback(response) {
         playlistRecursiveHelper = { ...playlistRecursiveHelperInitial }; //clear variables
         resultCallback(null);
     }
-    for (let i = 0; i < response.items.length; i++) {
-        playlistRecursiveHelper.runningResults.push(getPlaylistResultData(response, i));
-    }
+    playlistRecursiveHelper.runningResults.push(response);
     if (response.nextPageToken !== undefined) {
         executePlaylistSearchNextPage(playlistRecursiveHelper.playlistID,
             response.nextPageToken, getPlaylistVideosCallback);
@@ -171,20 +152,6 @@ function getPlaylistVideosCallback(response) {
         playlistRecursiveHelper = { ...playlistRecursiveHelperInitial }; //clear variables
         returnFunction(results);
     }
-}
-
-function getPlaylistResultData (playlistData, number) {
-    let thumbnail = '';
-    if (playlistData.items[number].snippet.thumbnails !== undefined) {
-        thumbnail = playlistData.items[number].snippet.thumbnails.default.url
-    }
-    return new RowData(
-        playlistData.items[number].snippet.resourceId.videoId,
-        playlistData.items[number].snippet.title,
-        ' Playlist ',
-        ' - ',
-        'YouTube',
-        thumbnail);
 }
 
 //end playlist functions
