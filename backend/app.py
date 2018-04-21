@@ -52,7 +52,7 @@ def set(key, value):
 
 @socketio.on('create')
 def handle_create(data):
-    print(data)
+    # print(data)
 
     displayName = data['displayName']
 
@@ -80,7 +80,7 @@ def handle_create(data):
 
 @socketio.on('join')
 def handle_join(data):
-    print(data)
+    # print(data)
     qID = data['qID']
     room = qID
     displayName = data['displayName']
@@ -93,7 +93,7 @@ def handle_join(data):
         return
 
     queue_info = json.loads(queue_info)
-    print(queue_info)
+    # print(queue_info)
 
     queue_info['connected_users'].append({
         'sid': request.sid,
@@ -109,7 +109,7 @@ def handle_join(data):
 
 @socketio.on('leave')
 def handle_leave(data):
-    print(data)
+    # print(data)
     qID = data['qID']
     room = qID
     displayName = data['displayName']
@@ -134,7 +134,7 @@ def handle_leave(data):
 
 @socketio.on('addToQueue')
 def handle_add_to_queue(data):
-    print(data)
+    # print(data)
 
     # should probably check if the user exists in that qID
     qID = data['qID']
@@ -166,7 +166,7 @@ def handle_disconnect():
 # should probably not be used since the user already grabs current queue when they join
 @socketio.on('getQueueInfo')
 def handle_get_queue(data):
-    print(data)
+    # print(data)
     qID = data['qID']
     queue_info = json.loads(get(qID))
     emit('getQueueInfo', queue_info['queue'])

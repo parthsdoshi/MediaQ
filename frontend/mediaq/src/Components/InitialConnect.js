@@ -1,38 +1,34 @@
 import React, { Component } from 'react';
 import { Jumbotron, Button, Container } from 'reactstrap';
-import LoginScreen from './LoginScreen.js'
+
+import { connect } from 'react-redux';
+import {
+    setDisplayName,
+    setQID,
+    login,
+    setQIDPopupDisplayStatus,
+    setIncorrectQIDPopupDisplayStatus } from "../actions";
+
+import LoginScreen from './LoginScreen'
 import PopupModal from './PopupModal';
 
 class InitialConnect extends Component {
     constructor(props) {
         super(props);
-        console.log('initialconnect constructor called')
 
-        this.setDisplayNameCallback = this.props.setDisplayNameCallback;
-        this.setQIDCallback = this.props.setQIDCallback;
-        this.hideMeCallback = this.props.hideInitialConnectCallback;
-        this.socket = props.socket;
+        let displayNameInStorage = localStorage.getItem('displayName');
+        let qIDInStorage = localStorage.getItem('qID');
+        if (displayNameInStorage !== null && qIDInStorage !== null) {
+            this.props.socket.emit('join', {'displayName': displayNameInStorage, 'qID': qIDInStorage});
+            this.props.setDisplayName(displayNameInStorage);
+            this.props.setQID(qIDInStorage);
+        }
 
         this.state = {
             displayLoginScreen: false,
             createQueue: false,
             joinQueue: false,
-            displayQIDModal: false,
-            qID: '' //needed to pass to popup modal to show user their QID
         };
-
-        this.socket.on('create', (data) => {
-            console.log(data);
-            let qID = data['qID'];
-            this.setQIDCallback(qID);
-            this.setState({
-                displayQIDModal: true,
-                qID: qID
-            });
-        });
-        this.socket.on('join', (data) => {
-            console.log(data);
-        });
     }
 
     createQueue = () => {
@@ -41,7 +37,7 @@ class InitialConnect extends Component {
             createQueue: true,
             joinQueue: false,
         });
-    }
+    };
 
     joinQueue = () => {
         this.setState({
@@ -49,7 +45,7 @@ class InitialConnect extends Component {
             createQueue: false,
             joinQueue: true,
         });
-    }
+    };
 
     hideLoginAndCallParentCallback = (displayName, qID) => {
         if (displayName === '' && qID === '') { //user clicked cancel
@@ -61,32 +57,36 @@ class InitialConnect extends Component {
             return;
         }
         if (this.state.joinQueue){
-            this.socket.emit('join', {'displayName': displayName, 'qID': qID});
-            this.setDisplayNameCallback(displayName);
-            this.setQIDCallback(qID);
+            this.props.socket.emit('join', {'displayName': displayName, 'qID': qID});
+            this.props.setDisplayName(displayName);
+            this.props.setQID(qID);
             this.setState({
                 displayLoginScreen: false,
                 createQueue: false,
                 joinQueue: false,
             });
-            this.hideMeCallback();
         } else if (this.state.createQueue) {
-            this.socket.emit('create', {'displayName': displayName});
-            this.setDisplayNameCallback(displayName);
+            this.props.socket.emit('create', {'displayName': displayName});
+            this.props.setDisplayName(displayName);
+            //qID set in socket listeners
             this.setState({
                 displayLoginScreen: false,
                 createQueue: false,
                 joinQueue: false,
             });
         }
-    }
+    };
     
     hideQIDModal = () => {
-        this.setState({
-            displayQIDModal: false
-        });
-        this.hideMeCallback();
-   }
+        this.props.setQIDPopupDisplayStatus(false);
+        this.props.login();
+   };
+
+    hideIncorrectQIDModal = () => {
+        this.props.setIncorrectQIDPopupDisplayStatus(false);
+        this.props.setQID('');
+        this.props.setDisplayName('');
+    };
 
     render() {
         return (
@@ -119,16 +119,46 @@ class InitialConnect extends Component {
                 </Container>
                 {this.state.displayLoginScreen && 
                 <LoginScreen 
-                    userAction={this.state.joinQueue ? 'Join an existing queue' : 'Create a new queue'}
+                    createQueue={this.state.createQueue}
                     hideLoginAndCallParentCallback={this.hideLoginAndCallParentCallback} />
                 }
-                {this.state.displayQIDModal && 
-                <PopupModal modelWantsToCloseCallback={this.hideQIDModal} 
-                    title={'Your new Queue ID: ' + this.state.qID} 
-                    body={'Give the Queue ID "' + this.state.qID + '" to your friends to join your queue'}/>}
+                {this.props.displayQIDPopup &&
+                <PopupModal modelWantsToCloseCallback={this.hideQIDModal}
+                            title={'Your new Queue ID: ' + this.props.qID}
+                            body={'Your Queue ID is "' + this.props.qID +
+                            '" save it and give it to friends to join your queue'}
+                />}
+                {this.props.displayIncorrectQIDPopup &&
+                <PopupModal modelWantsToCloseCallback={this.hideIncorrectQIDModal}
+                            title={'Incorrect Queue ID'}
+                            body={'The Queue ID you inputted "' + this.props.qID +
+                            '" is incorrect, please check that this is the correct Queue ID'}
+                />}
             </div>
             );
     }
 }
 
-export default InitialConnect
+const mapStateToProps = state => {
+    return {
+        socket: state.socket.socket,
+        qID : state.semiRoot.qID,
+        displayQIDPopup: state.semiRoot.displayQIDPopup,
+        displayIncorrectQIDPopup: state.semiRoot.displayIncorrectQIDPopup
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        setQID : qID => dispatch(setQID(qID)),
+        setDisplayName: displayName => dispatch(setDisplayName(displayName)),
+        login: () => dispatch(login()),
+        setQIDPopupDisplayStatus: newDisplayStatus => dispatch(setQIDPopupDisplayStatus(newDisplayStatus)),
+        setIncorrectQIDPopupDisplayStatus: newDisplayStatus => dispatch(setIncorrectQIDPopupDisplayStatus(newDisplayStatus))
+    }
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(InitialConnect)

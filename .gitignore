@@ -67,5 +67,7 @@ build
 *.bak
 
 # redis database files
-dump.rdb
-data.aof
+redis_data
+
+# Webstorm files
+.idea/**

@@ -1,54 +1,52 @@
 import React, { Component } from 'react';
 import {
     Collapse,
-    Button,
-    Navbar,
-    NavbarToggler,
-    NavbarBrand,
-    Nav,
-    NavItem,
-    NavLink,
     Container,
-    UncontrolledDropdown,
     DropdownToggle,
     DropdownMenu,
     DropdownItem,
+    UncontrolledDropdown,
+    Navbar,
+    NavbarBrand,
+    NavbarToggler,
+    Nav,
+    NavItem,
+    NavLink,
     Popover,
-    PopoverHeader,
-    PopoverBody } from 'reactstrap';
+    PopoverHeader } from 'reactstrap';
+
 import LogoutIcon from 'open-iconic/svg/account-logout.svg';
-import MediaQIcon from './logo.svg';
+
+import { connect } from 'react-redux';
+import { logout } from "../actions";
+
+import MediaQIcon from '../logo.svg';
 
 class Header extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            isOpen: false,
-            displayQIDModal: true,
-            popoverOpen: false
+            collapseIsOpen: false,
+            QIDClipboardPopover: false,
         };
     }
 
     toggle = () => {
         this.setState({
-            isOpen: !this.state.isOpen
+            collapseIsOpen: !this.state.collapseIsOpen
         });
-    }
+    };
 
-    togglePopover = () => {
-        console.log('wtf')
+    toggleQIDClipboardPopover = () => {
         this.setState({
-            popoverOpen: !this.state.popoverOpen
+            QIDClipboardPopover: !this.state.QIDClipboardPopover
         });
-    }
+    };
 
-    test = () => {
-        console.log("hi")
-    }
-
+    //don't look at this its ugly. it copies qID to clipboard.
     copyQIDToClipboard = () => {
-        var textarea = document.createElement("textarea");
+        let textarea = document.createElement("textarea");
         textarea.textContent = this.props.qID;
         textarea.style.position = "fixed";  // Prevent scrolling to bottom of page in MS Edge.
         document.body.appendChild(textarea);
@@ -61,14 +59,17 @@ class Header extends Component {
         } finally {
             document.body.removeChild(textarea);
         }
-        this.togglePopover();
-    }
+        this.toggleQIDClipboardPopover();
+    };
 
     render() {
-        var icon = {
+        let icon = {
             width: '16px',
             height: '16px'
-        }
+        };
+        let userList = this.props.userList.map((object, i) =>
+            <DropdownItem disabled key={i}>{object.displayName}</DropdownItem>);
+
         return (
             <div>
                 <Navbar color="light" light expand="md">
@@ -78,14 +79,25 @@ class Header extends Component {
                             MediaQ
                         </NavbarBrand>
                         <NavbarToggler onClick={this.toggle} />
-                        <Collapse isOpen={this.state.isOpen} navbar>
+                        <Collapse isOpen={this.state.collapseIsOpen} navbar>
                             <Nav className="ml-auto" navbar>
+                                {this.props.qID !== "" && this.props.displayName !== "" &&
+                                <UncontrolledDropdown nav inNavbar>
+                                    <DropdownToggle nav caret>
+                                        {'User List (' + this.props.userList.length + ')'}
+                                    </DropdownToggle>
+                                    <DropdownMenu right>
+                                        {userList}
+                                    </DropdownMenu>
+                                </UncontrolledDropdown>
+                                }
                                 {this.props.qID !== "" && this.props.displayName !== "" &&
                                 <NavItem>
                                     <NavLink id="QIDPopover" onClick={this.copyQIDToClipboard} href="#">
                                         {'Queue ID: ' + this.props.qID}
                                     </NavLink>
-                                    <Popover placement="bottom" isOpen={this.state.popoverOpen} target="QIDPopover" toggle={this.togglePopover}>
+                                    <Popover placement="bottom" isOpen={this.state.QIDClipboardPopover}
+                                             target="QIDPopover" toggle={this.toggleQIDClipboardPopover}>
                                         <PopoverHeader>Copied Queue ID!</PopoverHeader>
                                     </Popover>
                                 </NavItem>
@@ -96,7 +108,7 @@ class Header extends Component {
                                         {this.props.displayName}
                                     </DropdownToggle>
                                     <DropdownMenu right>
-                                        <DropdownItem onClick={this.props.logoutRequestCallback} >
+                                        <DropdownItem onClick={this.props.logout} >
                                             <NavLink href="#">
                                                 <img alt="Logout" src={LogoutIcon} style={icon} />
                                                 <div style={{marginLeft: 20, display: 'inline'}}>
@@ -116,4 +128,21 @@ class Header extends Component {
 }
 }
 
-export default Header;
+const mapStateToProps = state => {
+    return {
+        displayName : state.semiRoot.displayName,
+        qID: state.semiRoot.qID,
+        userList: state.semiRoot.userList
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        logout : () => dispatch(logout())
+    }
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Header)

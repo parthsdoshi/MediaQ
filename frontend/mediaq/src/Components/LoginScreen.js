@@ -7,15 +7,13 @@ class LoginScreen extends Component {
     // contact server in this component to grab queue
 
     constructor(props) {
-        super(props)
-
-        this.hideLoginAndCallParentCallback = this.props.hideLoginAndCallParentCallback;
+        super(props);
 
         this.state = {
             displaynameBoxText: '',
             qIDBoxText: '',
             modal: true,
-            showQIDInput: this.props.userAction === 'Create a new queue' ? false : true,
+            showQIDInput: !this.props.createQueue,
             warningModal: false,
             warningModalTitle: '',
             warningModalBody: ''
@@ -27,22 +25,22 @@ class LoginScreen extends Component {
         if(target.charCode === 13){
             this.callParent();
         }
-    }
+    };
 
     handleTextChangeqID = (event) => {
         this.setState({qIDBoxText: event.target.value});
-    }
+    };
 
     handleTextChangeDisplayname = (event) => {
         this.setState({displaynameBoxText: event.target.value});
-    }
+    };
 
     cancel = () => {
         this.setState({
             modal: false
         });
-        this.hideLoginAndCallParentCallback('', '');
-    }
+        this.props.hideLoginAndCallParentCallback('', '');
+    };
 
     callParent = () => {
         if (this.state.displaynameBoxText === '') {
@@ -66,8 +64,8 @@ class LoginScreen extends Component {
         this.setState({
             modal: false
         });
-        this.hideLoginAndCallParentCallback(this.state.displaynameBoxText, this.state.qIDBoxText);
-    }
+        this.props.hideLoginAndCallParentCallback(this.state.displaynameBoxText, this.state.qIDBoxText);
+    };
 
     hideWarning = () => {
         this.setState({
@@ -75,7 +73,7 @@ class LoginScreen extends Component {
             warningModalTitle: '',
             warningModalBody: ''
         });
-    }
+    };
 
 
 
@@ -84,7 +82,7 @@ class LoginScreen extends Component {
             <div>
                 <Modal isOpen={this.state.modal} className={this.props.className}>
                     <ModalHeader toggle={this.modalTurnOff}>
-                        {this.props.userAction}
+                        {this.props.createQueue ? 'Create a new queue' : 'Join an existing queue'}
                     </ModalHeader>
                     <ModalBody>
                         <div className="form-group">
