@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Media, Button, Container, Row, Col } from 'reactstrap';
 
-import { RowData } from '../utils/rowData'
 import * as youtubeStates from "../constants/youtube";
 import {
     loadYoutubeAPI,
@@ -15,11 +14,14 @@ class Search extends Component {
         super(props);
 
         this.state = {
-            youtubeResults: null,
-            youtubeSearchReady: false,
             youtubeReady: (Search.APIHasLoaded === true),
-            searchBoxTextValue: '',
-            searchFailed: false
+            searchResultsInvalid: false,
+            searchAttemptInvalid: false,
+
+            youtubeResults: null,
+            displaySearchResults: false,
+
+            searchBoxTextValue: ''
         };
 
         this.numberOfResults = youtubeStates.INITIAL_NUMBER_OF_RESULTS;
@@ -42,22 +44,24 @@ class Search extends Component {
     };
 
     searchYoutube = (searchTag, numberOfResults) => {
-        this.setState({youtubeSearchReady: false});
+        this.setState({displaySearchResults: false});
         if( this.state.youtubeReady ){
             getSearchResults(searchTag, numberOfResults, this.youtubeSearchCallback);
         } else {
+            this.setState({searchAttemptInvalid: true});
             console.log('Youtube is not ready');
         }
     };
 
     youtubeSearchCallback = (results) => {
         console.log('google utils returned: ' + results);
-        this.setState({youtubeResults: results, youtubeSearchReady: true})
+        this.setState({youtubeResults: results, displaySearchResults: true})
     };
 
     importYoutubePlaylist = (playlistID) => {
-        this.setState({youtubeSearchReady: false});
+        this.setState({displaySearchResults: false});
         if( !this.state.youtubeReady ){
+            this.setState({searchAttemptInvalid: true});
             console.log('Youtube is not ready');
             return;
         }
@@ -67,7 +71,7 @@ class Search extends Component {
     importYoutubePlaylistCallback = (results) => {
         console.log('google utils returned: ' + results);
         if (results == null) {
-            this.setState({searchFailed: true});
+            this.setState({searchResultsInvalid: true});
             return;
         }
         this.props.loadPlaylistCallback(results);
@@ -97,12 +101,12 @@ class Search extends Component {
         }
     };
 
-    handleChange = (event) => {
+    handleSearchBoxChange = (event) => {
         this.setState({searchBoxTextValue: event.target.value});
     };
 
     getResultMedia = (number) => {
-        if (!this.state.youtubeSearchReady || number >= this.state.youtubeResults.length) {
+        if (!this.state.displaySearchResults || number >= this.state.youtubeResults.length) {
             console.log('getResultMedia was called before search ' +
                 'results were ready or called with out of bounds element');
             return null;
@@ -133,22 +137,27 @@ class Search extends Component {
 
     render() {
         let youtubeMedia = [];
-        if( this.state.youtubeSearchReady ){
+        if( this.state.displaySearchResults ){
             for (let i = 0; i < this.state.youtubeResults.length; i++) {
                 youtubeMedia.push(this.getResultMedia(i));
             }
         }
         return (
             <Container fluid>
-                {this.state.searchFailed &&
-                <PopupModal modelWantsToCloseCallback={() => this.setState({searchFailed: false})}
+                {this.state.searchResultsInvalid &&
+                <PopupModal modelWantsToCloseCallback={() => this.setState({searchResultsInvalid: false})}
                             title={'Search Failed'}
                             body={'Youtube did not respond with a valid result.'} />
+                }
+                {this.state.searchAttemptInvalid &&
+                <PopupModal modelWantsToCloseCallback={() => this.setState({searchAttemptInvalid: false})}
+                            title={'Search Failed'}
+                            body={'Youtube API has not loaded yet, please try again in a moment.'} />
                 }
                 <Row>
                         <input type="text"
                             onKeyPress={this.handleKeyboardKeyPress}
-                            onChange={this.handleChange} />
+                            onChange={this.handleSearchBoxChange} />
                         <Button onClick={this.handleSearchButtonPress} color="primary" >
                             Search
                         </Button>
@@ -159,7 +168,7 @@ class Search extends Component {
                 <hr className="my-2" />
                 {youtubeMedia}
                 <Row>
-                    {this.state.youtubeSearchReady &&
+                    {this.state.displaySearchResults &&
                         <Col sm={{ size: 'auto', offset: 0 }}>
                             <Button onClick={this.handleMoreResultsButtonPress} color="primary">
                                 More Results
