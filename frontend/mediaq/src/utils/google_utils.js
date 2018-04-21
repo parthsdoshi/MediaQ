@@ -75,8 +75,76 @@ function buildApiRequest(requestMethod, path, params, youtubeSearchCallback) {
     executeRequest(request, youtubeSearchCallback);
 }
 
+function executeSearch(searchTag, numberOfResults, callback) {
+    console.log('Youtube API search called with ' + searchTag);
+    buildApiRequest('GET',
+        '/youtube/v3/search',
+        {'maxResults': numberOfResults,
+            'part': 'snippet',
+            'q': searchTag,
+            'type': 'video'},
+        callback);
+}
+
+function executePlaylistSearch(playlistID, callback) {
+    console.log('Youtube API playlist called with ' + playlistID);
+    buildApiRequest('GET',
+        '/youtube/v3/playlistItems',
+        {'part': 'snippet',
+            'playlistId': playlistID,
+            'maxResults': 50},
+        callback);
+
+}
+
+function executePlaylistSearchNextPage(playlistID, nextPageToken, callback) {
+    console.log('Youtube API playlist next page called with ' + nextPageToken);
+    buildApiRequest('GET',
+        '/youtube/v3/playlistItems',
+        {'part': 'snippet',
+            'playlistId': playlistID,
+            'pageToken': nextPageToken,
+            'maxResults': 50},
+        callback);
+}
+
+// exported functions and their helper functions/variables
+
+let resultCallback = null;
+
+export function getSearchResults(searchtag, numberOfResults, youtubeSearchCallback) {
+    resultCallback = youtubeSearchCallback;
+    executeSearch(searchtag, numberOfResults, getSearchResultsCallback)
+}
+
+function getSearchResultsCallback(response) {
+    if (response.error !== undefined) {
+        const tempReturnFunction = resultCallback;
+        resultCallback = null;
+        tempReturnFunction(null);
+    }
+    let resulst = [];
+    for (let i = 0; i < response.items.length; i++) {
+        resulst.push(getResultData(response, i));
+    }
+    const tempReturnFunction = resultCallback;
+    resultCallback = null;
+    tempReturnFunction(resulst);
+}
+
+function getResultData(data, number) {
+    return new RowData(
+        data.items[number].id.videoId,
+        data.items[number].snippet.title,
+        data.items[number].snippet.channelTitle,
+        ' - ',
+        'YouTube',
+        data.items[number].snippet.thumbnails.default.url);
+}
+
 //playlist functions
 const playlistRecursiveHelperInitial = { runningResults: [], playlistID: '', resultCallback: null };
+
 let playlistRecursiveHelper = { ...playlistRecursiveHelperInitial };
 
 export function getPlaylistVideos(playlistID, youtubeSearchCallback) {
@@ -87,9 +155,9 @@ export function getPlaylistVideos(playlistID, youtubeSearchCallback) {
 
 function getPlaylistVideosCallback(response) {
     if (response.error !== undefined) {
-        const returnFunction = playlistRecursiveHelper.resultCallback;
+        const resultCallback = playlistRecursiveHelper.resultCallback;
         playlistRecursiveHelper = { ...playlistRecursiveHelperInitial }; //clear variables
-        returnFunction(null);
+        resultCallback(null);
     }
     for (let i = 0; i < response.items.length; i++) {
         playlistRecursiveHelper.runningResults.push(getPlaylistResultData(response, i));
@@ -119,37 +187,4 @@ function getPlaylistResultData (playlistData, number) {
         thumbnail);
 }
 
-function executePlaylistSearch(playlistID, callback) {
-    console.log('Youtube API playlist called with ' + playlistID);
-    buildApiRequest('GET',
-        '/youtube/v3/playlistItems',
-        {'part': 'snippet',
-            'playlistId': playlistID,
-            'maxResults': 50},
-        callback);
-
-}
-
-function executePlaylistSearchNextPage(playlistID, nextPageToken, callback) {
-    console.log('Youtube API playlist next page called with ' + nextPageToken);
-    buildApiRequest('GET',
-        '/youtube/v3/playlistItems',
-        {'part': 'snippet',
-            'playlistId': playlistID,
-            'pageToken': nextPageToken,
-            'maxResults': 50},
-        callback);
-}
-
 //end playlist functions
-
-export function executeSearch(searchtag, numberOfResults, youtubeSearchCallback) {
-    console.log('Youtube API search called with ' + searchtag);
-    buildApiRequest('GET',
-        '/youtube/v3/search',
-        {'maxResults': numberOfResults,
-            'part': 'snippet',
-            'q': searchtag,
-            'type': 'video'},
-        youtubeSearchCallback);
-}

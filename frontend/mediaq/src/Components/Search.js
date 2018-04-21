@@ -5,7 +5,7 @@ import { RowData } from '../utils/rowData'
 import * as youtubeStates from "../constants/youtube";
 import {
     loadYoutubeAPI,
-    executeSearch,
+    getSearchResults,
     getPlaylistVideos } from '../utils/google_utils';
 import PopupModal from "./PopupModal";
 
@@ -44,15 +44,15 @@ class Search extends Component {
     searchYoutube = (searchTag, numberOfResults) => {
         this.setState({youtubeSearchReady: false});
         if( this.state.youtubeReady ){
-            executeSearch(searchTag, numberOfResults, this.youtubeSearchCallback);
+            getSearchResults(searchTag, numberOfResults, this.youtubeSearchCallback);
         } else {
             console.log('Youtube is not ready');
         }
     };
 
-    youtubeSearchCallback = (response) => {
-        console.log(response);
-        this.setState({youtubeResults: response, youtubeSearchReady: true})
+    youtubeSearchCallback = (results) => {
+        console.log('google utils returned: ' + results);
+        this.setState({youtubeResults: results, youtubeSearchReady: true})
     };
 
     importYoutubePlaylist = (playlistID) => {
@@ -64,64 +64,17 @@ class Search extends Component {
         getPlaylistVideos(playlistID, this.importYoutubePlaylistCallback);
     };
 
-    importYoutubePlaylistCallback = (response) => {
-        if (response == null) {
+    importYoutubePlaylistCallback = (results) => {
+        console.log('google utils returned: ' + results);
+        if (results == null) {
             this.setState({searchFailed: true});
             return;
         }
-        this.props.loadPlaylistCallback(response);
-    };
-
-    getResultData = (number) => {
-        return new RowData(this.getResultID(number),
-                                    this.getResultTitle(number),
-                                    this.getResultAuthor(number),
-                                    ' - ',
-                                    'YouTube',
-                                    this.getResultThumbnailUrl(number));
+        this.props.loadPlaylistCallback(results);
     };
 
     addToQueue = (number) => {
-        this.props.loadVideoCallback(this.getResultData(number));
-    };
-
-    getResultTitle = (number) => {
-        if (this.state.youtubeSearchReady &&
-            this.state.youtubeResults.items.length > number) {
-            return this.state.youtubeResults.items[number].snippet.title
-        }
-        console.log('getResultTitle was called before search ' +
-            'results were ready or called with out of bounds element');
-        return null;
-    };
-
-    getResultAuthor = (number) => {
-        if (this.state.youtubeSearchReady &&
-            this.state.youtubeResults.items.length > number) {
-            return this.state.youtubeResults.items[number].snippet.channelTitle
-        }
-        console.log('getResultAuthor was called before search ' +
-            'results were ready or called with out of bounds element');
-        return null;
-    };
-
-    getResultThumbnailUrl = (number) => {
-        if (this.state.youtubeSearchReady &&
-            this.state.youtubeResults.items.length > number) {
-            return this.state.youtubeResults.items[number].snippet.thumbnails.default.url;
-        }
-        console.log('getResultThumbnailUrl was called before search ' +
-            'results were ready or called with out of bounds element');
-        return null;
-    };
-
-    getResultID = (number) => {
-        if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
-            return this.state.youtubeResults.items[number].id.videoId
-        }
-        console.log('getResultID was called before search ' +
-            'results were ready or called with out of bounds element');
-        return null;
+        this.props.loadVideoCallback(this.state.youtubeResults[number]);
     };
 
     handleSearchButtonPress = (target) => {
@@ -129,7 +82,7 @@ class Search extends Component {
     };
 
     handlePlaylistButtonPress = (target) => {
-        this.importYoutubePlaylist(this.state.searchBoxTextValue, false);
+        this.importYoutubePlaylist(this.state.searchBoxTextValue);
     };
 
     handleMoreResultsButtonPress = (target) => {
@@ -149,23 +102,23 @@ class Search extends Component {
     };
 
     getResultMedia = (number) => {
-        if (!this.state.youtubeSearchReady || number >= this.state.youtubeResults.items.length) {
+        if (!this.state.youtubeSearchReady || number >= this.state.youtubeResults.length) {
             console.log('getResultMedia was called before search ' +
                 'results were ready or called with out of bounds element');
             return null;
         }
         return (
-            <div key={this.getResultID(number)}>
+            <div key={this.state.youtubeResults[number].id}>
                 <Media>
                     <Media left href="#">
                         <Media object
-                               src={this.getResultThumbnailUrl(number)}
+                               src={this.state.youtubeResults[number].thumbnail}
                                alt="Youtube Video Thumbnail" />
                     </Media>
 
                     <Media body style={{paddingLeft: 8}}>
                         <Media heading>
-                            {this.getResultTitle(number)}
+                            {this.state.youtubeResults[number].title}
                         </Media>
                         <Button onClick={() => this.addToQueue(number)} color="success">
                             {'Add'}
@@ -181,7 +134,7 @@ class Search extends Component {
     render() {
         let youtubeMedia = [];
         if( this.state.youtubeSearchReady ){
-            for (let i = 0; i < this.state.youtubeResults.items.length; i++) {
+            for (let i = 0; i < this.state.youtubeResults.length; i++) {
                 youtubeMedia.push(this.getResultMedia(i));
             }
         }
