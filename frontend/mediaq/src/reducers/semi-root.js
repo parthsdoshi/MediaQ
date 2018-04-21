@@ -2,7 +2,6 @@ import * as types from "../constants/action-types";
 import * as youtubeStates from "../constants/youtube";
 
 const initialState = {
-    loggedIn: false,
     displayName: '',
     qID: '',
     displayQIDPopup: false,
@@ -35,10 +34,6 @@ function getNextPlayingIndexShuffled(state) {
 
 export default function semiRoot(state = initialState, action) {
     switch (action.type) {
-        case types.LOGIN:
-            localStorage.setItem('displayName', state.displayName);
-            localStorage.setItem('qID', state.qID);
-            return { ...state, loggedIn: true };
         case types.SET_DISPLAY_NAME:
             return { ...state, displayName: action.payload.displayName };
         case types.SET_QID:
@@ -48,17 +43,7 @@ export default function semiRoot(state = initialState, action) {
         case types.SET_INCORRECT_QID_POPUP_DISPLAY_STATUS:
             return { ...state, displayIncorrectQIDPopup: action.payload.newDisplayStatus };
         case types.LOGOUT:
-            localStorage.removeItem("qID");
-            localStorage.removeItem("displayName");
-            state.socket.emit('leave', {'displayName': state.displayName, 'qID': state.qID});
-            return { ...initialState, socket: state.socket };
-        case types.RESOLVE_BROWSER_CLOSE:
-            if (state.loggedIn) {
-                localStorage.setItem('displayName', state.displayName);
-                localStorage.setItem('qID', state.qID);
-                state.socket.emit('leave', {'displayName': state.displayName, 'qID': state.qID});
-            }
-            return { ...state };
+            return { ...initialState };
         case types.ADD_NEW_USER:
             return { ...state, userList: [...state.userList, action.payload.newUser] };
         case types.REMOVE_USER:

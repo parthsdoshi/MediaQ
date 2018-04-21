@@ -12,13 +12,6 @@ import {
     generateRowDataFromPlaylistResults,
     generateRowDataFromYoutubeSearchResults } from '../utils/rowData';
 import PopupModal from "./PopupModal";
-import {
-    changePlayState,
-    changeYoutubeVideoObject,
-    incrementCurrentlyPlayingIndex,
-    setCurrentlyPlayingIndex,
-    setVolume
-} from "../actions";
 
 class Search extends Component {
 

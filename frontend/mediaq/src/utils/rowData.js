@@ -28,7 +28,14 @@ function getResultData(data, number, displayName) {
 }
 
 export function generateRowDataFromPlaylistResults(playlistResults, displayName) {
-
+    let results = [];
+    for (let i = 0; i < playlistResults.length; i++) {
+        const currentPageResults = playlistResults[i];
+        for (let j = 0; j < currentPageResults.items.length; j++) {
+            results.push(getPlaylistResultData(currentPageResults, j, displayName));
+        }
+    }
+    return results;
 }
 
 function getPlaylistResultData (playlistData, number, displayName) {
