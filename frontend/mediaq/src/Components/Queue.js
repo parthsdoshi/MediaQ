@@ -30,14 +30,17 @@ class Queue extends Component {
 
     //scroll if video position changes
     componentDidUpdate = (prevProps, prevState, snapshot) => {
-        if (prevProps.currentlyPlayingIndex !== this.props.currentlyPlayingIndex) {
+        if (prevProps.currentlyPlayingIndex !== this.props.currentlyPlayingIndex &&
+            this.props.currentlyPlayingIndex !== 0) {
             this.scrollToEmbeddedVideo();
         }
     };
 
     scrollToEmbeddedVideo = () => {
         const tesNode = ReactDOM.findDOMNode(this.refs.embeddedVideo);
-        window.scrollTo(0, tesNode.offsetTop);
+        if (tesNode != null) { //!= null: not null or undefined
+            window.scrollTo(0, tesNode.offsetTop);
+        }
     };
 
     setYoutubeVideoObjectAPICallback = (event) => {
