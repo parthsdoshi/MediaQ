@@ -71,4 +71,4 @@ dump.rdb
 data.aof
 
 # Webstorm files
-.idea/
+.idea/**
