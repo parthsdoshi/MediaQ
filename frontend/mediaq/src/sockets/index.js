@@ -12,25 +12,33 @@ import {
     removeUser
 } from '../actions'
 
+const VERBOSE_SOCKET_LISTEN = false;
+
 const setupSocket = (dispatch) => {
     let socket = io('http://' + document.domain + ':' + window.location.port);
 
     socket.on('connect', (data) => {
-        console.log('socket got connect');
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got connect');
+        }
         dispatch(setSocket(socket));
     });
 
     socket.on('create', (data) => {
-        console.log('socket got create with data ');
-        console.log(data);
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got create with data ');
+            console.log(data);
+        }
         let qID = data['qID'];
         dispatch(setQIDPopupDisplayStatus(true));
         dispatch(setQID(qID));
     });
 
     socket.on('join', (data) => {
-        console.log('socket got join with data ');
-        console.log(data);
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got join with data ');
+            console.log(data);
+        }
         //todo don't hardcode this error code
         if (data === 'ERRCO 1: ROOM DOES NOT EXIST') {
             dispatch(setIncorrectQIDPopupDisplayStatus(true));
@@ -48,14 +56,18 @@ const setupSocket = (dispatch) => {
     });
 
     socket.on('addToQueue', (data) => {
-        console.log('socket got addToQueue with data ');
-        console.log(data);
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got addToQueue with data ');
+            console.log(data);
+        }
         dispatch(addToQueue(data));
     });
 
     socket.on('leave', (data) => {
-        console.log('socket got leave with data ');
-        console.log(data);
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got leave with data ');
+            console.log(data);
+        }
         dispatch(removeUser(data.displayName));
     });
 
