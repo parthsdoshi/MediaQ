@@ -64,7 +64,8 @@ class Search extends Component {
             return;
         }
         results = generateRowDataFromYoutubeSearchResults(results, this.props.displayName);
-        console.log('search results created: ' + results);
+        console.log('search results created: ');
+        console.log(results);
         this.setState({youtubeResults: results, displaySearchResults: true})
     };
 
@@ -84,7 +85,8 @@ class Search extends Component {
             return;
         }
         results = generateRowDataFromPlaylistResults(results, this.props.displayName);
-        console.log('playlist results created: ' + results);
+        console.log('playlist results created: ');
+        console.log(results);
         this.props.loadPlaylistCallback(results);
     };
 

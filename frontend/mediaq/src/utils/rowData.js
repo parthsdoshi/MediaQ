@@ -6,6 +6,7 @@ export function RowData(id, title, author, album, source, thumbnail, displayName
     this.source = source;
     this.thumbnail = thumbnail;
     this.displayName = displayName;
+    this.timestamp = 'SERVER_GENERATED_TIMESTAMP';
 }
 
 export function generateRowDataFromYoutubeSearchResults(youtubeResults, displayName) {
@@ -28,6 +29,7 @@ function getResultData(data, number, displayName) {
 }
 
 export function generateRowDataFromPlaylistResults(playlistResults, displayName) {
+    console.log(playlistResults);
     let results = [];
     for (let i = 0; i < playlistResults.length; i++) {
         const currentPageResults = playlistResults[i];
