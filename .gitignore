@@ -60,9 +60,6 @@ typings/
 # vim swap files
 .*.swp
 
-# build folder
-build
-
 # notpad++ swap files
 *.bak
 

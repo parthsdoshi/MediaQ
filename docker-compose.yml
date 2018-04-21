@@ -9,7 +9,7 @@ services:
     backend:
         build: ./backend
         ports:
-            - "5000:80"
+            - "80:80"
         volumes:
             - ./frontend/mediaq/build:/build
             - ./backend/app.py:/app/app.py
@@ -17,5 +17,3 @@ services:
         build: ./database
         ports:
             - "6379:6379"
-        volumes:
-            - ./database/redis_data:/data
