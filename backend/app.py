@@ -198,36 +198,52 @@ def handle_add_medias(data):
         return {'response': constants.QID_DOES_NOT_EXIST}
 
     media = data['data']
-
     for key, value in media:
         set('queues', 'queue.' + key, value)
 
     emit(constants.MEDIASADDED, {'data': media, 'response': constants.SUCCESS}, room=qID, include_self=False)
     return {'response': constants.SUCCESS}
 
+# @socketio.on(constants.REMOVEMEDIA)
+@socketio.on(constants.REMOVEMEDIAS)
+def handle_remove_medias(data):
+    qID = data['qID']
+    queue_info = get('queues', qID)
+    if (queue_info == None):
+        return {'response': constants.QID_DOES_NOT_EXIST}
+
+    removedMedia = []
+    media = data['data']
+    for id in media:
+        if tryDatabaseCommand('json.del', 'queues', qID + '.queue.' + id) == 1:
+            removedMedia.append(id)
+    
+    emit(constants.MEDIASREMOVED, {'data': removedMedia, 'response': constants.SUCCESS}, room=qID, include_self=False)
+    return {'response': constants.SUCCESS}
+
+@socketio.on(constants.CURRENTQUEUE)
+def handle_current_queue(data):
+    qID = data['qID']
+    media = get('queues', qID + '.queue')
+    if (media == None):
+        return {'response': constants.QID_DOES_NOT_EXIST}
+    
+    return {'response': constants.SUCCESS, 'data': media}
+
+@socketio.on(constants.CURRENTUSERS)
+def handle_current_users(data):
+    qID = data['qID']
+    current_users = get('queues', qID + '.current_users')
+    if current_users == None:
+        return {'response': constants.QID_DOES_NOT_EXIST}
+
+    ret = []
+    for user in current_users:
+        ret.append(user['displayName'])
+
+    return {'response': constants.SUCCESS, 'data': ret}
+
 # @socketio.on('disconnect')
-# def handle_disconnect():
-#     for room in rooms():
-#         if (room != request.sid):
-#             queue_info = json.loads(get(room))
-#             for connected_user in queue_info['connected_users']:
-#                 if (connected_user['sid'] == request.sid):
-#                     displayName = connected_user['displayName']
-#                     emit('leave', {'displayName': displayName}, room=room, include_self=False)
-#                     queue_info['connected_users'].remove(connected_user)
-# 
-#             leave_room(room)
-# 
-# 
-# # should probably not be used since the user already grabs current queue when they join
-# @socketio.on('getQueueInfo')
-# def handle_get_queue(data):
-#     # print(data)
-#     qID = data['qID']
-#     queue_info = json.loads(get(qID))
-#     emit('getQueueInfo', queue_info['queue'])
-# 
-# 
-# 
+
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=80, debug=True)
