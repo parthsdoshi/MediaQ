@@ -33,13 +33,25 @@ export function generateRowDataFromPlaylistResults(playlistResults, displayName)
     for (let i = 0; i < playlistResults.length; i++) {
         const currentPageResults = playlistResults[i];
         for (let j = 0; j < currentPageResults.items.length; j++) {
-            results.push(getPlaylistResultData(currentPageResults, j, displayName));
+            const rowData = getPlaylistResultData(currentPageResults, j, displayName);
+            if (rowData === null) {
+                // deleted video
+                continue;
+            }
+            results.push(rowData);
         }
     }
     return results;
 }
 
 function getPlaylistResultData (playlistData, number, displayName) {
+    if (playlistData.items[number].snippet.thumbnails === undefined &&
+            playlistData.items[number].snippet.title === 'Deleted video' &&
+            playlistData.items[number].snippet.description === 'This video is unavailable.') {
+        // deleted video
+        return null;
+    }
+
     let thumbnail = '';
     if (playlistData.items[number].snippet.thumbnails !== undefined) {
         thumbnail = playlistData.items[number].snippet.thumbnails.default.url
