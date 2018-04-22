@@ -12,7 +12,7 @@ import {
     removeUser
 } from '../actions'
 
-const VERBOSE_SOCKET_LISTEN = false;
+const VERBOSE_SOCKET_LISTEN = true;
 
 const setupSocket = (dispatch) => {
     let socket = io('http://' + document.domain + ':' + window.location.port);
@@ -24,11 +24,13 @@ const setupSocket = (dispatch) => {
         dispatch(setSocket(socket));
     });
 
-    socket.on('create', (data) => {
+    socket.on('Create', (data) => {
         if (VERBOSE_SOCKET_LISTEN) {
             console.log('socket got create with data ');
             console.log(data);
         }
+        console.log('yay server responded');
+        let response = data['response'];
         let qID = data['qID'];
         dispatch(setQIDPopupDisplayStatus(true));
         dispatch(setQID(qID));

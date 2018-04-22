@@ -67,7 +67,8 @@ class InitialConnect extends Component {
                 joinQueue: false,
             });
         } else if (this.state.createQueue) {
-            this.props.socket.emit('create', { 'displayName': displayName });
+            console.log('sending to server');
+            this.props.socket.emit('Create', { 'data': displayName });
             this.props.setDisplayName(displayName);
             //qID set in socket listeners
             this.setState({
