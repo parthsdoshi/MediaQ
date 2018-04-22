@@ -29,7 +29,6 @@ function getResultData(data, number, displayName) {
 }
 
 export function generateRowDataFromPlaylistResults(playlistResults, displayName) {
-    console.log(playlistResults);
     let results = [];
     for (let i = 0; i < playlistResults.length; i++) {
         const currentPageResults = playlistResults[i];

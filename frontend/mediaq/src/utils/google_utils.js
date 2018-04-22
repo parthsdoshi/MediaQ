@@ -111,9 +111,14 @@ function executePlaylistSearchNextPage(playlistID, nextPageToken, callback) {
 // exported functions and their helper functions/variables
 
 let resultCallback = null;
+let searchInProgress = false;
 
 export function getSearchResults(searchtag, numberOfResults, youtubeSearchCallback) {
+    if (searchInProgress) {
+        return;
+    }
     resultCallback = youtubeSearchCallback;
+    searchInProgress = true;
     executeSearch(searchtag, numberOfResults, getSearchResultsCallback)
 }
 
@@ -122,34 +127,44 @@ function getSearchResultsCallback(response) {
         response = null; // return null because youtube returned error
     }
     const tempReturnFunction = resultCallback;
-    resultCallback = null; // clear global variable before returning
+    // clear global variable before returning
+    resultCallback = null;
+    searchInProgress = false;
     tempReturnFunction(response);
 }
 
 //playlist functions
-const playlistRecursiveHelperInitial = { runningResults: [], playlistID: '', resultCallback: null };
+const playlistRecursiveHelperInitial = { searchInProgress: false, runningResults: [],
+    playlistID: '', resultCallback: null };
 let playlistRecursiveHelper = { ...playlistRecursiveHelperInitial };
 
 export function getPlaylistVideos(playlistID, youtubeSearchCallback) {
+    if (playlistRecursiveHelper.searchInProgress) {
+        return;
+    }
     playlistRecursiveHelper = { ...playlistRecursiveHelperInitial,
-        playlistID: playlistID, resultCallback: youtubeSearchCallback };
+        playlistID: playlistID, resultCallback: youtubeSearchCallback, searchInProgress: true };
     executePlaylistSearch(playlistID, getPlaylistVideosCallback);
 }
 
 function getPlaylistVideosCallback(response) {
+    // youtube returned an error, return null as the result
     if (response.error !== undefined) {
         const resultCallback = playlistRecursiveHelper.resultCallback;
-        playlistRecursiveHelper = { ...playlistRecursiveHelperInitial }; //clear variables
+        // clear global variable before returning
+        playlistRecursiveHelper = { ...playlistRecursiveHelperInitial };
         resultCallback(null);
     }
-    playlistRecursiveHelper.runningResults.push(response);
+
+    playlistRecursiveHelper.runningResults = [ ...playlistRecursiveHelper.runningResults, response ];
     if (response.nextPageToken !== undefined) {
         executePlaylistSearchNextPage(playlistRecursiveHelper.playlistID,
             response.nextPageToken, getPlaylistVideosCallback);
     } else {
         const returnFunction = playlistRecursiveHelper.resultCallback;
         const results = playlistRecursiveHelper.runningResults;
-        playlistRecursiveHelper = { ...playlistRecursiveHelperInitial }; //clear variables
+        // clear global variable before returning
+        playlistRecursiveHelper = { ...playlistRecursiveHelperInitial };
         returnFunction(results);
     }
 }
