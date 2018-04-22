@@ -172,23 +172,24 @@ def handle_leave(data):
     return {'response': constants.SUCCESS}
 
 
+# @socketio.on(constants.ADDMEDIA)
+# def handle_add_media(data):
+#     qID = data['qID']
+# 
+#     queue_info = get('queues', qID)
+#     if (queue_info == None):
+#         return {'response': constants.QID_DOES_NOT_EXIST}
+# 
+#     media = data['data']
+#     mediaId = [*media][0]
+#     rowData = media[mediaId]
+# 
+#     set('queues', 'queue.' + mediaId, rowData)
+# 
+#     emit(constants.MEDIAADDED, {'data': {mediaId: rowData}, 'response': constants.SUCCESS}, room=qID, include_self=False)
+#     return {'response': constants.SUCCESS}
+
 @socketio.on(constants.ADDMEDIA)
-def handle_add_media(data):
-    qID = data['qID']
-
-    queue_info = get('queues', qID)
-    if (queue_info == None):
-        return {'response': constants.QID_DOES_NOT_EXIST}
-
-    media = data['data']
-    mediaId = [*media][0]
-    rowData = media[mediaId]
-
-    set('queues', 'queue.' + mediaId, rowData)
-
-    emit(constants.MEDIAADDED, {'data': {mediaId: rowData}, 'response': constants.SUCCESS}, room=qID, include_self=False)
-    return {'response': constants.SUCCESS}
-
 @socketio.on(constants.ADDMEDIAS)
 def handle_add_medias(data):
     qID = data['qID']
@@ -197,10 +198,12 @@ def handle_add_medias(data):
         return {'response': constants.QID_DOES_NOT_EXIST}
 
     media = data['data']
-    mediaId = [*media][0]
-    rowData = media[mediaId]
 
-    set('queues', 'queue.' + mediaId, rowData)
+    for key, value in media:
+        set('queues', 'queue.' + key, value)
+
+    emit(constants.MEDIASADDED, {'data': media, 'response': constants.SUCCESS}, room=qID, include_self=False)
+    return {'response': constants.SUCCESS}
 
 # @socketio.on('disconnect')
 # def handle_disconnect():
