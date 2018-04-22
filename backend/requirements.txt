@@ -8,3 +8,4 @@ eventlet
 
 # database
 redis
+# rejson
