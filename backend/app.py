@@ -27,7 +27,10 @@ def get(key, path):
     retries = 5
     while True:
         try:
-            return json.loads(database.execute_command('JSON.GET', key, path))
+            value = database.execute_command('JSON.GET', key, path)
+            if value != None:
+                value = json.loads(value)
+            return value
         except redis.exceptions.ConnectionError as exc:
             if retries == 0:
                 raise exc
