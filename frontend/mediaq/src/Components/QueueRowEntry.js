@@ -5,6 +5,7 @@ import MinusIcon from 'open-iconic/svg/minus.svg';
 
 import MediaPlayPauseButton from './MediaPlayPauseButton';
 import * as youtubeStates from '../constants/youtube';
+import youTubeLogo from '../youtube.png'
 
 class QueueRowEntry extends Component {
 
@@ -28,7 +29,13 @@ class QueueRowEntry extends Component {
                 <td>{this.props.rowData.title}</td>
                 <td>{this.props.rowData.author}</td>
                 <td>{this.props.rowData.album}</td>
-                <td>{this.props.rowData.source}</td>
+                <td>
+                    <a href={"https://www.youtube.com/watch?v=" + this.props.rowData.id}
+                       target="_blank" style={{display: "table-cell"}}>
+                    <img  src={youTubeLogo} style={{width: 34, height: 38}}
+                          alt="youtube logo" />
+                    </a>
+                </td>
                 {/*<td>*/}
                     {/*<Button color="danger">*/}
                         {/*<img alt="Remove to Queue" src={MinusIcon} />*/}
