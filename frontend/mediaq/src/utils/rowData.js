@@ -35,7 +35,7 @@ export function generateRowDataFromPlaylistResults(playlistResults, displayName)
         for (let j = 0; j < currentPageResults.items.length; j++) {
             const rowData = getPlaylistResultData(currentPageResults, j, displayName);
             if (rowData === null) {
-                // deleted video
+                // video unavailable
                 continue;
             }
             results.push(rowData);
@@ -51,10 +51,19 @@ function getPlaylistResultData (playlistData, number, displayName) {
         // deleted video
         return null;
     }
+    if (playlistData.items[number].snippet.thumbnails === undefined &&
+        playlistData.items[number].snippet.title === 'Private video' &&
+        playlistData.items[number].snippet.description === 'This video is private.') {
+        // private video
+        return null;
+    }
+
 
     let thumbnail = '';
     if (playlistData.items[number].snippet.thumbnails !== undefined) {
-        thumbnail = playlistData.items[number].snippet.thumbnails.default.url
+        thumbnail = playlistData.items[number].snippet.thumbnails.default.url;
+    } else {
+        console.log(playlistData.items[number]);
     }
     return new RowData(
         playlistData.items[number].snippet.resourceId.videoId,
