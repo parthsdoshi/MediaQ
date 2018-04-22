@@ -164,8 +164,6 @@ def handle_leave(data):
             tryDatabaseCommand('json.arrpop', 'queues', qID + '.connected_users', i)
             break
 
-    # include_self set to True because the website should wait till we've confirmed
-    # that the user has been removed...
     leave_room(qID)
     emit(constants.USERLEFT, {'data': displayName, 'response': constants.SUCCESS}, room=qID, include_self=False)
     return {'response': constants.SUCCESS}
@@ -187,8 +185,20 @@ def handle_add_media(data):
 
     emit(constants.MEDIAADDED, {'data': {mediaId: rowData}, 'response': constants.SUCCESS}, room=qID, include_self=False)
     return {'response': constants.SUCCESS}
-# 
-# 
+
+@socketio.on(constants.ADDMEDIAS)
+def handle_add_medias(data):
+    qID = data['qID']
+    queue_info = get('queues', qID)
+    if (queue_info == None):
+        return {'response': constants.QID_DOES_NOT_EXIST}
+
+    media = data['data']
+    mediaId = [*media][0]
+    rowData = media[mediaId]
+
+    set('queues', 'queue.' + mediaId, rowData)
+
 # @socketio.on('disconnect')
 # def handle_disconnect():
 #     for room in rooms():
