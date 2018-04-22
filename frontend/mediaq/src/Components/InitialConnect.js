@@ -69,6 +69,7 @@ class InitialConnect extends Component {
         } else if (this.state.createQueue) {
             console.log('sending to server');
             this.props.socket.emit('Create', { 'data': displayName }, (response) => {
+                // dispatch here or import function socket file
                 console.log(response)
             });
             this.props.setDisplayName(displayName);
