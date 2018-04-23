@@ -87,9 +87,10 @@ def handle_create(data):
                     'displayName': displayName}]
                 }
         hset('queues', random_id, queue_info)
+        connected_users = queue_info['connected_users']
 
         join_room(room)
-        return {'response': constants.SUCCESS, 'qID': random_id}
+        return {'response': constants.SUCCESS, 'qID': random_id, 'data': {'connected_users': connected_users}}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
@@ -104,14 +105,14 @@ def handle_join(data):
         queue_info = hget('queues', qID)
 
         if (queue_info == None):
-            return {'response': constants.QID_DOES_NOT_EXIST}
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
 
         connected_users = queue_info['connected_users']
         queue = queue_info['queue']
 
         for user in connected_users:
             if (user['displayName'] == displayName):
-                return {'response': constants.DISPLAY_NAME_NOT_UNIQUE}
+                return {'response': constants.DISPLAY_NAME_NOT_UNIQUE, 'qID': qID, 'data': {'displayName': displayName}}
 
         current_user = {
             'sid': request.sid,
@@ -126,8 +127,8 @@ def handle_join(data):
         hset('queues', qID, queue_info)
 
         join_room(qID)
-        emit(constants.USERJOINED, {'data': {'displayName': displayName}, 'response': constants.SUCCESS}, room=qID, include_self=False)
-        return {'response': constants.SUCCESS, 'data': {'connected_users': usersArr, 'queue': queue}}
+        emit(constants.USERJOINED, {'data': {'displayName': displayName}, 'response': constants.SUCCESS, 'qID': qID}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS, 'data': {'connected_users': usersArr, 'queue': queue}, 'qID': qID}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
@@ -143,7 +144,7 @@ def handle_leave(data):
 
         queue_info = hget('queues', qID)
         if (queue_info == None):
-            return {'response': constants.QID_DOES_NOT_EXIST}
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
 
         connected_users = queue_info['connected_users']
 
@@ -157,11 +158,11 @@ def handle_leave(data):
                 break
 
         if not found_user:
-            return {'response': constants.USER_DOES_NOT_EXIST}
+            return {'response': constants.USER_DOES_NOT_EXIST, 'qID': qID, 'data': {'displayName': displayName}}
 
         leave_room(qID)
-        emit(constants.USERLEFT, {'data': {'displayName': displayName}, 'response': constants.SUCCESS}, room=qID, include_self=False)
-        return {'response': constants.SUCCESS}
+        emit(constants.USERLEFT, {'data': {'displayName': displayName}, 'response': constants.SUCCESS, 'qID': qID}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS, 'qID': qID, 'data': {'displayName': displayName}}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
@@ -195,7 +196,7 @@ def handle_add_medias(data):
 
         queue_info = hget('queues', qID)
         if (queue_info == None):
-            return {'response': constants.QID_DOES_NOT_EXIST}
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
 
         queue = queue_info['queue']
 
@@ -206,8 +207,8 @@ def handle_add_medias(data):
 
         hset('queues', qID, queue_info)
 
-        emit(constants.MEDIASADDED, {'data': {'medias': medias}, 'response': constants.SUCCESS}, room=qID, include_self=False)
-        return {'response': constants.SUCCESS}
+        emit(constants.MEDIASADDED, {'data': {'medias': medias}, 'response': constants.SUCCESS, 'qID': qID}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS, 'data': {'medias': medias}, 'qID': qID}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
@@ -222,7 +223,7 @@ def handle_remove_medias(data):
         qID = data['qID']
         queue_info = hget('queues', qID)
         if (queue_info == None):
-            return {'response': constants.QID_DOES_NOT_EXIST}
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
 
         queue = queue_info['queue']
 
@@ -235,8 +236,8 @@ def handle_remove_medias(data):
     
         hset('queues', qID, queue_info)
 
-        emit(constants.MEDIASREMOVED, {'data': {'medias': removedMedias}, 'response': constants.SUCCESS}, room=qID, include_self=False)
-        return {'response': constants.SUCCESS}
+        emit(constants.MEDIASREMOVED, {'data': {'medias': removedMedias}, 'response': constants.SUCCESS, 'qID': qID}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS, 'qID': qID, 'data': {'medias': removedMedias}}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
@@ -250,11 +251,11 @@ def handle_current_queue(data):
         qID = data['qID']
         queue_info = hget('queues', qID)
         if (queue_info == None):
-            return {'response': constants.QID_DOES_NOT_EXIST}
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
 
         queue = queue_info['queue']
     
-        return {'response': constants.SUCCESS, 'data': {'queue': queue}}
+        return {'response': constants.SUCCESS, 'data': {'queue': queue}, 'qID': qID}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
@@ -268,7 +269,7 @@ def handle_connected_users(data):
         qID = data['qID']
         queue_info = hget('queues', qID)
         if queue_info == None:
-            return {'response': constants.QID_DOES_NOT_EXIST}
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
 
         connected_users = queue_info['connected_users']
 
@@ -276,7 +277,7 @@ def handle_connected_users(data):
         for user in connected_users:
             ret.append(user['displayName'])
 
-        return {'response': constants.SUCCESS, 'data': {'connected_users': ret}}
+        return {'response': constants.SUCCESS, 'data': {'connected_users': ret}, 'qID': qID}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
@@ -287,4 +288,13 @@ def handle_connected_users(data):
 # @socketio.on('disconnect')
 
 if __name__ == '__main__':
+    db_state = tryDatabaseCommand('hgetall', 'queues')
+    print(db_state)
+    if db_state != None:
+        for i, s in enumerate(db_state):
+            if i % 2 == 1 and s != None:
+                queue_info = json.loads(s)
+                queue_info["connected_users"] = []
+                hset('queues', db_state[i - 1], queue_info)
+
     socketio.run(app, host='0.0.0.0', port=80, debug=False)
