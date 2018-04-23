@@ -129,7 +129,7 @@ const setupSocket = (dispatch) => {
         //todo don't hardcode this error code
         if (response === socketErrors.SUCCESS) {
             let newUser = data['data']['displayName']
-            dispatch(addNewUser(data));
+            dispatch(addNewUser(newUser));
         } else if (response === socketErrors.QID_DOES_NOT_EXIST) {
             dispatch(setIncorrectQIDPopupDisplayStatus(true));
         } else {
