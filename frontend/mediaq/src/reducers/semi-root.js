@@ -11,6 +11,7 @@ const initialState = {
     currentlyPlayingIndex: 0, //0 means no video is playing
     volumeLevel: 100,
     shuffleMode: false,
+    showMediaDetailsModal: false,
     youtubeVideoObject: null,
     QueueRowEntries: {},
     visibleQueue: [],
@@ -98,6 +99,8 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, volumeLevel: action.payload.newVolumeLevel };
         case types.TOGGLE_SHUFFLE:
             return { ...state, shuffleMode: !state.shuffleMode };
+        case types.TOGGLE_MEDIA_DETAIL_MODAL:
+                return { ...state, showMediaDetailsModal: !state.showMediaDetailsModal };
         case types.CHANGE_YOUTUBE_VIDEO_OBJECT:
             return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };
         case types.ADD_TO_QUEUE:

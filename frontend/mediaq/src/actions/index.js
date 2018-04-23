@@ -120,6 +120,12 @@ export const toggleShuffle = () => {
     };
 };
 
+export const toggleMediaDetailModal = () => {
+    return {
+        type: types.TOGGLE_MEDIA_DETAIL_MODAL
+    };
+};
+
 export const changeYoutubeVideoObject = youtubeVideoObject => {
     return {
         type: types.CHANGE_YOUTUBE_VIDEO_OBJECT,

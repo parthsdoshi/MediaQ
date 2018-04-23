@@ -6,12 +6,14 @@ import PlusIcon from 'open-iconic/svg/plus.svg';
 import { connect } from 'react-redux';
 
 import * as youtubeStates from "../constants/youtube";
-import { changePlayState,
+import {
+    changePlayState,
     changeYoutubeVideoObject,
     addToQueue,
     setCurrentlyPlayingIndex,
     incrementCurrentlyPlayingIndex,
-    setVolume } from "../actions";
+    setVolume, toggleMediaDetailModal
+} from "../actions";
 
 import * as keyUtility from 'firebase-key'
 
@@ -20,6 +22,7 @@ import QueueRowEntry from './QueueRowEntry';
 import Search from './Search';
 import { getEmbeddedVideoComponent } from '../utils/google_utils';
 import { socketCommands, socketErrors, VERBOSE_SOCKET_LISTEN } from '../sockets/socketConstants';
+import PopupModal from "./PopupModal";
 
 class Queue extends Component {
 
@@ -86,19 +89,19 @@ class Queue extends Component {
     };
 
     loadVideosCallback = (medias) => {
-        console.log(medias)
+        console.log(medias);
         this.props.addToQueue(medias);
         this.props.socket.emit(socketCommands.ADDMEDIAS,
             { 'data': {'medias':  medias}, 'qID': this.props.qID },
-            this.props.socket.ADDMEDIASACKNOWLEDGEMENT)
+            this.props.socket.ADDMEDIASACKNOWLEDGEMENT);
         this.setState({
             showAddNewMediaModal: false
         });
-    }
+    };
 
     loadVideoCallback = (mediaId, rowData) => {
-        let obj = {}
-        obj[mediaId] = rowData
+        let obj = {};
+        obj[mediaId] = rowData;
         this.loadVideosCallback(obj)
     };
 
@@ -131,6 +134,23 @@ class Queue extends Component {
         }
     };
 
+    getRowDataMoreDetails = (rowData) => {
+        return (
+            <div>
+                <img src={rowData.thumbnail} alt="Video Thumbnail" className="img-thumbnail"></img>
+                <p><b>Title:</b> {rowData.title}</p>
+                <p><b>Description:</b></p>
+                <p>{rowData.description}</p>
+                <p><b>Author:</b> {rowData.author}</p>
+                <a href={rowData.getLink()} target="_blank" style={{display: "table-cell"}}>
+                    <p><b>Source:</b> {rowData.source}</p>
+                </a>
+                <p><b>Added by:</b> {rowData.displayName}</p>
+                <p><b>Timestamp:</b> {rowData.timestamp}</p>
+            </div>
+        )
+    };
+
     render() {
         let QueueRowEntries = [];
         for (let i = 0; i < this.props.QueueRowEntries.length; i++) {
@@ -144,8 +164,9 @@ class Queue extends Component {
                     rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked} />
             );
             if (this.props.currentlyPlayingIndex === i + 1) {
+                //todo use better keys?
                 QueueRowEntries.push(
-                    <tr ref="embeddedVideo">
+                    <tr ref="embeddedVideo" key={-1}>
                         <td></td>
                         <td></td>
                         <td>
@@ -170,7 +191,12 @@ class Queue extends Component {
                         <Search loadVideoCallback={this.loadVideoCallback}
                             loadPlaylistCallback={this.loadPlaylistCallback} />
                     </AddNewMediaModal>}
-                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+                {this.props.showMediaDetailsModal && this.props.currentlyPlayingIndex !== 0 &&
+                    <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
+                                title={'Media Details'}
+                                body={this.getRowDataMoreDetails(
+                                    this.props.QueueRowEntries[this.props.currentlyPlayingIndex - 1])} />}
+
                 <Table hover>
                     <thead>
                         <tr>
@@ -206,21 +232,22 @@ class Queue extends Component {
 
 }
 
+//todo move in utils file
 const lexicographicalSort = (queue) => {
-    let keys = []
+    let keys = [];
     for (let key in queue) {
         keys.push(key)
     }
 
-    keys.sort()
+    keys.sort();
 
-    let ret = []
+    let ret = [];
     for (let key of keys) {
         ret.push(queue[key])
     }
 
     return ret
-}
+};
 
 const mapStateToProps = state => {
     return {
@@ -230,7 +257,8 @@ const mapStateToProps = state => {
         currentlyPlayingYoutubeVideoObject: state.semiRoot.youtubeVideoObject,
         QueueRowEntries: lexicographicalSort(state.semiRoot.QueueRowEntries),
         currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex,
-        volumeLevel: state.semiRoot.volumeLevel
+        volumeLevel: state.semiRoot.volumeLevel,
+        showMediaDetailsModal: state.semiRoot.showMediaDetailsModal,
     }
 };
 
@@ -241,7 +269,9 @@ const mapDispatchToProps = dispatch => {
         addToQueue: medias => dispatch(addToQueue(medias)),
         setCurrentlyPlayingIndex: newIndex => dispatch(setCurrentlyPlayingIndex(newIndex)),
         incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
-        setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel))
+        setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
+        toggleMediaDetailModal: () => dispatch(toggleMediaDetailModal()),
+
     }
 };
 
