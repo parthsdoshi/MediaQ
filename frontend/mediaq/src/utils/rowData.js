@@ -1,8 +1,9 @@
 import * as keyUtils from 'firebase-key'
 
-export function RowData(id, title, author, album, source, thumbnail, displayName) {
+export function RowData(id, title, description, author, album, source, thumbnail, displayName) {
     this.id = id;
     this.title = title;
+    this.description = description;
     this.author = author;
     this.album = album;
     this.source = source;
@@ -24,6 +25,7 @@ function getResultData(data, number, displayName) {
     return new RowData(
         data.items[number].id.videoId,
         data.items[number].snippet.title,
+        data.items[number].snippet.description,
         data.items[number].snippet.channelTitle,
         ' - ',
         'YouTube',
@@ -71,6 +73,7 @@ function getPlaylistResultData (playlistData, number, displayName) {
     return new RowData(
         playlistData.items[number].snippet.resourceId.videoId,
         playlistData.items[number].snippet.title,
+        playlistData.items[number].snippet.description,
         ' Playlist ',
         ' - ',
         'YouTube',
