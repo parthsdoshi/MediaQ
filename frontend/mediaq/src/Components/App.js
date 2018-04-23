@@ -12,7 +12,7 @@ import Queue from './Queue';
 class App extends Component {
 
     componentDidMount() {
-        console.log('4 5 6 ');
+        console.log('4 56 ');
         window.onbeforeunload = confirmExit;
         let resolveBrowserClose = this.props.resolveBrowserClose;
         function confirmExit() {

@@ -90,8 +90,8 @@ class Search extends Component {
         this.props.loadPlaylistCallback(results);
     };
 
-    addToQueue = (number) => {
-        this.props.loadVideoCallback(this.state.youtubeResults[number]);
+    addToQueue = (mediaId) => {
+        this.props.loadVideoCallback(mediaId, this.state.youtubeResults[mediaId]);
     };
 
     handleSearchButtonPress = (target) => {
@@ -118,26 +118,26 @@ class Search extends Component {
         this.setState({searchBoxTextValue: event.target.value});
     };
 
-    getResultMedia = (number) => {
-        if (!this.state.displaySearchResults || number >= this.state.youtubeResults.length) {
+    getResultMedia = (mediaId) => {
+        if (!this.state.displaySearchResults || !(mediaId in this.state.youtubeResults)) {
             console.log('getResultMedia was called before search ' +
                 'results were ready or called with out of bounds element');
             return null;
         }
         return (
-            <div key={this.state.youtubeResults[number].id}>
+            <div key={this.state.youtubeResults[mediaId].id}>
                 <Media>
                     <Media left href="#">
                         <Media object
-                               src={this.state.youtubeResults[number].thumbnail}
+                               src={this.state.youtubeResults[mediaId].thumbnail}
                                alt="Youtube Video Thumbnail" />
                     </Media>
 
                     <Media body style={{paddingLeft: 8}}>
                         <Media heading>
-                            {this.state.youtubeResults[number].title}
+                            {this.state.youtubeResults[mediaId].title}
                         </Media>
-                        <Button onClick={() => this.addToQueue(number)} color="success">
+                        <Button onClick={() => this.addToQueue(mediaId)} color="success">
                             {'Add'}
                         </Button>
                     </Media>
@@ -151,8 +151,8 @@ class Search extends Component {
     render() {
         let youtubeMedia = [];
         if( this.state.displaySearchResults ){
-            for (let i = 0; i < this.state.youtubeResults.length; i++) {
-                youtubeMedia.push(this.getResultMedia(i));
+            for (let key in this.state.youtubeResults) {
+                youtubeMedia.push(this.getResultMedia(key));
             }
         }
         return (

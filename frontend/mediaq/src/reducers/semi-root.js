@@ -12,7 +12,8 @@ const initialState = {
     volumeLevel: 100,
     shuffleMode: false,
     youtubeVideoObject: null,
-    QueueRowEntries: [],
+    QueueRowEntries: {},
+    visibleQueue: [],
 
     userList: []
 };
@@ -100,7 +101,7 @@ export default function semiRoot(state = initialState, action) {
         case types.CHANGE_YOUTUBE_VIDEO_OBJECT:
             return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };
         case types.ADD_TO_QUEUE:
-            return { ...state, QueueRowEntries: [...state.QueueRowEntries, action.payload.rowData] };
+            return { ...state, QueueRowEntries: {...state.QueueRowEntries, ...action.payload.medias} };
         case types.SET_QUEUE:
             return { ...state, QueueRowEntries: action.payload.newQueue };
         default:

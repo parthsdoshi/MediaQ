@@ -1,3 +1,5 @@
+import * as keyUtils from 'firebase-key'
+
 export function RowData(id, title, author, album, source, thumbnail, displayName) {
     this.id = id;
     this.title = title;
@@ -6,13 +8,14 @@ export function RowData(id, title, author, album, source, thumbnail, displayName
     this.source = source;
     this.thumbnail = thumbnail;
     this.displayName = displayName;
-    this.timestamp = 'SERVER_GENERATED_TIMESTAMP';
+    this.timestamp = keyUtils.key().replace(/-/g, '$');
 }
 
 export function generateRowDataFromYoutubeSearchResults(youtubeResults, displayName) {
-    let results = [];
+    let results = {};
     for (let i = 0; i < youtubeResults.items.length; i++) {
-        results.push(getResultData(youtubeResults, i, displayName));
+        let rowData = getResultData(youtubeResults, i, displayName)
+        results[rowData.timestamp] = rowData;
     }
     return results;
 }
@@ -25,11 +28,11 @@ function getResultData(data, number, displayName) {
         ' - ',
         'YouTube',
         data.items[number].snippet.thumbnails.default.url,
-        displayName);
+        displayName)
 }
 
 export function generateRowDataFromPlaylistResults(playlistResults, displayName) {
-    let results = [];
+    let results = {};
     for (let i = 0; i < playlistResults.length; i++) {
         const currentPageResults = playlistResults[i];
         for (let j = 0; j < currentPageResults.items.length; j++) {
@@ -38,7 +41,7 @@ export function generateRowDataFromPlaylistResults(playlistResults, displayName)
                 // video unavailable
                 continue;
             }
-            results.push(rowData);
+            results[rowData.timestamp] = rowData
         }
     }
     return results;

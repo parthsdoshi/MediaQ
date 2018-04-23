@@ -93,7 +93,7 @@ const setupSocket = (dispatch) => {
         }
         let response = responseData['response']
         if (response === socketErrors.SUCCESS) {
-            let queue = responseData['data']
+            let queue = responseData['data']['queue']
             dispatch(setQueue(queue));
         } else {
 
@@ -106,7 +106,7 @@ const setupSocket = (dispatch) => {
         }
         let response = responseData['data']
         if (response === socketErrors.SUCCESS) {
-            let userList = responseData['data']
+            let userList = responseData['data']['current_users']
             dispatch(setUserList(userList));
         } else {
 
@@ -128,7 +128,7 @@ const setupSocket = (dispatch) => {
         let response = data['response']
         //todo don't hardcode this error code
         if (response === socketErrors.SUCCESS) {
-            let newUser = data['data']
+            let newUser = data['data']['displayName']
             dispatch(addNewUser(data));
         } else if (response === socketErrors.QID_DOES_NOT_EXIST) {
             dispatch(setIncorrectQIDPopupDisplayStatus(true));
@@ -144,7 +144,7 @@ const setupSocket = (dispatch) => {
         }
         let response = data['response']
         if (response === socketErrors.SUCCESS) {
-            let medias = data['data']
+            let medias = data['data']['medias']
             dispatch(addToQueue(medias));
         } else {
 
@@ -158,7 +158,7 @@ const setupSocket = (dispatch) => {
         }
         let response = data['response']
         if (response === socketErrors.SUCCESS) {
-            let user = data['data']
+            let user = data['data']['displayName']
             dispatch(removeUser(user));
         } else {
 

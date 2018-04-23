@@ -128,10 +128,10 @@ export const changeYoutubeVideoObject = youtubeVideoObject => {
 };
 
 
-export const addToQueue = rowData => {
+export const addToQueue = medias => {
     return {
         type: types.ADD_TO_QUEUE,
-        payload: {rowData: rowData}
+        payload: { medias: medias }
     };
 };
 

@@ -24,7 +24,7 @@ class InitialConnect extends Component {
             this.props.setDisplayName(displayNameInStorage)
             this.props.setQID(qIDInStorage)
             this.props.socket.emit(socketCommands.JOIN,
-                { 'displayName': displayNameInStorage, 'qID': qIDInStorage },
+                { 'data': {'displayName': displayNameInStorage, 'qID': qIDInStorage} },
                 this.props.socket.JOINACKNOWLEDGEMENT);
         }
 
@@ -62,7 +62,7 @@ class InitialConnect extends Component {
         }
         if (this.state.joinQueue) {
             this.props.socket.emit(socketCommands.JOIN,
-                { 'displayName': displayName, 'qID': qID },
+                { 'data': {'displayName': displayName, 'qID': qID} },
                 this.props.socket.JOINACKNOWLEDGEMENT);
             this.props.setDisplayName(displayName);
             this.props.setQID(qID);
@@ -74,7 +74,7 @@ class InitialConnect extends Component {
         } else if (this.state.createQueue) {
             console.log('sending to server');
             this.props.socket.emit(socketCommands.CREATE,
-                { 'data': displayName },
+                { 'data': {'displayName': displayName} },
                 this.props.socket.CREATEACKNOWLEDGEMENT);
             this.props.setDisplayName(displayName);
             //qID set in socket listeners

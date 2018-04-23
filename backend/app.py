@@ -1,4 +1,4 @@
-import os, time, random, string, json
+import os, time, random, string, json, sys
 from flask import Flask, send_from_directory, request
 from flask_socketio import SocketIO, emit, join_room, leave_room, rooms
 import redis
@@ -98,78 +98,97 @@ if (get('queues', '') == None):
 
 @socketio.on(constants.CREATE)
 def handle_create(data):
-    displayName = data['data']
+    try:
+        displayName = data['data']['displayName']
 
-    random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+        random_id = ''.join(random.choices(string.ascii_uppercase, k=4))
+        while(get('queues', random_id) != None):
+            random_id = ''.join(random.choices(string.ascii_uppercase, k=4))
 
-    while(get('queues', random_id) != None):
-        random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+        qID = random_id
+        room = qID
 
-    qID = random_id
-    room = qID
+        queue_info = {
+                'queue': {},
+                'connected_users': [{
+                    'sid': request.sid,
+                    'displayName': displayName}]
+                }
+        set("queues", qID, queue_info)
 
-    queue_info = {
-            'queue': {},
-            'connected_users': [{
-                'sid': request.sid,
-                'displayName': displayName}]
-            }
-    set("queues", qID, queue_info)
-
-    join_room(room)
-    return {'response': constants.SUCCESS, 'qID': random_id}
+        join_room(room)
+        return {'response': constants.SUCCESS, 'qID': random_id}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
 
 
 @socketio.on(constants.JOIN)
 def handle_join(data):
-    # print(data)
-    qID = data['qID']
-    displayName = data['data']
+    try:
+        qID = data['qID']
+        displayName = data['data']['displayName']
 
-    queue_info = get('queues', qID)
+        queue_info = get('queues', qID)
 
-    if (queue_info == None):
-        return {'response': constants.QID_DOES_NOT_EXIST}
+        if (queue_info == None):
+            return {'response': constants.QID_DOES_NOT_EXIST}
 
-    for user in queue_info['connected_users']:
-        if (user['displayName'] == displayName):
-            return {'response': constants.DISPLAY_NAME_NOT_UNIQUE}
+        for user in queue_info['connected_users']:
+            if (user['displayName'] == displayName):
+                return {'response': constants.DISPLAY_NAME_NOT_UNIQUE}
 
-    current_user = {
-        'sid': request.sid,
-        'displayName': displayName
-        }
-    queue_info['connected_users'].append(current_user)
+        current_user = {
+            'sid': request.sid,
+            'displayName': displayName
+            }
+        queue_info['connected_users'].append(current_user)
 
-    usersArr = []
-    for user in queue_info['connected_users']:
-        usersArr.append(user['displayName'])
+        usersArr = []
+        for user in queue_info['connected_users']:
+            usersArr.append(user['displayName'])
 
-    arrAppend('queues', qID + '.connected_users', current_user)
+        arrAppend('queues', qID + '.connected_users', current_user)
 
-    join_room(qID)
-    emit(constants.USERJOINED, {'data': displayName, 'response': constants.SUCCESS}, room=qID, include_self=False)
-    return {'response': constants.SUCCESS, 'data': usersArr}
+        join_room(qID)
+        emit(constants.USERJOINED, {'data': {'displayName': displayName}, 'response': constants.SUCCESS}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS, 'data': {'current_users': usersArr, 'queue': queue_info['queue']}}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
  
  
 @socketio.on(constants.LEAVE)
 def handle_leave(data):
-    qID = data['qID']
-    displayName = data['data']
+    try:
+        qID = data['qID']
+        displayName = data['data']['displayName']
 
-    queue_info = get('queues', qID)
-    if (queue_info == None):
-        return {'response': constants.QID_DOES_NOT_EXIST}
+        queue_info = get('queues', qID)
+        if (queue_info == None):
+            return {'response': constants.QID_DOES_NOT_EXIST}
 
-    current_user = {'sid': request.sid, 'displayName': displayName}
-    for i in range(queue_info['connected_users'].length):
-        if queue_info['connected_users'][i] == current_user:
-            tryDatabaseCommand('json.arrpop', 'queues', qID + '.connected_users', i)
-            break
+        current_user = {'sid': request.sid, 'displayName': displayName}
+        for i in range(queue_info['connected_users'].length):
+            if queue_info['connected_users'][i] == current_user:
+                tryDatabaseCommand('json.arrpop', 'queues', qID + '.connected_users', i)
+                break
 
-    leave_room(qID)
-    emit(constants.USERLEFT, {'data': displayName, 'response': constants.SUCCESS}, room=qID, include_self=False)
-    return {'response': constants.SUCCESS}
+        leave_room(qID)
+        emit(constants.USERLEFT, {'data': {'displayName': displayName}, 'response': constants.SUCCESS}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
 
 
 # @socketio.on(constants.ADDMEDIA)
@@ -189,59 +208,87 @@ def handle_leave(data):
 #     emit(constants.MEDIAADDED, {'data': {mediaId: rowData}, 'response': constants.SUCCESS}, room=qID, include_self=False)
 #     return {'response': constants.SUCCESS}
 
-@socketio.on(constants.ADDMEDIA)
+# @socketio.on(constants.ADDMEDIA)
 @socketio.on(constants.ADDMEDIAS)
 def handle_add_medias(data):
-    qID = data['qID']
-    queue_info = get('queues', qID)
-    if (queue_info == None):
-        return {'response': constants.QID_DOES_NOT_EXIST}
+    try:
+        qID = data['qID']
+        queue_info = get('queues', qID)
+        if (queue_info == None):
+            return {'response': constants.QID_DOES_NOT_EXIST}
 
-    media = data['data']
-    for key, value in media:
-        set('queues', 'queue.' + key, value)
+        medias = data['data']['medias']
+        for key, value in medias.items():
+            set('queues', qID + '.queue.' + key, value)
 
-    emit(constants.MEDIASADDED, {'data': media, 'response': constants.SUCCESS}, room=qID, include_self=False)
-    return {'response': constants.SUCCESS}
+        emit(constants.MEDIASADDED, {'data': {'medias': medias}, 'response': constants.SUCCESS}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
 
 # @socketio.on(constants.REMOVEMEDIA)
 @socketio.on(constants.REMOVEMEDIAS)
 def handle_remove_medias(data):
-    qID = data['qID']
-    queue_info = get('queues', qID)
-    if (queue_info == None):
-        return {'response': constants.QID_DOES_NOT_EXIST}
+    try:
+        qID = data['qID']
+        queue_info = get('queues', qID)
+        if (queue_info == None):
+            return {'response': constants.QID_DOES_NOT_EXIST}
 
-    removedMedia = []
-    media = data['data']
-    for id in media:
-        if tryDatabaseCommand('json.del', 'queues', qID + '.queue.' + id) == 1:
-            removedMedia.append(id)
+        removedMedias = []
+        medias = data['data']['medias']
+        for id in medias:
+            if tryDatabaseCommand('json.del', 'queues', qID + '.queue.' + id) == 1:
+                removedMedias.append(id)
     
-    emit(constants.MEDIASREMOVED, {'data': removedMedia, 'response': constants.SUCCESS}, room=qID, include_self=False)
-    return {'response': constants.SUCCESS}
+        emit(constants.MEDIASREMOVED, {'data': {'medias': removedMedias}, 'response': constants.SUCCESS}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
 
 @socketio.on(constants.CURRENTQUEUE)
 def handle_current_queue(data):
-    qID = data['qID']
-    media = get('queues', qID + '.queue')
-    if (media == None):
-        return {'response': constants.QID_DOES_NOT_EXIST}
+    try:
+        qID = data['qID']
+        queue = get('queues', qID + '.queue')
+        if (queue == None):
+            return {'response': constants.QID_DOES_NOT_EXIST}
     
-    return {'response': constants.SUCCESS, 'data': media}
+        return {'response': constants.SUCCESS, 'data': {'queue': queue}}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
 
 @socketio.on(constants.CURRENTUSERS)
 def handle_current_users(data):
-    qID = data['qID']
-    current_users = get('queues', qID + '.current_users')
-    if current_users == None:
-        return {'response': constants.QID_DOES_NOT_EXIST}
+    try:
+        qID = data['qID']
+        current_users = get('queues', qID + '.current_users')
+        if current_users == None:
+            return {'response': constants.QID_DOES_NOT_EXIST}
 
-    ret = []
-    for user in current_users:
-        ret.append(user['displayName'])
+        ret = []
+        for user in current_users:
+            ret.append(user['displayName'])
 
-    return {'response': constants.SUCCESS, 'data': ret}
+        return {'response': constants.SUCCESS, 'data': {'current_users': ret}}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
 
 # @socketio.on('disconnect')
 

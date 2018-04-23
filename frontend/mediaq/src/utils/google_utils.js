@@ -17,7 +17,7 @@ export function initClient() {
     });
 }
 
-export function getEmbededVideoComponent(id, onReady, onStateChange, width=640, height=390) {
+export function getEmbeddedVideoComponent(id, onReady, onStateChange, width=640, height=390) {
     const opts = {
         height: height,
         width: width,
@@ -154,6 +154,7 @@ function getPlaylistVideosCallback(response) {
         // clear global variable before returning
         playlistRecursiveHelper = { ...playlistRecursiveHelperInitial };
         resultCallback(null);
+        return;
     }
 
     playlistRecursiveHelper.runningResults = [ ...playlistRecursiveHelper.runningResults, response ];
@@ -166,6 +167,7 @@ function getPlaylistVideosCallback(response) {
         // clear global variable before returning
         playlistRecursiveHelper = { ...playlistRecursiveHelperInitial };
         returnFunction(results);
+        return;
     }
 }
 
