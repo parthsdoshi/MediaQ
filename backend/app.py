@@ -2,7 +2,6 @@ import os, time, random, string, json, sys
 from flask import Flask, send_from_directory, request
 from flask_socketio import SocketIO, emit, join_room, leave_room, rooms
 import redis
-# from rejson import Client, Path
 import time
 
 import socket_constants as constants
@@ -23,48 +22,6 @@ def serve(path):
         else:
             return send_from_directory('/build', 'index.html')
 
-def get(key, path):
-    retries = 5
-    while True:
-        try:
-            value = database.execute_command('JSON.GET', key, path)
-            if value != None:
-                value = json.loads(value)
-            return value
-        except redis.exceptions.ConnectionError as exc:
-            if retries == 0:
-                raise exc
-            retries -= 1
-            time.sleep(0.5)
-        except redis.exceptions.ResponseError as exc:
-            return None
-
-def set(key, path, value):
-    retries = 5
-    while True:
-        try:
-            return database.execute_command('JSON.SET', key, path, json.dumps(value))
-        except redis.exceptions.ConnectionError as exc:
-            if retries == 0:
-                raise exc
-            retries -= 1
-            time.sleep(0.5)
-        except redis.exceptions.ResponseError as exc:
-            return None
-
-def arrAppend(key, path, value):
-    retries = 5
-    while True:
-        try:
-            return database.execute_command('JSON.ARRAPPEND', key, path, json.dumps(value))
-        except redis.exceptions.ConnectionError as exc:
-            if retries == 0:
-                raise exc
-            retries -= 1
-            time.sleep(0.5)
-        except redis.exceptions.ResponseError as exc:
-            return None
-
 def tryDatabaseCommand(command, *args):
     retries = 5
     while True:
@@ -78,15 +35,29 @@ def tryDatabaseCommand(command, *args):
         except redis.exceptions.ResponseError as exc:
             return None
 
+def hget(hash, key):
+    ret = tryDatabaseCommand('hget', hash, key)
+    if (ret != None):
+        ret = json.loads(ret)
+    return ret
 
-# print(json.loads(database.execute_command('JSON.GET', "foo", "ans")))
-# set("foo", ".", "{}");
-# set("foo", "ans", "34");
-# print(json.loads(get("foo", "ans")));
+def hset(hash, key, value):
+    ret = tryDatabaseCommand('hset', hash, key, json.dumps(value))
+    return ret
+
+# 
+# def get(key):
+#     ret = tryDatabaseCommand('GET', key)
+#     if (ret != None):
+#         ret = json.loads(ret)
+#     return ret
+#     
+# def set(key, value):
+#     return tryDatabaseCommand('SET', key, json.dumps(value))
 
 # initialize queues
-if (get('queues', '') == None):
-    set('queues', '.', {})
+# if ez_database.queues == None:
+#     ez_database.queues = {}
 
 # just some info about the socketio library...
 # calling just 'emit' sends back to the sender
@@ -102,7 +73,8 @@ def handle_create(data):
         displayName = data['data']['displayName']
 
         random_id = ''.join(random.choices(string.ascii_uppercase, k=4))
-        while(get('queues', random_id) != None):
+
+        while hget('queues', random_id) != None:
             random_id = ''.join(random.choices(string.ascii_uppercase, k=4))
 
         qID = random_id
@@ -114,16 +86,13 @@ def handle_create(data):
                     'sid': request.sid,
                     'displayName': displayName}]
                 }
-        set("queues", qID, queue_info)
+        hset('queues', random_id, queue_info)
 
         join_room(room)
         return {'response': constants.SUCCESS, 'qID': random_id}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
-    except Exception as exc:
-        print(exc, file=sys.stderr)
-        return {'response': constants.SERVER_ERROR}
 
 
 @socketio.on(constants.JOIN)
@@ -132,12 +101,15 @@ def handle_join(data):
         qID = data['qID']
         displayName = data['data']['displayName']
 
-        queue_info = get('queues', qID)
+        queue_info = hget('queues', qID)
 
         if (queue_info == None):
             return {'response': constants.QID_DOES_NOT_EXIST}
 
-        for user in queue_info['connected_users']:
+        connected_users = queue_info['connected_users']
+        queue = queue_info['queue']
+
+        for user in connected_users:
             if (user['displayName'] == displayName):
                 return {'response': constants.DISPLAY_NAME_NOT_UNIQUE}
 
@@ -145,17 +117,17 @@ def handle_join(data):
             'sid': request.sid,
             'displayName': displayName
             }
-        queue_info['connected_users'].append(current_user)
+        connected_users.append(current_user)
 
         usersArr = []
-        for user in queue_info['connected_users']:
+        for user in connected_users:
             usersArr.append(user['displayName'])
 
-        arrAppend('queues', qID + '.connected_users', current_user)
+        hset('queues', qID, queue_info)
 
         join_room(qID)
         emit(constants.USERJOINED, {'data': {'displayName': displayName}, 'response': constants.SUCCESS}, room=qID, include_self=False)
-        return {'response': constants.SUCCESS, 'data': {'connected_users': usersArr, 'queue': queue_info['queue']}}
+        return {'response': constants.SUCCESS, 'data': {'connected_users': usersArr, 'queue': queue}}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
@@ -163,22 +135,29 @@ def handle_join(data):
         print(exc, file=sys.stderr)
         return {'response': constants.SERVER_ERROR}
  
- 
 @socketio.on(constants.LEAVE)
 def handle_leave(data):
     try:
         qID = data['qID']
         displayName = data['data']['displayName']
 
-        queue_info = get('queues', qID)
+        queue_info = hget('queues', qID)
         if (queue_info == None):
             return {'response': constants.QID_DOES_NOT_EXIST}
 
+        connected_users = queue_info['connected_users']
+
+        found_user = False
         current_user = {'sid': request.sid, 'displayName': displayName}
-        for i in range(queue_info['connected_users'].length):
-            if queue_info['connected_users'][i] == current_user:
-                tryDatabaseCommand('json.arrpop', 'queues', qID + '.connected_users', i)
+        for (i, user) in enumerate(connected_users):
+            if (user == current_user):
+                found_user = True
+                connected_users.pop(i)
+                hset('queues', qID, queue_info)
                 break
+
+        if not found_user:
+            return {'response': constants.USER_DOES_NOT_EXIST}
 
         leave_room(qID)
         emit(constants.USERLEFT, {'data': {'displayName': displayName}, 'response': constants.SUCCESS}, room=qID, include_self=False)
@@ -213,13 +192,19 @@ def handle_leave(data):
 def handle_add_medias(data):
     try:
         qID = data['qID']
-        queue_info = get('queues', qID)
+
+        queue_info = hget('queues', qID)
         if (queue_info == None):
             return {'response': constants.QID_DOES_NOT_EXIST}
 
+        queue = queue_info['queue']
+
         medias = data['data']['medias']
-        for key, value in medias.items():
-            set('queues', qID + '.queue.' + key, value)
+        for mediaId, media in medias.items():
+            mediaId.replace('-', '$')
+            queue[mediaId] = media
+
+        hset('queues', qID, queue_info)
 
         emit(constants.MEDIASADDED, {'data': {'medias': medias}, 'response': constants.SUCCESS}, room=qID, include_self=False)
         return {'response': constants.SUCCESS}
@@ -235,16 +220,21 @@ def handle_add_medias(data):
 def handle_remove_medias(data):
     try:
         qID = data['qID']
-        queue_info = get('queues', qID)
+        queue_info = hget('queues', qID)
         if (queue_info == None):
             return {'response': constants.QID_DOES_NOT_EXIST}
+
+        queue = queue_info['queue']
 
         removedMedias = []
         medias = data['data']['medias']
         for id in medias:
-            if tryDatabaseCommand('json.del', 'queues', qID + '.queue.' + id) == 1:
+            if id in queue:
+                queue.pop(id)
                 removedMedias.append(id)
     
+        hset('queues', qID, queue_info)
+
         emit(constants.MEDIASREMOVED, {'data': {'medias': removedMedias}, 'response': constants.SUCCESS}, room=qID, include_self=False)
         return {'response': constants.SUCCESS}
     except KeyError as exc:
@@ -258,9 +248,11 @@ def handle_remove_medias(data):
 def handle_current_queue(data):
     try:
         qID = data['qID']
-        queue = get('queues', qID + '.queue')
-        if (queue == None):
+        queue_info = hget('queues', qID)
+        if (queue_info == None):
             return {'response': constants.QID_DOES_NOT_EXIST}
+
+        queue = queue_info['queue']
     
         return {'response': constants.SUCCESS, 'data': {'queue': queue}}
     except KeyError as exc:
@@ -270,19 +262,21 @@ def handle_current_queue(data):
         print(exc, file=sys.stderr)
         return {'response': constants.SERVER_ERROR}
 
-@socketio.on(constants.CURRENTUSERS)
-def handle_current_users(data):
+@socketio.on(constants.CONNECTEDUSERS)
+def handle_connected_users(data):
     try:
         qID = data['qID']
-        current_users = get('queues', qID + '.current_users')
-        if current_users == None:
+        queue_info = hget('queues', qID)
+        if queue_info == None:
             return {'response': constants.QID_DOES_NOT_EXIST}
 
+        connected_users = queue_info['connected_users']
+
         ret = []
-        for user in current_users:
+        for user in connected_users:
             ret.append(user['displayName'])
 
-        return {'response': constants.SUCCESS, 'data': {'current_users': ret}}
+        return {'response': constants.SUCCESS, 'data': {'connected_users': ret}}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
@@ -293,4 +287,4 @@ def handle_current_users(data):
 # @socketio.on('disconnect')
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=80, debug=True)
+    socketio.run(app, host='0.0.0.0', port=80, debug=False)

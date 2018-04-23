@@ -23,7 +23,9 @@ export default function socket(state = initialState, action) {
             return { ...state, loggedIn: true };
         case types.SOCKET_LOGOUT:
             if (state.loggedIn) {
-                state.socket.emit(socketCommands.LEAVE, {'displayName': state.displayName, 'qID': state.qID});
+                state.socket.emit(socketCommands.LEAVE,
+                    {'data': {'displayName': state.displayName}, 'qID': state.qID},
+                    state.socket.LEAVEACKNOWLEDGEMENT);
                 localStorage.removeItem("qID");
                 localStorage.removeItem("displayName");
             }
@@ -37,7 +39,9 @@ export default function socket(state = initialState, action) {
         case types.RESOLVE_BROWSER_CLOSE:
             if (state.loggedIn) {
                 // we should probably put these in a saga
-                state.socket.emit(socketCommands.LEAVE, {'displayName': state.displayName, 'qID': state.qID});
+                state.socket.emit(socketCommands.LEAVE,
+                    {'data': {'displayName': state.displayName}, 'qID': state.qID},
+                    state.socket.LEAVEACKNOWLEDGEMENT);
                 localStorage.setItem('displayName', state.displayName);
                 localStorage.setItem('qID', state.qID);
             }

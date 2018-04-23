@@ -16,7 +16,7 @@ import {
     toggleMediaDetailModal,
     setSessionRestoredPopupDisplayStatus, } from "../actions";
 
-import * as keyUtility from 'firebase-key'
+import * as keyUtils from 'firebase-key'
 
 import AddNewMediaModal from './AddNewMediaModal';
 import QueueRowEntry from './QueueRowEntry';
@@ -147,7 +147,7 @@ class Queue extends Component {
                     <p><b>Source:</b> {rowData.source}</p>
                 </a>
                 <p><b>Added by:</b> {rowData.displayName}</p>
-                <p><b>Timestamp:</b> {rowData.timestamp}</p>
+                <p><b>Timestamp:</b> {keyUtils.date(rowData.timestamp).toString()}</p>
             </div>
         )
     };

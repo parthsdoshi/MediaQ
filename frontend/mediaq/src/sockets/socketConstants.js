@@ -4,8 +4,9 @@ export const socketErrors = {
     DISPLAY_NAME_NOT_UNIQUE: -1,
     QID_DOES_NOT_EXIST: -2,
     ILL_FORMED_DATA: -3,
-    SERVER_ERROR: -4
-};
+    SERVER_ERROR: -4,
+    USER_DOES_NOT_EXIST: -5
+}
 
 // Socket IO
 export const socketCommands = {
@@ -23,7 +24,7 @@ export const socketCommands = {
     MEDIAREMOVED: 'MediaRemoved',
     MEDIASREMOVED: 'MediasRemoved',
     CURRENTQUEUE: 'CurrentQueue',
-    CURRENTUSERS: 'CurrentUsers'
-};
+    CONNECTEDUSERS: 'ConnectedUsers'
+}
 
 export const VERBOSE_SOCKET_LISTEN = true;

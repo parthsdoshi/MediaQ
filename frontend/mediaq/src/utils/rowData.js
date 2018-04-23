@@ -9,7 +9,7 @@ export function RowData(id, title, description, author, album, source, thumbnail
     this.source = source;
     this.thumbnail = thumbnail;
     this.displayName = displayName;
-    this.timestamp = keyUtils.key().replace(/-/g, '$');
+    this.timestamp = keyUtils.key();
     this.link = "https://www.youtube.com/watch?v=" + this.id;
 }
 
