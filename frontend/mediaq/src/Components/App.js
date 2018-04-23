@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container } from 'reactstrap';
 
 import { connect } from 'react-redux';
-import { login, resolveBrowserClose } from "../actions";
+import { resolveBrowserClose } from "../actions";
 
 import Footer from './Footer';
 import Header from './Header';
@@ -57,7 +57,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        login: () => dispatch(login()),
         resolveBrowserClose: () => dispatch(resolveBrowserClose()),
     }
 };

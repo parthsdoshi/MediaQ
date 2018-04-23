@@ -17,11 +17,13 @@ import {
 } from 'reactstrap';
 
 import LogoutIcon from 'open-iconic/svg/account-logout.svg';
+import DuplicateIcon from 'open-iconic/svg/fork.svg';
 
 import { connect } from 'react-redux';
-import { logout } from "../actions";
+import { logout, socketLogout, socketClearState } from "../actions";
 
 import MediaQIcon from '../logo.svg';
+import {socketCommands} from "../sockets/socketConstants";
 
 class Header extends Component {
     constructor(props) {
@@ -63,6 +65,19 @@ class Header extends Component {
         this.toggleQIDClipboardPopover();
     };
 
+    duplicateQueue = () => {
+        const displayName = this.props.displayName;
+        const qID = this.props.qID;
+        const QueueRowEntries = this.props.QueueRowEntries;
+        this.props.logout();
+        this.props.socketClearState();
+        this.props.socket.emit(socketCommands.LEAVE,
+            { 'data': { 'displayName': displayName }, 'qID': qID },
+            (responseData) => {this.props.socket.DUPLICATE_LEAVE_ACKNOWLEDGEMENT(
+                responseData, displayName, QueueRowEntries)});
+
+    };
+
     render() {
         let icon = {
             width: '16px',
@@ -71,6 +86,7 @@ class Header extends Component {
         let userList = this.props.userList.map((displayName) =>
             <DropdownItem disabled key={displayName}>{displayName}</DropdownItem>);
 
+        //todo change if qid !== '' to loggedin === true and make sure it works
         return (
             <div>
                 <Navbar color="light" light expand="md">
@@ -109,12 +125,20 @@ class Header extends Component {
                                             {this.props.displayName}
                                         </DropdownToggle>
                                         <DropdownMenu right>
-                                            <DropdownItem onClick={this.props.logout} >
+                                            <DropdownItem onClick={this.duplicateQueue} >
+                                                <NavLink href="#">
+                                                    <img alt="Duplicate Queue" src={DuplicateIcon} style={icon} />
+                                                    <div style={{ marginLeft: 20, display: 'inline' }}>
+                                                        Duplicate Queue
+                                                    </div>
+                                                </NavLink>
+                                            </DropdownItem>
+                                            <DropdownItem onClick={() => {this.props.logout(); this.props.socketLogout();}} >
                                                 <NavLink href="#">
                                                     <img alt="Logout" src={LogoutIcon} style={icon} />
                                                     <div style={{ marginLeft: 20, display: 'inline' }}>
                                                         Logout
-                                                </div>
+                                                    </div>
                                                 </NavLink>
                                             </DropdownItem>
                                         </DropdownMenu>
@@ -131,15 +155,19 @@ class Header extends Component {
 
 const mapStateToProps = state => {
     return {
+        socket: state.socket.socket,
         displayName: state.semiRoot.displayName,
         qID: state.semiRoot.qID,
-        userList: state.semiRoot.userList
+        userList: state.semiRoot.userList,
+        QueueRowEntries: state.semiRoot.QueueRowEntries,
     }
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        logout: () => dispatch(logout())
+        logout: () => dispatch(logout()),
+        socketLogout: () => dispatch(socketLogout()),
+        socketClearState: () => dispatch(socketClearState()),
     }
 };
 

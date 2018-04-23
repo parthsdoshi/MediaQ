@@ -137,12 +137,12 @@ class Queue extends Component {
     getRowDataMoreDetails = (rowData) => {
         return (
             <div>
-                <img src={rowData.thumbnail} alt="Video Thumbnail" className="img-thumbnail"></img>
+                <img src={rowData.thumbnail} alt="Video Thumbnail" className="img-thumbnail" />
                 <p><b>Title:</b> {rowData.title}</p>
                 <p><b>Description:</b></p>
                 <p>{rowData.description}</p>
                 <p><b>Author:</b> {rowData.author}</p>
-                <a href={rowData.getLink()} target="_blank" style={{display: "table-cell"}}>
+                <a href={rowData.link} target="_blank" style={{display: "table-cell"}}>
                     <p><b>Source:</b> {rowData.source}</p>
                 </a>
                 <p><b>Added by:</b> {rowData.displayName}</p>
@@ -152,6 +152,7 @@ class Queue extends Component {
     };
 
     render() {
+        console.log('queuerowentrieslength ' + this.props.QueueRowEntries.length);
         let QueueRowEntries = [];
         for (let i = 0; i < this.props.QueueRowEntries.length; i++) {
             QueueRowEntries.push(
@@ -167,8 +168,8 @@ class Queue extends Component {
                 //todo use better keys?
                 QueueRowEntries.push(
                     <tr ref="embeddedVideo" key={-1}>
-                        <td></td>
-                        <td></td>
+                        <td />
+                        <td />
                         <td>
                             {getEmbeddedVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex - 1].id,
                                 this.setYoutubeVideoObjectAPICallback,
@@ -176,9 +177,9 @@ class Queue extends Component {
                                 64 * 9,
                                 39 * 9)}
                         </td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td />
+                        <td />
+                        <td />
                     </ tr>
                 );
             }
@@ -191,17 +192,27 @@ class Queue extends Component {
                         <Search loadVideoCallback={this.loadVideoCallback}
                             loadPlaylistCallback={this.loadPlaylistCallback} />
                     </AddNewMediaModal>}
-                {this.props.showMediaDetailsModal && this.props.currentlyPlayingIndex !== 0 &&
-                    <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
-                                title={'Media Details'}
-                                body={this.getRowDataMoreDetails(
-                                    this.props.QueueRowEntries[this.props.currentlyPlayingIndex - 1])} />}
+                {this.props.showMediaDetailsModal &&
+                    <div>
+                        {this.props.currentlyPlayingIndex === 0 &&
+                        <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
+                                    title={'Please Select Media'}
+                                    body={<p><b>Please select a media before attempting to view more details</b></p>} />
+                        }
+                        {this.props.currentlyPlayingIndex !== 0 &&
+                            <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
+                            title={'Media Details'}
+                            body={this.getRowDataMoreDetails(
+                            this.props.QueueRowEntries[this.props.currentlyPlayingIndex - 1])} />
+                        }
+                    </div>
+                }
 
                 <Table hover>
                     <thead>
                         <tr>
-                            <th></th>
-                            <th></th>
+                            <th />
+                            <th />
                             <th>Title</th>
                             <th>Author/Artist</th>
                             <th>Album</th>

@@ -10,9 +10,7 @@ export function RowData(id, title, description, author, album, source, thumbnail
     this.thumbnail = thumbnail;
     this.displayName = displayName;
     this.timestamp = keyUtils.key().replace(/-/g, '$');
-    this.getLink = () => {
-        return "https://www.youtube.com/watch?v=" + this.id
-    }
+    this.link = "https://www.youtube.com/watch?v=" + this.id;
 }
 
 export function generateRowDataFromYoutubeSearchResults(youtubeResults, displayName) {

@@ -100,7 +100,7 @@ export default function semiRoot(state = initialState, action) {
         case types.TOGGLE_SHUFFLE:
             return { ...state, shuffleMode: !state.shuffleMode };
         case types.TOGGLE_MEDIA_DETAIL_MODAL:
-                return { ...state, showMediaDetailsModal: !state.showMediaDetailsModal };
+            return { ...state, showMediaDetailsModal: !state.showMediaDetailsModal };
         case types.CHANGE_YOUTUBE_VIDEO_OBJECT:
             return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };
         case types.ADD_TO_QUEUE:

@@ -47,6 +47,18 @@ export const logout = () => {
     };
 };
 
+export const socketLogout = () => {
+    return {
+        type: types.SOCKET_LOGOUT
+    };
+};
+
+export const socketClearState = () => {
+    return {
+        type: types.SOCKET_CLEAR_STATE,
+    };
+};
+
 export const resolveBrowserClose = () => {
     return {
         type: types.RESOLVE_BROWSER_CLOSE

@@ -17,12 +17,16 @@ import { socketCommands, socketErrors, VERBOSE_SOCKET_LISTEN } from '../sockets/
 class InitialConnect extends Component {
     constructor(props) {
         super(props);
+        // localStorage.removeItem("qID");
+        // localStorage.removeItem("displayName");
 
         let displayNameInStorage = localStorage.getItem('displayName');
         let qIDInStorage = localStorage.getItem('qID');
         if (displayNameInStorage !== null && qIDInStorage !== null) {
-            this.props.setDisplayName(displayNameInStorage)
-            this.props.setQID(qIDInStorage)
+            displayNameInStorage += '\'';
+
+            this.props.setDisplayName(displayNameInStorage);
+            this.props.setQID(qIDInStorage);
             this.props.socket.emit(socketCommands.JOIN,
                 { 'data': {'displayName': displayNameInStorage}, 'qID': qIDInStorage },
                 this.props.socket.JOINACKNOWLEDGEMENT);
