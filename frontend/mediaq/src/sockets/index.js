@@ -11,11 +11,107 @@ import {
     addNewUser,
     removeUser
 } from '../actions'
-
-const VERBOSE_SOCKET_LISTEN = true;
+import { socketErrors, socketCommands, VERBOSE_SOCKET_LISTEN } from './socketConstants'
 
 const setupSocket = (dispatch) => {
     let socket = io('http://' + document.domain + ':' + window.location.port);
+
+    socket.CREATEACKNOWLEDGEMENT = (responseData) => {
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got create acknowledgement')
+            console.log(responseData)
+        }
+        let response = responseData['response'];
+        if (response === socketErrors.SUCCESS) {
+            let qID = responseData['qID'];
+            dispatch(setQIDPopupDisplayStatus(true));
+            dispatch(setQID(qID));
+        } else {
+
+        }
+    }
+
+    socket.JOINACKNOWLEDGEMENT = (responseData) => {
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got join acknowledgement')
+            console.log(responseData)
+        }
+        let response = responseData['response'];
+        //todo don't hardcode this error code
+        if (response === socketErrors.SUCCESS) {
+            //todo server: userlist doesnt include current user if they created the room
+            let queue = responseData['data']['queue'];
+            let userList = responseData['data']['connected_users']
+            dispatch(setUserList(userList));
+            dispatch(setQueue(queue));
+            dispatch(login());
+        } else if (response === socketErrors.QID_DOES_NOT_EXIST) {
+            dispatch(setIncorrectQIDPopupDisplayStatus(true));
+        } else {
+
+        }
+    }
+
+    // not used right now but we should display a loading screen probably
+    socket.LEAVEACKNOWLEDGEMENT = (responseData) => {
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got addmedias acknowledgement')
+            console.log(responseData)
+        }
+        let response = responseData['response']
+        if (response !== socketErrors.SUCCESS) {
+
+        }
+    }
+
+    socket.ADDMEDIASACKNOWLEDGEMENT = (responseData) => {
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got addmedias acknowledgement')
+            console.log(responseData)
+        }
+        let response = responseData['response']
+        if (response !== socketErrors.SUCCESS) {
+
+        }
+    }
+
+    socket.REMOVEMEDIASACKNOWLEDGEMENT = (responseData) => {
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got removemedias acknowledgement')
+            console.log(responseData)
+        }
+        let response = responseData['response']
+        if (response !== socketErrors.SUCCESS) {
+
+        }
+    }
+
+    socket.CURRENTQUEUEACKNOWLEDGEMENT = (responseData) => {
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got currentqueue acknowledgement')
+            console.log(responseData)
+        }
+        let response = responseData['response']
+        if (response === socketErrors.SUCCESS) {
+            let queue = responseData['data']
+            dispatch(setQueue(queue));
+        } else {
+
+        }
+    }
+
+    socket.CURRENTUSERSACKNOWLEDGEMENT = (responseData) => {
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got currentusers acknowledgement')
+        }
+        let response = responseData['data']
+        if (response === socketErrors.SUCCESS) {
+            let userList = responseData['data']
+            dispatch(setUserList(userList));
+        } else {
+
+        }
+    }
 
     socket.on('connect', (data) => {
         if (VERBOSE_SOCKET_LISTEN) {
@@ -24,53 +120,49 @@ const setupSocket = (dispatch) => {
         dispatch(setSocket(socket));
     });
 
-    socket.on('Create', (data) => {
+    socket.on(socketCommands.USERJOINED, (data) => {
         if (VERBOSE_SOCKET_LISTEN) {
-            console.log('socket got create with data ');
+            console.log('socket got userjoined');
             console.log(data);
         }
-        console.log('yay server responded');
-        let response = data['response'];
-        let qID = data['qID'];
-        dispatch(setQIDPopupDisplayStatus(true));
-        dispatch(setQID(qID));
-    });
-
-    socket.on('join', (data) => {
-        if (VERBOSE_SOCKET_LISTEN) {
-            console.log('socket got join with data ');
-            console.log(data);
-        }
+        let response = data['response']
         //todo don't hardcode this error code
-        if (data === 'ERRCO 1: ROOM DOES NOT EXIST') {
-            dispatch(setIncorrectQIDPopupDisplayStatus(true));
-        } else if (data['queue'] === undefined) { //queue not sent, which means this is to notify of new user joining
-            //todo why is the server sending join? and why is there no sid
+        if (response === socketErrors.SUCCESS) {
+            let newUser = data['data']
             dispatch(addNewUser(data));
+        } else if (response === socketErrors.QID_DOES_NOT_EXIST) {
+            dispatch(setIncorrectQIDPopupDisplayStatus(true));
         } else {
-            //todo server: userlist doesnt include current user if they created the room
-            let queue = data['queue'];
-            let userList = data['connected_users'];
-            dispatch(setQueue(queue));
-            dispatch(setUserList(userList));
-            dispatch(login());
+
         }
     });
 
-    socket.on('addToQueue', (data) => {
+    socket.on(socketCommands.MEDIASADDED, (data) => {
         if (VERBOSE_SOCKET_LISTEN) {
-            console.log('socket got addToQueue with data ');
+            console.log('socket got mediasadded');
             console.log(data);
         }
-        dispatch(addToQueue(data));
+        let response = data['response']
+        if (response === socketErrors.SUCCESS) {
+            let medias = data['data']
+            dispatch(addToQueue(medias));
+        } else {
+
+        }
     });
 
-    socket.on('leave', (data) => {
+    socket.on(socketCommands.USERLEFT, (data) => {
         if (VERBOSE_SOCKET_LISTEN) {
-            console.log('socket got leave with data ');
+            console.log('socket got userleft');
             console.log(data);
         }
-        dispatch(removeUser(data.displayName));
+        let response = data['response']
+        if (response === socketErrors.SUCCESS) {
+            let user = data['data']
+            dispatch(removeUser(user));
+        } else {
+
+        }
     });
 
     return socket

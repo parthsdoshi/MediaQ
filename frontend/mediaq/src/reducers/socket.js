@@ -1,4 +1,5 @@
 import * as types from "../constants/action-types";
+import { socketCommands, socketErrors, VERBOSE_SOCKET_LISTEN } from '../sockets/socketConstants';
 
 const initialState = {
     socket: null,
@@ -20,14 +21,15 @@ export default function socket(state = initialState, action) {
             return { ...state, loggedIn: true };
         case types.LOGOUT:
             if (state.loggedIn) {
-                state.socket.emit('leave', {'displayName': state.displayName, 'qID': state.qID});
+                state.socket.emit(socketCommands.LEAVE, {'displayName': state.displayName, 'qID': state.qID});
                 localStorage.removeItem("qID");
                 localStorage.removeItem("displayName");
             }
             return { ...state, loggedIn: false };
         case types.RESOLVE_BROWSER_CLOSE:
             if (state.loggedIn) {
-                state.socket.emit('leave', {'displayName': state.displayName, 'qID': state.qID});
+                // we should probably put these in a saga
+                state.socket.emit(socketCommands.LEAVE, {'displayName': state.displayName, 'qID': state.qID});
                 localStorage.setItem('displayName', state.displayName);
                 localStorage.setItem('qID', state.qID);
             }

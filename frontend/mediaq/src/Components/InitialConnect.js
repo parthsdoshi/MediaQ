@@ -10,8 +10,9 @@ import {
     setIncorrectQIDPopupDisplayStatus
 } from "../actions";
 
-import LoginScreen from './LoginScreen'
+import LoginScreen from './LoginScreen';
 import PopupModal from './PopupModal';
+import { socketCommands, socketErrors, VERBOSE_SOCKET_LISTEN } from '../sockets/socketConstants';
 
 class InitialConnect extends Component {
     constructor(props) {
@@ -20,9 +21,11 @@ class InitialConnect extends Component {
         let displayNameInStorage = localStorage.getItem('displayName');
         let qIDInStorage = localStorage.getItem('qID');
         if (displayNameInStorage !== null && qIDInStorage !== null) {
-            this.props.socket.emit('join', { 'displayName': displayNameInStorage, 'qID': qIDInStorage });
-            this.props.setDisplayName(displayNameInStorage);
-            this.props.setQID(qIDInStorage);
+            this.props.setDisplayName(displayNameInStorage)
+            this.props.setQID(qIDInStorage)
+            this.props.socket.emit(socketCommands.JOIN,
+                { 'displayName': displayNameInStorage, 'qID': qIDInStorage },
+                this.props.socket.JOINACKNOWLEDGEMENT);
         }
 
         this.state = {
@@ -58,7 +61,9 @@ class InitialConnect extends Component {
             return;
         }
         if (this.state.joinQueue) {
-            this.props.socket.emit('join', { 'displayName': displayName, 'qID': qID });
+            this.props.socket.emit(socketCommands.JOIN,
+                { 'displayName': displayName, 'qID': qID },
+                this.props.socket.JOINACKNOWLEDGEMENT);
             this.props.setDisplayName(displayName);
             this.props.setQID(qID);
             this.setState({
@@ -68,10 +73,9 @@ class InitialConnect extends Component {
             });
         } else if (this.state.createQueue) {
             console.log('sending to server');
-            this.props.socket.emit('Create', { 'data': displayName }, (response) => {
-                // dispatch here or import function socket file
-                console.log(response)
-            });
+            this.props.socket.emit(socketCommands.CREATE,
+                { 'data': displayName },
+                this.props.socket.CREATEACKNOWLEDGEMENT);
             this.props.setDisplayName(displayName);
             //qID set in socket listeners
             this.setState({

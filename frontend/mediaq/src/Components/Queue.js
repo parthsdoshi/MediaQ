@@ -16,6 +16,7 @@ import { changePlayState,
 import AddNewMediaModal from './AddNewMediaModal';
 import QueueRowEntry from './QueueRowEntry';
 import { getEmbededVideoComponent } from '../utils/google_utils';
+import { socketCommands, socketErrors, VERBOSE_SOCKET_LISTEN } from '../sockets/socketConstants';
 
 class Queue extends Component {
 
@@ -81,7 +82,7 @@ class Queue extends Component {
     };
 
     loadVideoCallback = (rowData) => {
-        this.socket.emit('addToQueue', {
+        this.socket.emit(socketCommands.ADDMEDIAS, {
             'rowData': rowData,
             'qID': this.props.qID
         });
@@ -97,7 +98,7 @@ class Queue extends Component {
             showAddNewMediaModal: false
         });
         for (let i = 0; i < rowDatas.length; i++) {
-            this.socket.emit('addToQueue', {
+            this.socket.emit(socketCommands.ADDMEDIAS, {
                 'rowData': rowDatas[i],
                 'qID': this.props.qID
             });
