@@ -118,9 +118,7 @@ const setupSocket = (dispatch) => {
             console.log(responseData)
         }
         let response = responseData['response'];
-        //todo fix if statement when leave is correctly implemented
-//        if (response === socketErrors.SUCCESS) {
-        if (true) {
+        if (response === socketErrors.SUCCESS) {
             // successfully left previous queue
             dispatch(setDisplayName(newDisplayName));
             socket.emit(socketCommands.CREATE,

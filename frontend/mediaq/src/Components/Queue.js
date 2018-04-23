@@ -17,12 +17,11 @@ import {
     setSessionRestoredPopupDisplayStatus, } from "../actions";
 
 import * as keyUtils from 'firebase-key'
-
 import AddNewMediaModal from './AddNewMediaModal';
 import QueueRowEntry from './QueueRowEntry';
 import Search from './Search';
 import { getEmbeddedVideoComponent } from '../utils/google_utils';
-import { socketCommands, socketErrors, VERBOSE_SOCKET_LISTEN } from '../sockets/socketConstants';
+import { socketCommands } from '../sockets/socketConstants';
 import PopupModal from "./PopupModal";
 
 class Queue extends Component {
@@ -146,8 +145,9 @@ class Queue extends Component {
                 <a href={rowData.link} target="_blank" style={{display: "table-cell"}}>
                     <p><b>Source:</b> {rowData.source}</p>
                 </a>
+                <p><b>Added on:</b> {keyUtils.date(rowData.timestamp).toString()}</p>
                 <p><b>Added by:</b> {rowData.displayName}</p>
-                <p><b>Timestamp:</b> {keyUtils.date(rowData.timestamp).toString()}</p>
+                <p><b>Hash:</b> {rowData.timestamp}</p>
             </div>
         )
     };

@@ -12,7 +12,7 @@ import {
 
 import LoginScreen from './LoginScreen';
 import PopupModal from './PopupModal';
-import { socketCommands, socketErrors, VERBOSE_SOCKET_LISTEN } from '../sockets/socketConstants';
+import { socketCommands } from '../sockets/socketConstants';
 
 class InitialConnect extends Component {
     constructor(props) {
@@ -23,7 +23,6 @@ class InitialConnect extends Component {
         let displayNameInStorage = localStorage.getItem('displayName');
         let qIDInStorage = localStorage.getItem('qID');
         if (displayNameInStorage !== null && qIDInStorage !== null) {
-            displayNameInStorage += '\'';
             this.props.setSessionRestoredPopupDisplayStatus(true);
             this.props.setDisplayName(displayNameInStorage);
             this.props.setQID(qIDInStorage);
