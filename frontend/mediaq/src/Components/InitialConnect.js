@@ -7,8 +7,8 @@ import {
     setQID,
     login,
     setQIDPopupDisplayStatus,
-    setIncorrectQIDPopupDisplayStatus
-} from "../actions";
+    setIncorrectQIDPopupDisplayStatus,
+    setSessionRestoredPopupDisplayStatus } from "../actions";
 
 import LoginScreen from './LoginScreen';
 import PopupModal from './PopupModal';
@@ -24,7 +24,7 @@ class InitialConnect extends Component {
         let qIDInStorage = localStorage.getItem('qID');
         if (displayNameInStorage !== null && qIDInStorage !== null) {
             displayNameInStorage += '\'';
-
+            this.props.setSessionRestoredPopupDisplayStatus(true);
             this.props.setDisplayName(displayNameInStorage);
             this.props.setQID(qIDInStorage);
             this.props.socket.emit(socketCommands.JOIN,
@@ -167,7 +167,8 @@ const mapDispatchToProps = dispatch => {
         setDisplayName: displayName => dispatch(setDisplayName(displayName)),
         login: () => dispatch(login()),
         setQIDPopupDisplayStatus: newDisplayStatus => dispatch(setQIDPopupDisplayStatus(newDisplayStatus)),
-        setIncorrectQIDPopupDisplayStatus: newDisplayStatus => dispatch(setIncorrectQIDPopupDisplayStatus(newDisplayStatus))
+        setIncorrectQIDPopupDisplayStatus: newDisplayStatus => dispatch(setIncorrectQIDPopupDisplayStatus(newDisplayStatus)),
+        setSessionRestoredPopupDisplayStatus: newDisplayStatus => dispatch(setSessionRestoredPopupDisplayStatus(newDisplayStatus)),
     }
 };
 

@@ -41,6 +41,13 @@ export const setIncorrectQIDPopupDisplayStatus = newDisplayStatus => {
     };
 };
 
+export const setSessionRestoredPopupDisplayStatus = newDisplayStatus => {
+    return {
+        type: types.SET_SESSION_RESTORED_POPUP_DISPLAY_STATUS,
+        payload: {newDisplayStatus: newDisplayStatus}
+    };
+};
+
 export const logout = () => {
     return {
         type: types.LOGOUT

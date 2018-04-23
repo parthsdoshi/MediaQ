@@ -12,8 +12,9 @@ import {
     addToQueue,
     setCurrentlyPlayingIndex,
     incrementCurrentlyPlayingIndex,
-    setVolume, toggleMediaDetailModal
-} from "../actions";
+    setVolume,
+    toggleMediaDetailModal,
+    setSessionRestoredPopupDisplayStatus, } from "../actions";
 
 import * as keyUtility from 'firebase-key'
 
@@ -191,7 +192,8 @@ class Queue extends Component {
                         header={'Add new media'}>
                         <Search loadVideoCallback={this.loadVideoCallback}
                             loadPlaylistCallback={this.loadPlaylistCallback} />
-                    </AddNewMediaModal>}
+                    </AddNewMediaModal>
+                }
                 {this.props.showMediaDetailsModal &&
                     <div>
                         {this.props.currentlyPlayingIndex === 0 &&
@@ -206,6 +208,11 @@ class Queue extends Component {
                             this.props.QueueRowEntries[this.props.currentlyPlayingIndex - 1])} />
                         }
                     </div>
+                }
+                {this.props.displaySessionRestoredPopup &&
+                    <PopupModal modelWantsToCloseCallback={() => this.props.setSessionRestoredPopupDisplayStatus(false)}
+                                title={'Session Restored'}
+                                body={<p><b>Your session has been restored</b></p>} />
                 }
 
                 <Table hover>
@@ -270,6 +277,7 @@ const mapStateToProps = state => {
         currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex,
         volumeLevel: state.semiRoot.volumeLevel,
         showMediaDetailsModal: state.semiRoot.showMediaDetailsModal,
+        displaySessionRestoredPopup: state.semiRoot.displaySessionRestoredPopup,
     }
 };
 
@@ -282,7 +290,7 @@ const mapDispatchToProps = dispatch => {
         incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
         setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
         toggleMediaDetailModal: () => dispatch(toggleMediaDetailModal()),
-
+        setSessionRestoredPopupDisplayStatus: (newStatus) => dispatch(setSessionRestoredPopupDisplayStatus(newStatus)),
     }
 };
 

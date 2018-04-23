@@ -6,6 +6,7 @@ const initialState = {
     qID: '',
     displayQIDPopup: false,
     displayIncorrectQIDPopup: false,
+    displaySessionRestoredPopup: false,
 
     playState: youtubeStates.PAUSED,
     currentlyPlayingIndex: 0, //0 means no video is playing
@@ -44,6 +45,8 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, displayQIDPopup: action.payload.newDisplayStatus };
         case types.SET_INCORRECT_QID_POPUP_DISPLAY_STATUS:
             return { ...state, displayIncorrectQIDPopup: action.payload.newDisplayStatus };
+        case types.SET_SESSION_RESTORED_POPUP_DISPLAY_STATUS:
+            return { ...state, displaySessionRestoredPopup: action.payload.newDisplayStatus };
         case types.LOGOUT:
             return { ...initialState };
         case types.ADD_NEW_USER:
