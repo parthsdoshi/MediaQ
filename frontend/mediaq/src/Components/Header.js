@@ -13,7 +13,8 @@ import {
     NavItem,
     NavLink,
     Popover,
-    PopoverHeader } from 'reactstrap';
+    PopoverHeader
+} from 'reactstrap';
 
 import LogoutIcon from 'open-iconic/svg/account-logout.svg';
 
@@ -67,8 +68,8 @@ class Header extends Component {
             width: '16px',
             height: '16px'
         };
-        let userList = this.props.userList.map((object, i) =>
-            <DropdownItem disabled key={i}>{object.displayName}</DropdownItem>);
+        let userList = this.props.userList.map((displayName) =>
+            <DropdownItem disabled key={displayName}>{displayName}</DropdownItem>);
 
         return (
             <div>
@@ -82,55 +83,55 @@ class Header extends Component {
                         <Collapse isOpen={this.state.collapseIsOpen} navbar>
                             <Nav className="ml-auto" navbar>
                                 {this.props.qID !== "" && this.props.displayName !== "" &&
-                                <UncontrolledDropdown nav inNavbar>
-                                    <DropdownToggle nav caret>
-                                        {'User List (' + this.props.userList.length + ')'}
-                                    </DropdownToggle>
-                                    <DropdownMenu right>
-                                        {userList}
-                                    </DropdownMenu>
-                                </UncontrolledDropdown>
+                                    <UncontrolledDropdown nav inNavbar>
+                                        <DropdownToggle nav caret>
+                                            {'User List (' + this.props.userList.length + ')'}
+                                        </DropdownToggle>
+                                        <DropdownMenu right>
+                                            {userList}
+                                        </DropdownMenu>
+                                    </UncontrolledDropdown>
                                 }
                                 {this.props.qID !== "" && this.props.displayName !== "" &&
-                                <NavItem>
-                                    <NavLink id="QIDPopover" onClick={this.copyQIDToClipboard} href="#">
-                                        {'Queue ID: ' + this.props.qID}
-                                    </NavLink>
-                                    <Popover placement="bottom" isOpen={this.state.QIDClipboardPopover}
-                                             target="QIDPopover" toggle={this.toggleQIDClipboardPopover}>
-                                        <PopoverHeader>Copied Queue ID!</PopoverHeader>
-                                    </Popover>
-                                </NavItem>
+                                    <NavItem>
+                                        <NavLink id="QIDPopover" onClick={this.copyQIDToClipboard} href="#">
+                                            {'Queue ID: ' + this.props.qID}
+                                        </NavLink>
+                                        <Popover placement="bottom" isOpen={this.state.QIDClipboardPopover}
+                                            target="QIDPopover" toggle={this.toggleQIDClipboardPopover}>
+                                            <PopoverHeader>Copied Queue ID!</PopoverHeader>
+                                        </Popover>
+                                    </NavItem>
                                 }
                                 {this.props.qID !== "" && this.props.displayName !== "" &&
-                                <UncontrolledDropdown nav inNavbar>
-                                    <DropdownToggle nav caret>
-                                        {this.props.displayName}
-                                    </DropdownToggle>
-                                    <DropdownMenu right>
-                                        <DropdownItem onClick={this.props.logout} >
-                                            <NavLink href="#">
-                                                <img alt="Logout" src={LogoutIcon} style={icon} />
-                                                <div style={{marginLeft: 20, display: 'inline'}}>
-                                                    Logout
+                                    <UncontrolledDropdown nav inNavbar>
+                                        <DropdownToggle nav caret>
+                                            {this.props.displayName}
+                                        </DropdownToggle>
+                                        <DropdownMenu right>
+                                            <DropdownItem onClick={this.props.logout} >
+                                                <NavLink href="#">
+                                                    <img alt="Logout" src={LogoutIcon} style={icon} />
+                                                    <div style={{ marginLeft: 20, display: 'inline' }}>
+                                                        Logout
                                                 </div>
-                                            </NavLink>
-                                        </DropdownItem>
-                                    </DropdownMenu>
-                                </UncontrolledDropdown>
+                                                </NavLink>
+                                            </DropdownItem>
+                                        </DropdownMenu>
+                                    </UncontrolledDropdown>
                                 }
                             </Nav>
                         </Collapse>
                     </Container>
                 </Navbar>
             </div>
-            );
-}
+        );
+    }
 }
 
 const mapStateToProps = state => {
     return {
-        displayName : state.semiRoot.displayName,
+        displayName: state.semiRoot.displayName,
         qID: state.semiRoot.qID,
         userList: state.semiRoot.userList
     }
@@ -138,7 +139,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        logout : () => dispatch(logout())
+        logout: () => dispatch(logout())
     }
 };
 
