@@ -90,7 +90,7 @@ def handle_create(data):
         connected_users = queue_info['connected_users']
 
         join_room(room)
-        return {'response': constants.SUCCESS, 'qID': random_id, 'data': {'connected_users': connected_users}}
+        return {'response': constants.SUCCESS, 'qID': random_id, 'data': {'displayName': displayName}}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
