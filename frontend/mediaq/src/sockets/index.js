@@ -10,7 +10,8 @@ import {
     addToQueue,
     setUserList,
     addNewUser,
-    removeUser } from '../actions'
+    removeUser,
+    setSessionRestoredPopupDisplayStatus } from '../actions'
 import { socketErrors, socketCommands, VERBOSE_SOCKET_LISTEN } from './socketConstants'
 
 const setupSocket = (dispatch) => {
@@ -26,7 +27,7 @@ const setupSocket = (dispatch) => {
             let qID = responseData['qID'];
             dispatch(setQIDPopupDisplayStatus(true));
             dispatch(setQID(qID));
-            let displayName = responseData['data']['displayName']
+            let displayName = responseData['data']['displayName'];
             dispatch(setUserList([displayName]))
         } else {
 
@@ -50,6 +51,29 @@ const setupSocket = (dispatch) => {
             dispatch(setIncorrectQIDPopupDisplayStatus(true));
         } else {
 
+        }
+    };
+
+    socket.SESSIONRESTOREDACKNOWLEDGEMENT = (responseData) => {
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got session restored acknowledgement');
+            console.log(responseData)
+        }
+        let response = responseData['response'];
+        if (response === socketErrors.SUCCESS) {
+            const queue = responseData['data']['queue'];
+            const userList = responseData['data']['connected_users'];
+            const qID = responseData['qID'];
+            const displayName = responseData['data']['displayName'];
+            dispatch(setSessionRestoredPopupDisplayStatus(true));
+            dispatch(setDisplayName(displayName));
+            dispatch(setQID(qID));
+            dispatch(setUserList(userList));
+            dispatch(setQueue(queue));
+            dispatch(login());
+        } else {
+            localStorage.removeItem("qID");
+            localStorage.removeItem("displayName");
         }
     };
 
