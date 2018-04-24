@@ -84,8 +84,7 @@ class Footer extends Component {
         const paddingLeft = {paddingLeft: 2};
         const volumeSlider = {paddingLeft: 20, width:150, paddingRight: 20, paddingTop: 13};
         return (
-            <div>
-                <div style={this.phantom} />
+            <div style={this.phantom}>
                 <div style={this.style}>
                     <Navbar color="light" light expand="md">
                         <Container fluid>
