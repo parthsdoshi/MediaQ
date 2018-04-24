@@ -22,7 +22,7 @@ const initialState = {
 
 function getNextPlayingIndexShuffled(state) {
     const current = state.currentlyPlayingIndex;
-    const max = state.QueueRowEntries.length;
+    const max = Object.keys(state.QueueRowEntries).length;
     if (current <= 0 || current > max) {//trivial
         return Math.floor(Math.random() * max) + 1;
     }
