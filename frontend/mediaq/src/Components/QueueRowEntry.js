@@ -40,6 +40,7 @@ class QueueRowEntry extends Component {
                 {this.props.deletionMode && <td>
                     <Input type="checkbox" onClick={() => this.props.rowEntryCheckboxClicked(this.props.rowData.timestamp)} />
                 </td>}
+                {!this.props.deletionMode && <td />}
                 {/*<td>*/}
                     {/*<Button color="danger">*/}
                         {/*<img alt="Remove to Queue" src={MinusIcon} />*/}
