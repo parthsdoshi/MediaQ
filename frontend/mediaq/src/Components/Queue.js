@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
 import { Table, Button } from 'reactstrap';
 import PlusIcon from 'open-iconic/svg/plus.svg';
+import MinusIcon from 'open-iconic/svg/minus.svg';
 
 import { connect } from 'react-redux';
 
@@ -14,7 +15,8 @@ import {
     incrementCurrentlyPlayingIndex,
     setVolume,
     toggleMediaDetailModal,
-    setSessionRestoredPopupDisplayStatus, } from "../actions";
+    setSessionRestoredPopupDisplayStatus,
+    setDeletionMode } from "../actions";
 
 import * as keyUtils from 'firebase-key'
 import AddNewMediaModal from './AddNewMediaModal';
@@ -136,6 +138,10 @@ class Queue extends Component {
         }
     };
 
+    rowEntryCheckboxClicked = (event) => {
+        console.log(event)
+    }
+
     getRowDataMoreDetails = (rowData) => {
         return (
             <div>
@@ -165,7 +171,9 @@ class Queue extends Component {
                     rowData={this.props.QueueRowEntries[i]}
                     playState={this.props.playState}
                     currentlyPlayingIndex={this.props.currentlyPlayingIndex}
-                    rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked} />
+                    rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked}
+                    rowEntryCheckboxClicked={this.rowEntryCheckboxClicked} 
+                    deletionMode={this.props.deletionMode} />
             );
             if (this.props.currentlyPlayingIndex === i + 1) {
                 //todo use better keys?
@@ -231,6 +239,13 @@ class Queue extends Component {
                                     <img alt="Add to Queue" src={PlusIcon} />
                                 </Button>
                             </th>
+                            <th>
+                                <Button onClick={() => this.props.setDeletionMode(!this.props.deletionMode)} 
+                                    color="danger"
+                                    className="rounded-circle">
+                                    <img alt="Remove from Queue" src={MinusIcon} />
+                                </Button>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -280,6 +295,7 @@ const mapStateToProps = state => {
         volumeLevel: state.semiRoot.volumeLevel,
         showMediaDetailsModal: state.semiRoot.showMediaDetailsModal,
         displaySessionRestoredPopup: state.semiRoot.displaySessionRestoredPopup,
+        deletionMode: state.semiRoot.deletionMode
     }
 };
 
@@ -293,6 +309,7 @@ const mapDispatchToProps = dispatch => {
         setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
         toggleMediaDetailModal: () => dispatch(toggleMediaDetailModal()),
         setSessionRestoredPopupDisplayStatus: (newStatus) => dispatch(setSessionRestoredPopupDisplayStatus(newStatus)),
+        setDeletionMode: (newMode) => dispatch(setDeletionMode(newMode))
     }
 };
 

@@ -166,3 +166,10 @@ export const setQueue = newQueue => {
         payload: {newQueue: newQueue}
     };
 };
+
+export const setDeletionMode = newDeletionMode => {
+    return {
+        type: types.SET_DELETION_MODE,
+        payload: {newDeletionMode: newDeletionMode}
+    }
+}

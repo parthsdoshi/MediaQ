@@ -7,6 +7,7 @@ const initialState = {
     displayQIDPopup: false,
     displayIncorrectQIDPopup: false,
     displaySessionRestoredPopup: false,
+    deletionMode: false,
 
     playState: youtubeStates.PAUSED,
     currentlyPlayingIndex: 0, //0 means no video is playing
@@ -108,6 +109,8 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, QueueRowEntries: {...state.QueueRowEntries, ...action.payload.medias} };
         case types.SET_QUEUE:
             return { ...state, QueueRowEntries: action.payload.newQueue };
+        case types.SET_DELETION_MODE:
+            return { ...state, deletionMode: action.payload.newDeletionMode }
         default:
             return state;
     }
