@@ -8,7 +8,6 @@ import { connect } from 'react-redux';
 import * as youtubeStates from "../constants/youtube";
 import { changePlayState,
     changeYoutubeVideoObject,
-    addToQueue,
     setCurrentlyPlayingIndex,
     incrementCurrentlyPlayingIndex,
     setVolume } from "../actions";

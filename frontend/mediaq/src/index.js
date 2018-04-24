@@ -11,7 +11,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import setupSocket from './sockets'
 
 const store = createStore(rootReducer);
-const socket = setupSocket(store.dispatch);
+setupSocket(store.dispatch);
 
 ReactDOM.render(
     <Provider store={store}>

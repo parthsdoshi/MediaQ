@@ -1,6 +1,5 @@
 import React from 'react';
 import YouTube from 'react-youtube';
-import {RowData} from "./rowData";
 
 /* global gapi */
 // above tells compiler that gapi is global
