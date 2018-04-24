@@ -1,0 +1,21 @@
+{
+  "main.css": "static/css/main.b0338339.css",
+  "main.css.map": "static/css/main.b0338339.css.map",
+  "main.js": "static/js/main.c07867c2.js",
+  "main.js.map": "static/js/main.c07867c2.js.map",
+  "static/media/account-logout.svg": "static/media/account-logout.ddc9bd9f.svg",
+  "static/media/aperture.svg": "static/media/aperture.e15376e4.svg",
+  "static/media/fork.svg": "static/media/fork.09296786.svg",
+  "static/media/info.svg": "static/media/info.df157113.svg",
+  "static/media/logo.svg": "static/media/logo.72287997.svg",
+  "static/media/media-pause.svg": "static/media/media-pause.624c0026.svg",
+  "static/media/media-play.svg": "static/media/media-play.8ea16cdc.svg",
+  "static/media/media-skip-backward.svg": "static/media/media-skip-backward.d7b60880.svg",
+  "static/media/media-skip-forward.svg": "static/media/media-skip-forward.793cb9a2.svg",
+  "static/media/media-step-backward.svg": "static/media/media-step-backward.b7e10ab4.svg",
+  "static/media/media-step-forward.svg": "static/media/media-step-forward.26c8b12f.svg",
+  "static/media/minus.svg": "static/media/minus.583b551d.svg",
+  "static/media/plus.svg": "static/media/plus.4a11d64c.svg",
+  "static/media/random.svg": "static/media/random.12774bff.svg",
+  "static/media/youtube.png": "static/media/youtube.02ada31a.png"
+}
