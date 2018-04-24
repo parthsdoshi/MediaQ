@@ -106,6 +106,16 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };
         case types.ADD_TO_QUEUE:
             return { ...state, QueueRowEntries: {...state.QueueRowEntries, ...action.payload.medias} };
+        case types.REMOVE_FROM_QUEUE:
+            let newQueueRowEntries = {...state.QueueRowEntries}
+            for (let id of action.payload.medias) {
+                console.log(id)
+                if (id in newQueueRowEntries) {
+                    delete newQueueRowEntries[id]
+                }
+            }
+
+            return { ...state, QueueRowEntries: newQueueRowEntries };
         case types.SET_QUEUE:
             return { ...state, QueueRowEntries: action.payload.newQueue };
         default:

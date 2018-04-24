@@ -87,7 +87,6 @@ def handle_create(data):
                     'displayName': displayName}]
                 }
         hset('queues', random_id, queue_info)
-        connected_users = queue_info['connected_users']
 
         join_room(room)
         return {'response': constants.SUCCESS, 'qID': random_id, 'data': {'displayName': displayName}}

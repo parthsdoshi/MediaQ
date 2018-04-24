@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button } from 'reactstrap';
+import { Button, Input } from 'reactstrap';
 
 import MinusIcon from 'open-iconic/svg/minus.svg';
 
@@ -36,6 +36,11 @@ class QueueRowEntry extends Component {
                           alt="youtube logo" />
                     </a>
                 </td>
+                <td />
+                {this.props.deletionMode && <td>
+                    <Input type="checkbox" onClick={() => this.props.rowEntryCheckboxClicked(this.props.rowData.timestamp)} />
+                </td>}
+                {!this.props.deletionMode && <td />}
                 {/*<td>*/}
                     {/*<Button color="danger">*/}
                         {/*<img alt="Remove to Queue" src={MinusIcon} />*/}

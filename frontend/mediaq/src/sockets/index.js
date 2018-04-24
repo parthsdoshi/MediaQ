@@ -10,8 +10,11 @@ import {
     addToQueue,
     setUserList,
     addNewUser,
-    removeUser,
-    setSessionRestoredPopupDisplayStatus } from '../actions'
+    removeUser, 
+    removeFromQueue,
+    setDeletionMode,
+    setSessionRestoredPopupDisplayStatus
+} from '../actions'
 import { socketErrors, socketCommands, VERBOSE_SOCKET_LISTEN } from './socketConstants'
 
 const setupSocket = (dispatch) => {
@@ -105,9 +108,11 @@ const setupSocket = (dispatch) => {
             console.log('socket got removemedias acknowledgement');
             console.log(responseData)
         }
-        let response = responseData['response'];
-        if (response !== socketErrors.SUCCESS) {
-
+        const response = responseData['response'];
+        if (response === socketErrors.SUCCESS) {
+            const medias = responseData['data']['medias']
+            dispatch(removeFromQueue(medias))
+            dispatch(setDeletionMode(false))
         }
     };
 
@@ -223,6 +228,19 @@ const setupSocket = (dispatch) => {
 
         }
     });
+
+    socket.on(socketCommands.MEDIASREMOVED, (data) => {
+        if (VERBOSE_SOCKET_LISTEN) {
+            console.log('socket got userleft');
+            console.log(data);
+        }
+        const response = data['response'];
+        if (response === socketErrors.SUCCESS) {
+            const medias = data['data']['medias']
+            dispatch(removeFromQueue(medias))
+            dispatch(setDeletionMode(false))
+        }
+    })
 
     return socket
 };

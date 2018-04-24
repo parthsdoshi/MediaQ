@@ -160,9 +160,36 @@ export const addToQueue = medias => {
     };
 };
 
+export const removeFromQueue = medias => {
+    return {
+        type: types.REMOVE_FROM_QUEUE,
+        payload: { medias: medias }
+    }
+}
+
 export const setQueue = newQueue => {
     return {
         type: types.SET_QUEUE,
         payload: {newQueue: newQueue}
     };
 };
+
+export const setDeletionMode = newDeletionMode => {
+    return {
+        type: types.SET_DELETION_MODE,
+        payload: {newDeletionMode: newDeletionMode}
+    };
+};
+
+export const rowEntryCheckboxClicked = rowID => {
+    return {
+        type: types.ROW_ENTRY_CHECKBOX_CLICKED,
+        payload: {rowID: rowID}
+    };
+};
+
+export const deleteCheckedRows = () => {
+    return {
+        type: types.DELETE_CHECKED_ROWS
+    }
+}
