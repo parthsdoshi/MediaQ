@@ -8,11 +8,11 @@ services:
             - ./frontend/mediaq/build:/build
             - ./backend/app.py:/app/app.py
             - ./backend/socket_constants.py:/app/socket_constants.py
-	restart: always
+        restart: always
     database:
         build: ./database
         ports:
             - "6379:6379"
         volumes:
             - ./database/redis_data:/data
-	restart: always
+        restart: always
