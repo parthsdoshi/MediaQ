@@ -13,6 +13,7 @@ import {
     incrementCurrentlyPlayingIndex,
     setVolume,
     toggleMediaDetailModal,
+    addToQueue,
     setSessionRestoredPopupDisplayStatus, } from "../actions";
 
 import * as keyUtils from 'firebase-key'
@@ -81,7 +82,11 @@ class Queue extends Component {
         }
 
         //volume
-        const volumeLevel = this.props.currentlyPlayingYoutubeVideoObject.getVolume();
+        let volumeLevel = this.props.currentlyPlayingYoutubeVideoObject.getVolume();
+        const isMuted = this.props.currentlyPlayingYoutubeVideoObject.isMuted();
+        if (isMuted) {
+            volumeLevel = 0;
+        }
         if (volumeLevel !== this.props.volumeLevel) {
             this.props.setVolume(volumeLevel);
         }
