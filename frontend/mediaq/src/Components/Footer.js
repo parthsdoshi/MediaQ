@@ -6,7 +6,9 @@ import {
     NavItem,
     Container } from 'reactstrap';
 
-import Slider from 'react-rangeslider'
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
+
 import SeekAheadIcon from 'open-iconic/svg/media-skip-forward.svg';
 import SeekBehindIcon from 'open-iconic/svg/media-skip-backward.svg';
 import PrevMediaIcon from 'open-iconic/svg/media-step-backward.svg';
@@ -80,7 +82,7 @@ class Footer extends Component {
 
     render() {
         const paddingLeft = {paddingLeft: 2};
-        const volumeSlider = {paddingLeft: 20, width:150};
+        const volumeSlider = {paddingLeft: 20, width:150, paddingRight: 20, paddingTop: 13};
         return (
             <div>
                 <div style={this.phantom} />
@@ -127,16 +129,15 @@ class Footer extends Component {
                                     </Button>
                                 </NavItem>
                                 <NavItem style={volumeSlider}>
-                                    <div className='slider-horizontal'>
-                                        <link rel="stylesheet" href="https://unpkg.com/react-rangeslider/umd/rangeslider.min.css" />
-                                        <Slider
-                                            min={0}
-                                            max={100}
-                                            value={this.props.volumeLevel}
-                                            orientation='horizontal'
-                                            onChange={this.handleChangeVolumeSlider}
+                                    {console.log(this.props.volumeLevel)}
+                                    <Slider
+                                        max={100}
+                                        min={0}
+                                        step={1}
+                                        vertical={false}
+                                        onChange={this.handleChangeVolumeSlider}
+                                        value={this.props.volumeLevel}
                                         />
-                                        <div className='value'>{this.props.volumeLevel}</div></div>
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={() => {this.props.toggleMediaDetailModal()}} color="secondary"

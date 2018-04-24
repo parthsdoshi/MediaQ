@@ -22,7 +22,7 @@ const initialState = {
 
 function getNextPlayingIndexShuffled(state) {
     const current = state.currentlyPlayingIndex;
-    const max = state.QueueRowEntries.length;
+    const max = Object.keys(state.QueueRowEntries).length;
     if (current <= 0 || current > max) {//trivial
         return Math.floor(Math.random() * max) + 1;
     }
@@ -53,11 +53,9 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, userList: [...state.userList, action.payload.newUser] };
         case types.REMOVE_USER:
             let newUserList = state.userList.slice(0); //clone array
-            for (let i = newUserList.length - 1; i >= 0; i--) {
-                if (newUserList[i].displayName === action.payload.userToRemove) {
-                    newUserList.splice(i, 1);
-                    break;
-                }
+            let index = newUserList.indexOf(action.payload.userToRemove)
+            if (index > -1) {
+                newUserList.splice(index, 1)
             }
             return { ...state, userList: newUserList };
         case types.SET_USER_LIST:

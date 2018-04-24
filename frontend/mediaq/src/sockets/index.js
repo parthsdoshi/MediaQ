@@ -26,6 +26,8 @@ const setupSocket = (dispatch) => {
             let qID = responseData['qID'];
             dispatch(setQIDPopupDisplayStatus(true));
             dispatch(setQID(qID));
+            let displayName = responseData['data']['displayName']
+            dispatch(setUserList([displayName]))
         } else {
 
         }
@@ -54,7 +56,7 @@ const setupSocket = (dispatch) => {
     // not used right now but we should display a loading screen probably
     socket.LEAVEACKNOWLEDGEMENT = (responseData) => {
         if (VERBOSE_SOCKET_LISTEN) {
-            console.log('socket got leve acknowledgement');
+            console.log('socket got leave acknowledgement');
             console.log(responseData)
         }
         let response = responseData['response'];
@@ -138,6 +140,8 @@ const setupSocket = (dispatch) => {
             let qID = responseData['qID'];
             dispatch(setQIDPopupDisplayStatus(true));
             dispatch(setQID(qID));
+            let displayName = responseData['data']['displayName']
+            dispatch(setUserList([displayName]))
             dispatch(addToQueue(newQueueMedia));
             socket.emit(socketCommands.ADDMEDIAS,
                 { 'data': {'medias':  newQueueMedia}, 'qID': qID },

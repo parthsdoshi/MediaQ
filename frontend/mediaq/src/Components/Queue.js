@@ -59,6 +59,7 @@ class Queue extends Component {
     };
 
     youtubeVideoStateChangedAPICallback = (event) => {
+        console.log(event.target)
         if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             //this might happen when we set the currentobject to null because of a media change
             //but when switching from one youtube video to another, youtube doesnt call onReady callback
@@ -89,6 +90,7 @@ class Queue extends Component {
         }
         if (volumeLevel !== this.props.volumeLevel) {
             this.props.setVolume(volumeLevel);
+            console.log(volumeLevel)
         }
     };
 
@@ -172,11 +174,11 @@ class Queue extends Component {
             if (this.props.currentlyPlayingIndex === i + 1) {
                 //todo use better keys?
                 QueueRowEntries.push(
-                    <tr ref="embeddedVideo" key={-1}>
+                    <tr ref="embeddedVideo" key={this.props.QueueRowEntries[i].timestamp}>
                         <td />
                         <td />
                         <td>
-                            {getEmbeddedVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex - 1].id,
+                            {getEmbeddedVideoComponent(this.props.QueueRowEntries[i].id,
                                 this.setYoutubeVideoObjectAPICallback,
                                 this.youtubeVideoStateChangedAPICallback,
                                 64 * 9,
