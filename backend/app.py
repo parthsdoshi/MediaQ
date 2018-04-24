@@ -128,7 +128,7 @@ def handle_join(data):
 
         join_room(qID)
         emit(constants.USERJOINED, {'data': {'displayName': displayName}, 'response': constants.SUCCESS, 'qID': qID}, room=qID, include_self=False)
-        return {'response': constants.SUCCESS, 'data': {'connected_users': usersArr, 'queue': queue}, 'qID': qID}
+        return {'response': constants.SUCCESS, 'data': {'connected_users': usersArr, 'queue': queue, 'displayName': displayName}, 'qID': qID}
     except KeyError as exc:
         print(exc, file=sys.stderr)
         return {'response': constants.ILL_FORMED_DATA}
