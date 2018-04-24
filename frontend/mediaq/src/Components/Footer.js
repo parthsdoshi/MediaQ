@@ -24,7 +24,8 @@ import {
     setVolume,
     toggleShuffle,
     toggleMediaDetailModal,
-    deleteCheckedRows } from "../actions/index";
+    deleteCheckedRows
+} from "../actions/index";
 
 import MediaPlayPauseButton from './MediaPlayPauseButton';
 import * as youtubeStates from '../constants/youtube';
@@ -88,8 +89,8 @@ class Footer extends Component {
             <div style={this.phantom}>
                 <div style={this.style}>
                     <Navbar color="light" light expand="md">
-                        <Container fluid>
-                            {this.props.deletionMode && <Nav className="mx-auto" navbar>
+                        <Container>
+                            {!this.props.deletionMode && <Nav className="mx-auto" navbar>
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={this.props.toggleShuffle} color={'primary'}
                                             active={this.props.shuffleMode}
@@ -146,7 +147,7 @@ class Footer extends Component {
                                     </Button>
                                 </NavItem>
                             </Nav>}
-                            {!this.props.deletionMode && <Nav className="mx-auto">
+                            {this.props.deletionMode && <Nav className="mx-auto">
                                 <NavItem>
                                     <Button onClick={this.props.deleteCheckedRows} color="danger">
                                         Delete Checked Media
@@ -169,7 +170,7 @@ const mapStateToProps = state => {
         currentlyPlayingYoutubeVideoObject: state.semiRoot.youtubeVideoObject,
         volumeLevel: state.semiRoot.volumeLevel,
         shuffleMode: state.semiRoot.shuffleMode,
-        deletionMode: state.semiRoot.deletionMode
+        deletionMode: state.socket.deletionMode
     }
 };
 

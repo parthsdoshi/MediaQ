@@ -16,7 +16,9 @@ import {
     setVolume,
     toggleMediaDetailModal,
     setSessionRestoredPopupDisplayStatus,
-    setDeletionMode } from "../actions";
+    setDeletionMode,
+    rowEntryCheckboxClicked
+} from "../actions";
 
 import * as keyUtils from 'firebase-key'
 import AddNewMediaModal from './AddNewMediaModal';
@@ -138,10 +140,6 @@ class Queue extends Component {
         }
     };
 
-    rowEntryCheckboxClicked = (event) => {
-        console.log(event)
-    }
-
     getRowDataMoreDetails = (rowData) => {
         return (
             <div>
@@ -172,7 +170,7 @@ class Queue extends Component {
                     playState={this.props.playState}
                     currentlyPlayingIndex={this.props.currentlyPlayingIndex}
                     rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked}
-                    rowEntryCheckboxClicked={this.rowEntryCheckboxClicked} 
+                    rowEntryCheckboxClicked={this.props.rowEntryCheckboxClicked} 
                     deletionMode={this.props.deletionMode} />
             );
             if (this.props.currentlyPlayingIndex === i + 1) {
@@ -295,7 +293,7 @@ const mapStateToProps = state => {
         volumeLevel: state.semiRoot.volumeLevel,
         showMediaDetailsModal: state.semiRoot.showMediaDetailsModal,
         displaySessionRestoredPopup: state.semiRoot.displaySessionRestoredPopup,
-        deletionMode: state.semiRoot.deletionMode
+        deletionMode: state.socket.deletionMode
     }
 };
 
@@ -309,6 +307,7 @@ const mapDispatchToProps = dispatch => {
         setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
         toggleMediaDetailModal: () => dispatch(toggleMediaDetailModal()),
         setSessionRestoredPopupDisplayStatus: (newStatus) => dispatch(setSessionRestoredPopupDisplayStatus(newStatus)),
+        rowEntryCheckboxClicked: (rowID) => dispatch(rowEntryCheckboxClicked(rowID)),
         setDeletionMode: (newMode) => dispatch(setDeletionMode(newMode))
     }
 };

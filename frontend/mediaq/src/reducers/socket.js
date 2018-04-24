@@ -5,7 +5,9 @@ const initialState = {
     socket: null,
     loggedIn: false,
     displayName: '',
-    qID: ''
+    qID: '',
+    deletionMode: false,
+    rowEntriesCheckboxClicked: []
 };
 
 export default function socket(state = initialState, action) {
@@ -46,6 +48,26 @@ export default function socket(state = initialState, action) {
                 localStorage.setItem('qID', state.qID);
             }
             return { ...state };
+        case types.SET_DELETION_MODE:
+            if (!action.payload.newDeletionMode) {
+                return { ...state, deletionMode: action.payload.newDeletionMode, rowEntriesCheckboxClicked: []}
+            }
+            return { ...state, deletionMode: action.payload.newDeletionMode }
+        case types.ROW_ENTRY_CHECKBOX_CLICKED:
+            let index = state.rowEntriesCheckboxClicked.indexOf(action.payload.rowID)
+            if (index > -1) {
+                let arr = state.rowEntriesCheckboxClicked.slice(0)
+                arr.splice(index, 1)
+                return { ...state, rowEntriesCheckboxClicked: arr }
+            } else {
+                return { ...state, rowEntriesCheckboxClicked: [...state.rowEntriesCheckboxClicked, action.payload.rowID] }
+            }
+        case types.DELETE_CHECKED_ROWS:
+            state.socket.emit(socketCommands.REMOVEMEDIAS,
+                { 'data': {'medias': state.rowEntriesCheckboxClicked}, 'qID': state.qID }, 
+                state.socket.REMOVEMEDIASACKNOWLEDGEMENT)
+            // emit
+            return state
         default:
             return state;
     }
