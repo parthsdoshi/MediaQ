@@ -23,12 +23,9 @@ class InitialConnect extends Component {
         let displayNameInStorage = localStorage.getItem('displayName');
         let qIDInStorage = localStorage.getItem('qID');
         if (displayNameInStorage !== null && qIDInStorage !== null) {
-            this.props.setSessionRestoredPopupDisplayStatus(true);
-            this.props.setDisplayName(displayNameInStorage);
-            this.props.setQID(qIDInStorage);
             this.props.socket.emit(socketCommands.JOIN,
                 { 'data': {'displayName': displayNameInStorage}, 'qID': qIDInStorage },
-                this.props.socket.JOINACKNOWLEDGEMENT);
+                this.props.socket.SESSIONRESTOREDACKNOWLEDGEMENT);
         }
 
         this.state = {
