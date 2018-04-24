@@ -1,52 +1,65 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
 import { Table, Button } from 'reactstrap';
-
 import PlusIcon from 'open-iconic/svg/plus.svg';
 
 import { connect } from 'react-redux';
+
 import * as youtubeStates from "../constants/youtube";
-import { changePlayState,
+import {
+    changePlayState,
     changeYoutubeVideoObject,
-    addToQueue,
     setCurrentlyPlayingIndex,
     incrementCurrentlyPlayingIndex,
-    setVolume } from "../actions";
+    setVolume,
+    toggleMediaDetailModal,
+    addToQueue,
+    setSessionRestoredPopupDisplayStatus, } from "../actions";
 
+import * as keyUtils from 'firebase-key'
 import AddNewMediaModal from './AddNewMediaModal';
 import QueueRowEntry from './QueueRowEntry';
-import { getEmbededVideoComponent } from '../utils/google_utils';
+import Search from './Search';
+import { getEmbeddedVideoComponent } from '../utils/google_utils';
+import { socketCommands } from '../sockets/socketConstants';
+import PopupModal from "./PopupModal";
 
 class Queue extends Component {
 
     constructor(props) {
         super(props);
-        this.socket = props.socket;
 
         this.state = {
             showAddNewMediaModal: false,
         };
+
+        // should probably be stored in redux state...
+        this.number = 0;
     }
 
     //scroll if video position changes
     componentDidUpdate = (prevProps, prevState, snapshot) => {
-        if (prevProps.currentlyPlayingIndex !== this.props.currentlyPlayingIndex) {
+        if (prevProps.currentlyPlayingIndex !== this.props.currentlyPlayingIndex &&
+            this.props.currentlyPlayingIndex !== 0) {
             this.scrollToEmbeddedVideo();
         }
     };
 
     scrollToEmbeddedVideo = () => {
         const tesNode = ReactDOM.findDOMNode(this.refs.embeddedVideo);
-        window.scrollTo(0, tesNode.offsetTop);
+        if (tesNode != null) { //!= null: not null or undefined
+            window.scrollTo(0, tesNode.offsetTop);
+        }
     };
 
     setYoutubeVideoObjectAPICallback = (event) => {
-        console.log('youtube video called on ready callback');
+        console.log('youtube video called on ready callback: ');
         this.props.changeYoutubeVideoObject(event.target);
         this.props.setVolume(this.props.volumeLevel);
     };
 
     youtubeVideoStateChangedAPICallback = (event) => {
+        console.log(event.target)
         if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             //this might happen when we set the currentobject to null because of a media change
             //but when switching from one youtube video to another, youtube doesnt call onReady callback
@@ -70,36 +83,39 @@ class Queue extends Component {
         }
 
         //volume
-        const volumeLevel = this.props.currentlyPlayingYoutubeVideoObject.getVolume();
+        let volumeLevel = this.props.currentlyPlayingYoutubeVideoObject.getVolume();
+        const isMuted = this.props.currentlyPlayingYoutubeVideoObject.isMuted();
+        if (isMuted) {
+            volumeLevel = 0;
+        }
         if (volumeLevel !== this.props.volumeLevel) {
             this.props.setVolume(volumeLevel);
+            console.log(volumeLevel)
         }
     };
 
-    loadVideoCallback = (rowData) => {
-        this.socket.emit('addToQueue', {
-            'rowData': rowData,
-            'qID': this.props.qID
-        });
+    loadVideosCallback = (medias) => {
+        console.log(medias);
+        this.props.addToQueue(medias);
+        this.props.socket.emit(socketCommands.ADDMEDIAS,
+            { 'data': {'medias':  medias}, 'qID': this.props.qID },
+            this.props.socket.ADDMEDIASACKNOWLEDGEMENT);
         this.setState({
             showAddNewMediaModal: false
         });
-        //todo make an optimistic server response and add it to queue immediately, then when server responds ignore it
-        //this.props.addToQueue(rowData);
     };
 
-    loadPlaylistCallback = (rowDatas) => {
+    loadVideoCallback = (mediaId, rowData) => {
+        let obj = {};
+        obj[mediaId] = rowData;
+        this.loadVideosCallback(obj)
+    };
+
+    loadPlaylistCallback = (medias) => {
         this.setState({
             showAddNewMediaModal: false
         });
-        for (let i = 0; i < rowDatas.length; i++) {
-            this.socket.emit('addToQueue', {
-                'rowData': rowDatas[i],
-                'qID': this.props.qID
-            });
-        }
-        //todo make an optimistic server response and add it to queue immediately, then when server responds ignore it
-        //this.props.addToQueue(rowData);
+        this.loadVideosCallback(medias)
     };
 
 
@@ -124,33 +140,53 @@ class Queue extends Component {
         }
     };
 
+    getRowDataMoreDetails = (rowData) => {
+        return (
+            <div>
+                <img src={rowData.thumbnail} alt="Video Thumbnail" className="img-thumbnail" />
+                <p><b>Title:</b> {rowData.title}</p>
+                <p><b>Description:</b></p>
+                <p>{rowData.description}</p>
+                <p><b>Author:</b> {rowData.author}</p>
+                <a href={rowData.link} target="_blank" style={{display: "table-cell"}}>
+                    <p><b>Source:</b> {rowData.source}</p>
+                </a>
+                <p><b>Added on:</b> {keyUtils.date(rowData.timestamp).toString()}</p>
+                <p><b>Added by:</b> {rowData.displayName}</p>
+                <p><b>Hash:</b> {rowData.timestamp}</p>
+            </div>
+        )
+    };
+
     render() {
+        console.log('queuerowentrieslength ' + this.props.QueueRowEntries.length);
         let QueueRowEntries = [];
-        for(let i = 0; i < this.props.QueueRowEntries.length; i++) {
+        for (let i = 0; i < this.props.QueueRowEntries.length; i++) {
             QueueRowEntries.push(
                 <QueueRowEntry
                     key={i}
-                    rowID={i+1}
+                    rowID={i + 1}
                     rowData={this.props.QueueRowEntries[i]}
                     playState={this.props.playState}
                     currentlyPlayingIndex={this.props.currentlyPlayingIndex}
                     rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked} />
-                );
+            );
             if (this.props.currentlyPlayingIndex === i + 1) {
+                //todo use better keys?
                 QueueRowEntries.push(
-                    <tr ref="embeddedVideo">
-                        <td></td>
-                        <td></td>
+                    <tr ref="embeddedVideo" key={this.props.QueueRowEntries[i].timestamp}>
+                        <td />
+                        <td />
                         <td>
-                            {getEmbededVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,
+                            {getEmbeddedVideoComponent(this.props.QueueRowEntries[i].id,
                                 this.setYoutubeVideoObjectAPICallback,
                                 this.youtubeVideoStateChangedAPICallback,
-                                64*9,
-                                39*9)}
+                                64 * 9,
+                                39 * 9)}
                         </td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td />
+                        <td />
+                        <td />
                     </ tr>
                 );
             }
@@ -158,33 +194,56 @@ class Queue extends Component {
         return (
             <div>
                 {this.state.showAddNewMediaModal &&
-                    <AddNewMediaModal loadVideoCallback={this.loadVideoCallback}
-                                      hideMe={this.toggleAddNewMediaModal}
-                                      loadPlaylistCallback={this.loadPlaylistCallback}/>}
-                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+                    <AddNewMediaModal hideMe={this.toggleAddNewMediaModal}
+                        header={'Add new media'}>
+                        <Search loadVideoCallback={this.loadVideoCallback}
+                            loadPlaylistCallback={this.loadPlaylistCallback} />
+                    </AddNewMediaModal>
+                }
+                {this.props.showMediaDetailsModal &&
+                    <div>
+                        {this.props.currentlyPlayingIndex === 0 &&
+                        <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
+                                    title={'Please Select Media'}
+                                    body={<p><b>Please select a media before attempting to view more details</b></p>} />
+                        }
+                        {this.props.currentlyPlayingIndex !== 0 &&
+                            <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
+                            title={'Media Details'}
+                            body={this.getRowDataMoreDetails(
+                            this.props.QueueRowEntries[this.props.currentlyPlayingIndex - 1])} />
+                        }
+                    </div>
+                }
+                {this.props.displaySessionRestoredPopup &&
+                    <PopupModal modelWantsToCloseCallback={() => this.props.setSessionRestoredPopupDisplayStatus(false)}
+                                title={'Session Restored'}
+                                body={<p><b>Your session has been restored</b></p>} />
+                }
+
                 <Table hover>
                     <thead>
                         <tr>
-                            <th></th>
-                            <th></th>
+                            <th />
+                            <th />
                             <th>Title</th>
                             <th>Author/Artist</th>
                             <th>Album</th>
                             <th>Source</th>
                             <th>
-                                <Button onClick={this.toggleAddNewMediaModal} color="primary"  className="rounded-circle">
+                                <Button onClick={this.toggleAddNewMediaModal} color="primary" className="rounded-circle">
                                     <img alt="Add to Queue" src={PlusIcon} />
                                 </Button>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                    {QueueRowEntries}
+                        {QueueRowEntries}
                     </tbody>
                 </Table>
                 {/*{this.props.currentlyPlayingIndex !== 0 &&*/}
-                    {/*<div className="text-center">*/}
-                        {/*{getEmbededVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,*/}
+                {/*<div className="text-center">*/}
+                        {/*{getEmbeddedVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,*/}
                                             {/*this.setYoutubeVideoObjectAPICallback,*/}
                                             {/*this.youtubeVideoStateChangedAPICallback,*/}
                                             {/*64*9,*/}
@@ -197,15 +256,34 @@ class Queue extends Component {
 
 }
 
+//todo move in utils file
+const lexicographicalSort = (queue) => {
+    let keys = [];
+    for (let key in queue) {
+        keys.push(key)
+    }
+
+    keys.sort();
+
+    let ret = [];
+    for (let key of keys) {
+        ret.push(queue[key])
+    }
+
+    return ret
+};
+
 const mapStateToProps = state => {
     return {
-        socket: state.socket,
-        qID: state.qID,
-        playState : state.playState,
-        currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject,
-        QueueRowEntries: state.QueueRowEntries,
-        currentlyPlayingIndex: state.currentlyPlayingIndex,
-        volumeLevel: state.volumeLevel
+        socket: state.socket.socket,
+        qID: state.semiRoot.qID,
+        playState : state.semiRoot.playState,
+        currentlyPlayingYoutubeVideoObject: state.semiRoot.youtubeVideoObject,
+        QueueRowEntries: lexicographicalSort(state.semiRoot.QueueRowEntries),
+        currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex,
+        volumeLevel: state.semiRoot.volumeLevel,
+        showMediaDetailsModal: state.semiRoot.showMediaDetailsModal,
+        displaySessionRestoredPopup: state.semiRoot.displaySessionRestoredPopup,
     }
 };
 
@@ -213,10 +291,12 @@ const mapDispatchToProps = dispatch => {
     return {
         changePlayState : playState => dispatch(changePlayState(playState)),
         changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObject(youtubeVideoObject)),
-//        addToQueue: rowData => dispatch(addToQueue(rowData)),
+        addToQueue: medias => dispatch(addToQueue(medias)),
         setCurrentlyPlayingIndex: newIndex => dispatch(setCurrentlyPlayingIndex(newIndex)),
         incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
-        setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel))
+        setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
+        toggleMediaDetailModal: () => dispatch(toggleMediaDetailModal()),
+        setSessionRestoredPopupDisplayStatus: (newStatus) => dispatch(setSessionRestoredPopupDisplayStatus(newStatus)),
     }
 };
 

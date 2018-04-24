@@ -1,11 +1,14 @@
-import os, time, random, string, json
+import os, time, random, string, json, sys
 from flask import Flask, send_from_directory, request
 from flask_socketio import SocketIO, emit, join_room, leave_room, rooms
 import redis
+import time
+
+import socket_constants as constants
 
 app = Flask(__name__, static_folder='/build')
 socketio = SocketIO(app)
-database = redis.Redis(host='database', port=6379)
+database = redis.StrictRedis(host='database', port=6379)
 
 # Serve React App
 @app.route('/', defaults={'path': ''})
@@ -19,28 +22,42 @@ def serve(path):
         else:
             return send_from_directory('/build', 'index.html')
 
-def get(key):
+def tryDatabaseCommand(command, *args):
     retries = 5
     while True:
         try:
-            return database.get(key)
+            return database.execute_command(command, *args)
         except redis.exceptions.ConnectionError as exc:
             if retries == 0:
                 raise exc
             retries -= 1
             time.sleep(0.5)
+        except redis.exceptions.ResponseError as exc:
+            return None
 
-def set(key, value):
-    retries = 5
-    while True:
-        try:
-            return database.set(key, value)
-        except redis.exceptions.ConnectionError as exc:
-            if retries == 0:
-                raise exc
-            retries -= 1
-            time.sleep(0.5)
+def hget(hash, key):
+    ret = tryDatabaseCommand('hget', hash, key)
+    if (ret != None):
+        ret = json.loads(ret)
+    return ret
 
+def hset(hash, key, value):
+    ret = tryDatabaseCommand('hset', hash, key, json.dumps(value))
+    return ret
+
+# 
+# def get(key):
+#     ret = tryDatabaseCommand('GET', key)
+#     if (ret != None):
+#         ret = json.loads(ret)
+#     return ret
+#     
+# def set(key, value):
+#     return tryDatabaseCommand('SET', key, json.dumps(value))
+
+# initialize queues
+# if ez_database.queues == None:
+#     ez_database.queues = {}
 
 # just some info about the socketio library...
 # calling just 'emit' sends back to the sender
@@ -50,128 +67,234 @@ def set(key, value):
 
 # TL;DR: socketio functions are NOT context aware
 
-@socketio.on('create')
+@socketio.on(constants.CREATE)
 def handle_create(data):
-    print(data)
+    try:
+        displayName = data['data']['displayName']
 
-    displayName = data['displayName']
+        random_id = ''.join(random.choices(string.ascii_uppercase, k=4))
 
-    random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+        while hget('queues', random_id) != None:
+            random_id = ''.join(random.choices(string.ascii_uppercase, k=4))
 
-    while(get(random_id) != None):
-        random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+        qID = random_id
+        room = qID
 
-    qID = random_id
-    room = qID
+        queue_info = {
+                'queue': {},
+                'connected_users': [{
+                    'sid': request.sid,
+                    'displayName': displayName}]
+                }
+        hset('queues', random_id, queue_info)
+        connected_users = queue_info['connected_users']
 
-    queue_info = {
-            'queue': [],
-            'connected_users': [{
-                'sid': request.sid,
-                'displayName': displayName}]
-            }
-    set(qID, json.dumps(queue_info))
-
-    join_room(room)
-
-    # random_id should always equal room here
-    emit('create', {'qID': random_id}, room=room)
+        join_room(room)
+        return {'response': constants.SUCCESS, 'qID': random_id, 'data': {'displayName': displayName}}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
 
 
-@socketio.on('join')
+@socketio.on(constants.JOIN)
 def handle_join(data):
-    print(data)
-    qID = data['qID']
-    room = qID
-    displayName = data['displayName']
+    try:
+        qID = data['qID']
+        displayName = data['data']['displayName']
 
-    queue_info = get(qID)
+        queue_info = hget('queues', qID)
 
-    if (queue_info == None):
-        # TODO: change errco to be a dictionary to keep it consistent
-        emit('join', 'ERRCO 1: ROOM DOES NOT EXIST')
-        return
+        if (queue_info == None):
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
 
-    queue_info = json.loads(queue_info)
-    print(queue_info)
+        connected_users = queue_info['connected_users']
+        queue = queue_info['queue']
 
-    queue_info['connected_users'].append({
-        'sid': request.sid,
-        'displayName': displayName
-        })
+        for user in connected_users:
+            if (user['displayName'] == displayName):
+                return {'response': constants.DISPLAY_NAME_NOT_UNIQUE, 'qID': qID, 'data': {'displayName': displayName}}
 
-    set(qID, json.dumps(queue_info))
+        current_user = {
+            'sid': request.sid,
+            'displayName': displayName
+            }
+        connected_users.append(current_user)
 
-    join_room(room)
-    emit('join', {'displayName': displayName}, room=room, include_self=False)
-    emit('join', queue_info)
+        usersArr = []
+        for user in connected_users:
+            usersArr.append(user['displayName'])
 
+        hset('queues', qID, queue_info)
 
-@socketio.on('leave')
+        join_room(qID)
+        emit(constants.USERJOINED, {'data': {'displayName': displayName}, 'response': constants.SUCCESS, 'qID': qID}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS, 'data': {'connected_users': usersArr, 'queue': queue, 'displayName': displayName}, 'qID': qID}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
+ 
+@socketio.on(constants.LEAVE)
 def handle_leave(data):
-    print(data)
-    qID = data['qID']
-    room = qID
-    displayName = data['displayName']
+    try:
+        qID = data['qID']
+        displayName = data['data']['displayName']
 
-    queue_info = get(qID)
-    if (queue_info == None):
-        # TODO: change errco to be a dictionary to keep it consistent
-        emit('leave', 'ERRCO 1: ROOM DOES NOT EXIST')
-        return
+        queue_info = hget('queues', qID)
+        if (queue_info == None):
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
 
-    queue_info = json.loads(queue_info)
+        connected_users = queue_info['connected_users']
 
-    queue_info['connected_users'].remove({'sid': request.sid, 'displayName': displayName})
+        found_user = False
+        current_user = {'sid': request.sid, 'displayName': displayName}
+        for (i, user) in enumerate(connected_users):
+            if (user == current_user):
+                found_user = True
+                connected_users.pop(i)
+                hset('queues', qID, queue_info)
+                break
 
-    set(qID, json.dumps(queue_info))
+        if not found_user:
+            return {'response': constants.USER_DOES_NOT_EXIST, 'qID': qID, 'data': {'displayName': displayName}}
 
-    # include_self set to True because the website should wait till we've confirmed
-    # that the user has been removed...
-    emit('leave', {'displayName': displayName}, room=room, include_self=True)
-    leave_room(room)
-
-
-@socketio.on('addToQueue')
-def handle_add_to_queue(data):
-    print(data)
-
-    # should probably check if the user exists in that qID
-    qID = data['qID']
-    room = qID
-
-    # should probably add some error handling...
-    queue_info = json.loads(get(qID))
-    queue_info['queue'].append(data['rowData'])
-    set(qID, json.dumps(queue_info))
-
-    # should include_self be set to true here?
-    emit('addToQueue', data['rowData'], room=room, include_self=True)
+        leave_room(qID)
+        emit(constants.USERLEFT, {'data': {'displayName': displayName}, 'response': constants.SUCCESS, 'qID': qID}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS, 'qID': qID, 'data': {'displayName': displayName}}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
 
 
-@socketio.on('disconnect')
-def handle_disconnect():
-    for room in rooms():
-        if (room != request.sid):
-            queue_info = json.loads(get(room))
-            for connected_user in queue_info['connected_users']:
-                if (connected_user['sid'] == request.sid):
-                    displayName = connected_user['displayName']
-                    emit('leave', {'displayName': displayName}, room=room, include_self=False)
-                    queue_info['connected_users'].remove(connected_user)
+# @socketio.on(constants.ADDMEDIA)
+# def handle_add_media(data):
+#     qID = data['qID']
+# 
+#     queue_info = get('queues', qID)
+#     if (queue_info == None):
+#         return {'response': constants.QID_DOES_NOT_EXIST}
+# 
+#     media = data['data']
+#     mediaId = [*media][0]
+#     rowData = media[mediaId]
+# 
+#     set('queues', 'queue.' + mediaId, rowData)
+# 
+#     emit(constants.MEDIAADDED, {'data': {mediaId: rowData}, 'response': constants.SUCCESS}, room=qID, include_self=False)
+#     return {'response': constants.SUCCESS}
 
-            leave_room(room)
+# @socketio.on(constants.ADDMEDIA)
+@socketio.on(constants.ADDMEDIAS)
+def handle_add_medias(data):
+    try:
+        qID = data['qID']
 
+        queue_info = hget('queues', qID)
+        if (queue_info == None):
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
 
-# should probably not be used since the user already grabs current queue when they join
-@socketio.on('getQueueInfo')
-def handle_get_queue(data):
-    print(data)
-    qID = data['qID']
-    queue_info = json.loads(get(qID))
-    emit('getQueueInfo', queue_info['queue'])
+        queue = queue_info['queue']
 
+        medias = data['data']['medias']
+        for mediaId, media in medias.items():
+            mediaId.replace('-', '$')
+            queue[mediaId] = media
 
+        hset('queues', qID, queue_info)
+
+        emit(constants.MEDIASADDED, {'data': {'medias': medias}, 'response': constants.SUCCESS, 'qID': qID}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS, 'data': {'medias': medias}, 'qID': qID}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
+
+# @socketio.on(constants.REMOVEMEDIA)
+@socketio.on(constants.REMOVEMEDIAS)
+def handle_remove_medias(data):
+    try:
+        qID = data['qID']
+        queue_info = hget('queues', qID)
+        if (queue_info == None):
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
+
+        queue = queue_info['queue']
+
+        removedMedias = []
+        medias = data['data']['medias']
+        for id in medias:
+            if id in queue:
+                queue.pop(id)
+                removedMedias.append(id)
+    
+        hset('queues', qID, queue_info)
+
+        emit(constants.MEDIASREMOVED, {'data': {'medias': removedMedias}, 'response': constants.SUCCESS, 'qID': qID}, room=qID, include_self=False)
+        return {'response': constants.SUCCESS, 'qID': qID, 'data': {'medias': removedMedias}}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
+
+@socketio.on(constants.CURRENTQUEUE)
+def handle_current_queue(data):
+    try:
+        qID = data['qID']
+        queue_info = hget('queues', qID)
+        if (queue_info == None):
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
+
+        queue = queue_info['queue']
+    
+        return {'response': constants.SUCCESS, 'data': {'queue': queue}, 'qID': qID}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
+
+@socketio.on(constants.CONNECTEDUSERS)
+def handle_connected_users(data):
+    try:
+        qID = data['qID']
+        queue_info = hget('queues', qID)
+        if queue_info == None:
+            return {'response': constants.QID_DOES_NOT_EXIST, 'qID': qID}
+
+        connected_users = queue_info['connected_users']
+
+        ret = []
+        for user in connected_users:
+            ret.append(user['displayName'])
+
+        return {'response': constants.SUCCESS, 'data': {'connected_users': ret}, 'qID': qID}
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.ILL_FORMED_DATA}
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        return {'response': constants.SERVER_ERROR}
+
+# @socketio.on('disconnect')
 
 if __name__ == '__main__':
+    db_state = tryDatabaseCommand('hgetall', 'queues')
+    print(db_state)
+    if db_state != None:
+        for i, s in enumerate(db_state):
+            if i % 2 == 1 and s != None:
+                queue_info = json.loads(s)
+                queue_info["connected_users"] = []
+                hset('queues', db_state[i - 1], queue_info)
+
     socketio.run(app, host='0.0.0.0', port=80, debug=False)

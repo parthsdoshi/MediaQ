@@ -1,11 +1,5 @@
 version: '3'
 services:
-    frontend:
-        build: ./frontend
-        volumes:
-            - ./frontend/mediaq/build:/app/build
-            - ./frontend/mediaq/src:/app/src
-            - ./frontend/mediaq/public:/app/public
     backend:
         build: ./backend
         ports:
@@ -13,7 +7,12 @@ services:
         volumes:
             - ./frontend/mediaq/build:/build
             - ./backend/app.py:/app/app.py
+            - ./backend/socket_constants.py:/app/socket_constants.py
+	restart: always
     database:
         build: ./database
         ports:
             - "6379:6379"
+        volumes:
+            - ./database/redis_data:/data
+	restart: always

@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import { Media, Button, Container, Row, Col } from 'reactstrap';
 
-import { RowData } from './QueueRowEntry'
+import { connect } from 'react-redux';
+
 import * as youtubeStates from "../constants/youtube";
 import {
     loadYoutubeAPI,
-    executeSearch,
-    executePlaylistSearch,
-    executePlaylistSearchNextPage } from '../utils/google_utils';
+    getSearchResults,
+    getPlaylistVideos } from '../utils/google_utils';
+import {
+    generateRowDataFromPlaylistResults,
+    generateRowDataFromYoutubeSearchResults } from '../utils/rowData';
 import PopupModal from "./PopupModal";
 
 class Search extends Component {
@@ -16,11 +19,14 @@ class Search extends Component {
         super(props);
 
         this.state = {
-            youtubeResults: null,
-            youtubeSearchReady: false,
             youtubeReady: (Search.APIHasLoaded === true),
-            searchBoxTextValue: '',
-            searchFailed: false
+            searchResultsInvalid: false,
+            searchAttemptInvalid: false,
+
+            youtubeResults: null,
+            displaySearchResults: false,
+
+            searchBoxTextValue: ''
         };
 
         this.numberOfResults = youtubeStates.INITIAL_NUMBER_OF_RESULTS;
@@ -43,122 +49,49 @@ class Search extends Component {
     };
 
     searchYoutube = (searchTag, numberOfResults) => {
-        this.setState({youtubeSearchReady: false});
+        this.setState({displaySearchResults: false});
         if( this.state.youtubeReady ){
-            executeSearch(searchTag, numberOfResults, this.youtubeSearchCallback);
+            getSearchResults(searchTag, numberOfResults, this.youtubeSearchCallback);
         } else {
+            this.setState({searchAttemptInvalid: true});
             console.log('Youtube is not ready');
         }
     };
 
-    youtubeSearchCallback = (response) => {
-        console.log(response);
-        this.setState({youtubeResults: response, youtubeSearchReady: true})
+    youtubeSearchCallback = (results) => {
+        if (results == null) {
+            this.setState({searchResultsInvalid: true});
+            return;
+        }
+        results = generateRowDataFromYoutubeSearchResults(results, this.props.displayName);
+        console.log('search results created: ');
+        console.log(results);
+        this.setState({youtubeResults: results, displaySearchResults: true})
     };
 
-    //playlist functions
-    importYoutubePlaylist = (playlistID, recursiveCallBoolean) => {
-        this.setState({youtubeSearchReady: false});
-        if( this.state.youtubeReady ){
-            //save results in here before recursive call for next token
-            if (!recursiveCallBoolean) {
-                this.allPlaylistResults = [];
-                this.playlistID = playlistID;
-                executePlaylistSearch(playlistID, this.importYoutubePlaylistCallback);
-            } else {
-                //playlistID here is actually nextpagetoken because recursion.
-                //todo this is ugly make it clean
-                executePlaylistSearchNextPage(this.playlistID, playlistID, this.importYoutubePlaylistCallback)
-            }
-        } else {
+    importYoutubePlaylist = (playlistID) => {
+        this.setState({displaySearchResults: false});
+        if( !this.state.youtubeReady ){
+            this.setState({searchAttemptInvalid: true});
             console.log('Youtube is not ready');
-        }
-    };
-
-    importYoutubePlaylistCallback = (response) => {
-        console.log(response);
-        if (response.error !== undefined) {
-            this.setState({searchFailed: true});
             return;
         }
-        for (let i = 0; i < response.items.length; i++) {
-            this.allPlaylistResults.push(this.getPlaylistResultData(i, response));
-        }
-        if (response.nextPageToken !== undefined) {
-            this.importYoutubePlaylist(response.nextPageToken, true);
+        getPlaylistVideos(playlistID, this.importYoutubePlaylistCallback);
+    };
+
+    importYoutubePlaylistCallback = (results) => {
+        if (results == null) {
+            this.setState({searchResultsInvalid: true});
             return;
         }
-        //clear the variable because recursive call is done
-        const result = this.allPlaylistResults;
-        this.allPlaylistResults = null;
-        this.playlistID = null;
-        this.props.loadPlaylistCallback(result);
+        results = generateRowDataFromPlaylistResults(results, this.props.displayName);
+        console.log('playlist results created: ');
+        console.log(results);
+        this.props.loadPlaylistCallback(results);
     };
 
-    getPlaylistResultData = (number, playlistData) => {
-        let thumbnail = '';
-        if (playlistData.items[number].snippet.thumbnails !== undefined) {
-            thumbnail = playlistData.items[number].snippet.thumbnails.default.url
-        }
-        return new RowData(
-            playlistData.items[number].snippet.resourceId.videoId,
-            playlistData.items[number].snippet.title,
-            ' Playlist ',
-            ' - ',
-            'YouTube',
-            thumbnail);
-    };
-
-    getResultData = (number) => {
-        return new RowData(this.getResultID(number),
-                                    this.getResultTitle(number),
-                                    this.getResultAuthor(number),
-                                    ' - ',
-                                    'YouTube',
-                                    this.getResultThumbnailUrl(number));
-    };
-
-    addToQueue = (number) => {
-        this.props.loadVideoCallback(this.getResultData(number));
-    };
-
-    getResultTitle = (number) => {
-        if (this.state.youtubeSearchReady &&
-            this.state.youtubeResults.items.length > number) {
-            return this.state.youtubeResults.items[number].snippet.title
-        }
-        console.log('getResultTitle was called before search ' +
-            'results were ready or called with out of bounds element');
-        return null;
-    };
-
-    getResultAuthor = (number) => {
-        if (this.state.youtubeSearchReady &&
-            this.state.youtubeResults.items.length > number) {
-            return this.state.youtubeResults.items[number].snippet.channelTitle
-        }
-        console.log('getResultAuthor was called before search ' +
-            'results were ready or called with out of bounds element');
-        return null;
-    };
-
-    getResultThumbnailUrl = (number) => {
-        if (this.state.youtubeSearchReady &&
-            this.state.youtubeResults.items.length > number) {
-            return this.state.youtubeResults.items[number].snippet.thumbnails.default.url;
-        }
-        console.log('getResultThumbnailUrl was called before search ' +
-            'results were ready or called with out of bounds element');
-        return null;
-    };
-
-    getResultID = (number) => {
-        if (this.state.youtubeSearchReady && this.state.youtubeResults.items.length > number) {
-            return this.state.youtubeResults.items[number].id.videoId
-        }
-        console.log('getResultID was called before search ' +
-            'results were ready or called with out of bounds element');
-        return null;
+    addToQueue = (mediaId) => {
+        this.props.loadVideoCallback(mediaId, this.state.youtubeResults[mediaId]);
     };
 
     handleSearchButtonPress = (target) => {
@@ -166,7 +99,7 @@ class Search extends Component {
     };
 
     handlePlaylistButtonPress = (target) => {
-        this.importYoutubePlaylist(this.state.searchBoxTextValue, false);
+        this.importYoutubePlaylist(this.state.searchBoxTextValue);
     };
 
     handleMoreResultsButtonPress = (target) => {
@@ -181,30 +114,30 @@ class Search extends Component {
         }
     };
 
-    handleChange = (event) => {
+    handleSearchBoxChange = (event) => {
         this.setState({searchBoxTextValue: event.target.value});
     };
 
-    getResultMedia = (number) => {
-        if (!this.state.youtubeSearchReady || number >= this.state.youtubeResults.items.length) {
+    getResultMedia = (mediaId) => {
+        if (!this.state.displaySearchResults || !(mediaId in this.state.youtubeResults)) {
             console.log('getResultMedia was called before search ' +
                 'results were ready or called with out of bounds element');
             return null;
         }
         return (
-            <div key={this.getResultID(number)}>
+            <div key={this.state.youtubeResults[mediaId].id}>
                 <Media>
                     <Media left href="#">
                         <Media object
-                               src={this.getResultThumbnailUrl(number)}
+                               src={this.state.youtubeResults[mediaId].thumbnail}
                                alt="Youtube Video Thumbnail" />
                     </Media>
 
                     <Media body style={{paddingLeft: 8}}>
                         <Media heading>
-                            {this.getResultTitle(number)}
+                            {this.state.youtubeResults[mediaId].title}
                         </Media>
-                        <Button onClick={() => this.addToQueue(number)} color="success">
+                        <Button onClick={() => this.addToQueue(mediaId)} color="success">
                             {'Add'}
                         </Button>
                     </Media>
@@ -217,39 +150,38 @@ class Search extends Component {
 
     render() {
         let youtubeMedia = [];
-        if( this.state.youtubeSearchReady ){
-            for (let i = 0; i < this.state.youtubeResults.items.length; i++) {
-                youtubeMedia.push(this.getResultMedia(i));
+        if( this.state.displaySearchResults ){
+            for (let key in this.state.youtubeResults) {
+                youtubeMedia.push(this.getResultMedia(key));
             }
         }
         return (
             <Container fluid>
-                {this.state.searchFailed &&
-                <PopupModal modelWantsToCloseCallback={() => this.setState({searchFailed: false})}
+                {this.state.searchResultsInvalid &&
+                <PopupModal modelWantsToCloseCallback={() => this.setState({searchResultsInvalid: false})}
                             title={'Search Failed'}
                             body={'Youtube did not respond with a valid result.'} />
                 }
+                {this.state.searchAttemptInvalid &&
+                <PopupModal modelWantsToCloseCallback={() => this.setState({searchAttemptInvalid: false})}
+                            title={'Search Failed'}
+                            body={'Youtube API has not loaded yet, please try again in a moment.'} />
+                }
                 <Row>
-                    <Col sm={{ size: 2, offset: 3 }}>
                         <input type="text"
                             onKeyPress={this.handleKeyboardKeyPress}
-                            onChange={this.handleChange} />
-                    </Col>
-                    <Col sm={{ size: 1 }}>
+                            onChange={this.handleSearchBoxChange} />
                         <Button onClick={this.handleSearchButtonPress} color="primary" >
                             Search
                         </Button>
-                    </Col>
-                    <Col sm={{ size: 1 }}>
                         <Button onClick={this.handlePlaylistButtonPress} color="primary" >
                             Import Playlist
                         </Button>
-                    </Col>
                 </Row>
                 <hr className="my-2" />
                 {youtubeMedia}
                 <Row>
-                    {this.state.youtubeSearchReady &&
+                    {this.state.displaySearchResults &&
                         <Col sm={{ size: 'auto', offset: 0 }}>
                             <Button onClick={this.handleMoreResultsButtonPress} color="primary">
                                 More Results
@@ -262,4 +194,12 @@ class Search extends Component {
     }
 }
 
-export default Search
+const mapStateToProps = state => {
+    return {
+        displayName: state.semiRoot.displayName,
+    }
+};
+
+export default connect(
+    mapStateToProps
+)(Search)

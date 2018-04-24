@@ -6,12 +6,15 @@ import {
     NavItem,
     Container } from 'reactstrap';
 
-import Slider from 'react-rangeslider'
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
+
 import SeekAheadIcon from 'open-iconic/svg/media-skip-forward.svg';
 import SeekBehindIcon from 'open-iconic/svg/media-skip-backward.svg';
 import PrevMediaIcon from 'open-iconic/svg/media-step-backward.svg';
 import NextMediaIcon from 'open-iconic/svg/media-step-forward.svg';
 import ShuffleIcon from 'open-iconic/svg/random.svg';
+import info from 'open-iconic/svg/info.svg';
 
 import { connect } from 'react-redux';
 import {
@@ -19,7 +22,8 @@ import {
     decrementCurrentlyPlayingIndex,
     incrementCurrentlyPlayingIndex,
     setVolume,
-    toggleShuffle } from "../actions/index";
+    toggleShuffle,
+    toggleMediaDetailModal } from "../actions/index";
 
 import MediaPlayPauseButton from './MediaPlayPauseButton';
 import * as youtubeStates from '../constants/youtube';
@@ -78,10 +82,9 @@ class Footer extends Component {
 
     render() {
         const paddingLeft = {paddingLeft: 2};
-        const volumeSlider = {paddingLeft: 20, width:150};
+        const volumeSlider = {paddingLeft: 20, width:150, paddingRight: 20, paddingTop: 13};
         return (
-            <div>
-                <div style={this.phantom} />
+            <div style={this.phantom}>
                 <div style={this.style}>
                     <Navbar color="light" light expand="md">
                         <Container fluid>
@@ -125,16 +128,21 @@ class Footer extends Component {
                                     </Button>
                                 </NavItem>
                                 <NavItem style={volumeSlider}>
-                                    <div className='slider-horizontal'>
-                                        <link rel="stylesheet" href="https://unpkg.com/react-rangeslider/umd/rangeslider.min.css" />
-                                        <Slider
-                                            min={0}
-                                            max={100}
-                                            value={this.props.volumeLevel}
-                                            orientation='horizontal'
-                                            onChange={this.handleChangeVolumeSlider}
+                                    {console.log(this.props.volumeLevel)}
+                                    <Slider
+                                        max={100}
+                                        min={0}
+                                        step={1}
+                                        vertical={false}
+                                        onChange={this.handleChangeVolumeSlider}
+                                        value={this.props.volumeLevel}
                                         />
-                                        <div className='value'>{this.props.volumeLevel}</div></div>
+                                </NavItem>
+                                <NavItem style={paddingLeft}>
+                                    <Button onClick={() => {this.props.toggleMediaDetailModal()}} color="secondary"
+                                            className="rounded-circle">
+                                        <img alt="More Info" src={info} />
+                                    </Button>
                                 </NavItem>
                             </Nav>
                         </Container>
@@ -148,11 +156,11 @@ class Footer extends Component {
 
 const mapStateToProps = state => {
     return {
-        playState : state.playState,
-        currentlyPlayingIndex: state.currentlyPlayingIndex,
-        currentlyPlayingYoutubeVideoObject: state.youtubeVideoObject,
-        volumeLevel: state.volumeLevel,
-        shuffleMode: state.shuffleMode
+        playState : state.semiRoot.playState,
+        currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex,
+        currentlyPlayingYoutubeVideoObject: state.semiRoot.youtubeVideoObject,
+        volumeLevel: state.semiRoot.volumeLevel,
+        shuffleMode: state.semiRoot.shuffleMode
     }
 };
 
@@ -162,7 +170,8 @@ const mapDispatchToProps = dispatch => {
         decrementCurrentlyPlayingIndex: () => dispatch(decrementCurrentlyPlayingIndex()),
         incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
         setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
-        toggleShuffle: () => dispatch(toggleShuffle())
+        toggleShuffle: () => dispatch(toggleShuffle()),
+        toggleMediaDetailModal: () => dispatch(toggleMediaDetailModal()),
     }
 };
 
