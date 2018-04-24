@@ -7,6 +7,7 @@ services:
             - ./frontend/mediaq/build:/app/build
             - ./frontend/mediaq/src:/app/src
             - ./frontend/mediaq/public:/app/public
+        restart: always
     backend:
         build: ./backend
         ports:
@@ -14,6 +15,7 @@ services:
         volumes:
             - ./frontend/mediaq/build:/build
             - ./backend/app.py:/app/app.py
+            - ./backend/socket_constants.py:/app/socket_constants.py
     database:
         build: ./database
         ports:

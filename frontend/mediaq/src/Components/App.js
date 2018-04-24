@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container } from 'reactstrap';
 
 import { connect } from 'react-redux';
-import { login, resolveBrowserClose } from "../actions";
+import { resolveBrowserClose } from "../actions";
 
 import Footer from './Footer';
 import Header from './Header';
@@ -12,7 +12,7 @@ import Queue from './Queue';
 class App extends Component {
 
     componentDidMount() {
-        console.log('4 5');
+        console.log('4 56 ');
         window.onbeforeunload = confirmExit;
         let resolveBrowserClose = this.props.resolveBrowserClose;
         function confirmExit() {
@@ -57,7 +57,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        login: () => dispatch(login()),
         resolveBrowserClose: () => dispatch(resolveBrowserClose()),
     }
 };

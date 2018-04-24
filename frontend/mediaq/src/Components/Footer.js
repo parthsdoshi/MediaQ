@@ -12,6 +12,7 @@ import SeekBehindIcon from 'open-iconic/svg/media-skip-backward.svg';
 import PrevMediaIcon from 'open-iconic/svg/media-step-backward.svg';
 import NextMediaIcon from 'open-iconic/svg/media-step-forward.svg';
 import ShuffleIcon from 'open-iconic/svg/random.svg';
+import info from 'open-iconic/svg/info.svg';
 
 import { connect } from 'react-redux';
 import {
@@ -19,7 +20,8 @@ import {
     decrementCurrentlyPlayingIndex,
     incrementCurrentlyPlayingIndex,
     setVolume,
-    toggleShuffle } from "../actions/index";
+    toggleShuffle,
+    toggleMediaDetailModal } from "../actions/index";
 
 import MediaPlayPauseButton from './MediaPlayPauseButton';
 import * as youtubeStates from '../constants/youtube';
@@ -136,6 +138,12 @@ class Footer extends Component {
                                         />
                                         <div className='value'>{this.props.volumeLevel}</div></div>
                                 </NavItem>
+                                <NavItem style={paddingLeft}>
+                                    <Button onClick={() => {this.props.toggleMediaDetailModal()}} color="secondary"
+                                            className="rounded-circle">
+                                        <img alt="More Info" src={info} />
+                                    </Button>
+                                </NavItem>
                             </Nav>
                         </Container>
                     </Navbar>
@@ -162,7 +170,8 @@ const mapDispatchToProps = dispatch => {
         decrementCurrentlyPlayingIndex: () => dispatch(decrementCurrentlyPlayingIndex()),
         incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
         setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
-        toggleShuffle: () => dispatch(toggleShuffle())
+        toggleShuffle: () => dispatch(toggleShuffle()),
+        toggleMediaDetailModal: () => dispatch(toggleMediaDetailModal()),
     }
 };
 

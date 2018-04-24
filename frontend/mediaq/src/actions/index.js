@@ -41,9 +41,28 @@ export const setIncorrectQIDPopupDisplayStatus = newDisplayStatus => {
     };
 };
 
+export const setSessionRestoredPopupDisplayStatus = newDisplayStatus => {
+    return {
+        type: types.SET_SESSION_RESTORED_POPUP_DISPLAY_STATUS,
+        payload: {newDisplayStatus: newDisplayStatus}
+    };
+};
+
 export const logout = () => {
     return {
         type: types.LOGOUT
+    };
+};
+
+export const socketLogout = () => {
+    return {
+        type: types.SOCKET_LOGOUT
+    };
+};
+
+export const socketClearState = () => {
+    return {
+        type: types.SOCKET_CLEAR_STATE,
     };
 };
 
@@ -120,6 +139,12 @@ export const toggleShuffle = () => {
     };
 };
 
+export const toggleMediaDetailModal = () => {
+    return {
+        type: types.TOGGLE_MEDIA_DETAIL_MODAL
+    };
+};
+
 export const changeYoutubeVideoObject = youtubeVideoObject => {
     return {
         type: types.CHANGE_YOUTUBE_VIDEO_OBJECT,
@@ -128,10 +153,10 @@ export const changeYoutubeVideoObject = youtubeVideoObject => {
 };
 
 
-export const addToQueue = rowData => {
+export const addToQueue = medias => {
     return {
         type: types.ADD_TO_QUEUE,
-        payload: {rowData: rowData}
+        payload: { medias: medias }
     };
 };
 

@@ -1,8 +1,11 @@
 import * as types from "../constants/action-types";
+import { socketCommands, socketErrors, VERBOSE_SOCKET_LISTEN } from '../sockets/socketConstants';
 
 const initialState = {
     socket: null,
     loggedIn: false,
+    displayName: '',
+    qID: ''
 };
 
 export default function socket(state = initialState, action) {
@@ -18,16 +21,27 @@ export default function socket(state = initialState, action) {
             localStorage.setItem('displayName', state.displayName);
             localStorage.setItem('qID', state.qID);
             return { ...state, loggedIn: true };
-        case types.LOGOUT:
+        case types.SOCKET_LOGOUT:
             if (state.loggedIn) {
-                state.socket.emit('leave', {'displayName': state.displayName, 'qID': state.qID});
+                state.socket.emit(socketCommands.LEAVE,
+                    {'data': {'displayName': state.displayName}, 'qID': state.qID},
+                    state.socket.LEAVEACKNOWLEDGEMENT);
                 localStorage.removeItem("qID");
                 localStorage.removeItem("displayName");
             }
-            return { ...state, loggedIn: false };
+            return { ...initialState, socket: state.socket };
+        case types.SOCKET_CLEAR_STATE:
+            if (state.loggedIn) {
+                localStorage.removeItem("qID");
+                localStorage.removeItem("displayName");
+            }
+            return { ...initialState, socket: state.socket };
         case types.RESOLVE_BROWSER_CLOSE:
             if (state.loggedIn) {
-                state.socket.emit('leave', {'displayName': state.displayName, 'qID': state.qID});
+                // we should probably put these in a saga
+                state.socket.emit(socketCommands.LEAVE,
+                    {'data': {'displayName': state.displayName}, 'qID': state.qID},
+                    state.socket.LEAVEACKNOWLEDGEMENT);
                 localStorage.setItem('displayName', state.displayName);
                 localStorage.setItem('qID', state.qID);
             }

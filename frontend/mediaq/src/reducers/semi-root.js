@@ -6,13 +6,16 @@ const initialState = {
     qID: '',
     displayQIDPopup: false,
     displayIncorrectQIDPopup: false,
+    displaySessionRestoredPopup: false,
 
     playState: youtubeStates.PAUSED,
     currentlyPlayingIndex: 0, //0 means no video is playing
     volumeLevel: 100,
     shuffleMode: false,
+    showMediaDetailsModal: false,
     youtubeVideoObject: null,
-    QueueRowEntries: [],
+    QueueRowEntries: {},
+    visibleQueue: [],
 
     userList: []
 };
@@ -42,6 +45,8 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, displayQIDPopup: action.payload.newDisplayStatus };
         case types.SET_INCORRECT_QID_POPUP_DISPLAY_STATUS:
             return { ...state, displayIncorrectQIDPopup: action.payload.newDisplayStatus };
+        case types.SET_SESSION_RESTORED_POPUP_DISPLAY_STATUS:
+            return { ...state, displaySessionRestoredPopup: action.payload.newDisplayStatus };
         case types.LOGOUT:
             return { ...initialState };
         case types.ADD_NEW_USER:
@@ -97,10 +102,12 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, volumeLevel: action.payload.newVolumeLevel };
         case types.TOGGLE_SHUFFLE:
             return { ...state, shuffleMode: !state.shuffleMode };
+        case types.TOGGLE_MEDIA_DETAIL_MODAL:
+            return { ...state, showMediaDetailsModal: !state.showMediaDetailsModal };
         case types.CHANGE_YOUTUBE_VIDEO_OBJECT:
             return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };
         case types.ADD_TO_QUEUE:
-            return { ...state, QueueRowEntries: [...state.QueueRowEntries, action.payload.rowData] };
+            return { ...state, QueueRowEntries: {...state.QueueRowEntries, ...action.payload.medias} };
         case types.SET_QUEUE:
             return { ...state, QueueRowEntries: action.payload.newQueue };
         default:

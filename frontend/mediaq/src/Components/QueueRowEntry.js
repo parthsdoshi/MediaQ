@@ -30,7 +30,7 @@ class QueueRowEntry extends Component {
                 <td>{this.props.rowData.author}</td>
                 <td>{this.props.rowData.album}</td>
                 <td>
-                    <a href={"https://www.youtube.com/watch?v=" + this.props.rowData.id}
+                    <a href={this.props.rowData.link}
                        target="_blank" style={{display: "table-cell"}}>
                     <img  src={youTubeLogo} style={{width: 34, height: 38}}
                           alt="youtube logo" />
