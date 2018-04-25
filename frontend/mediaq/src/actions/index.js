@@ -139,6 +139,12 @@ export const toggleShuffle = () => {
     };
 };
 
+export const toggleRepeat = () => {
+    return {
+        type: types.TOGGLE_REPEAT
+    };
+};
+
 export const toggleMediaDetailModal = () => {
     return {
         type: types.TOGGLE_MEDIA_DETAIL_MODAL

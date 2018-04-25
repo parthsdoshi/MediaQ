@@ -1,7 +1,7 @@
 import * as types from "../constants/action-types";
 import * as youtubeStates from "../constants/youtube";
 import { NO_MEDIA_PLAYING, MAX_VOLUME, MIN_VOLUME } from "../constants/queue";
-import { getYoutubeVideoVolume, setYoutubeVideoVolume } from "../utils/google_utils";
+import { getYoutubeVideoVolume, setYoutubeVideoVolume, replayVideo } from "../utils/google_utils";
 
 const initialState = {
     displayName: '',
@@ -15,6 +15,7 @@ const initialState = {
     playingIndexHistory: [],
     volumeLevel: MAX_VOLUME,
     shuffleMode: false,
+    repeatMode: false,
     showMediaDetailsModal: false,
     youtubeVideoObject: null,
     QueueRowEntries: {},
@@ -37,10 +38,20 @@ function getNextIndexShuffle(current, max) {
         console.log('getRandomNumNotCurrent error, returning.');
         return;
     }
-
     const random = Math.floor(Math.random() * (max - 1)); // random number from 0 to max-2
     // return conditions splits choices to 0 1 2 3 ... current-2 current-1 current+1 current+2 ... max-1
     return random >= current ? random+1 : random;
+}
+
+function getNextIndex(current, queueLength) {
+    if (current === NO_MEDIA_PLAYING || current < 0) {
+        return 0;
+    } else if (current + 1 >= queueLength) {
+        // end of queue
+        return NO_MEDIA_PLAYING;
+    } else {
+        return current + 1;
+    }
 }
 
 export default function semiRoot(state = initialState, action) {
@@ -77,32 +88,34 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, currentlyPlayingIndex: newIndex, playingIndexHistory: newPlayingIndexHistory,
                 playState: youtubeStates.PAUSED, youtubeVideoObject: null };
         case types.PLAY_NEXT_MEDIA:
-            let nextIndex;
             const currentlyPlayingIndex = state.currentlyPlayingIndex;
             const queueLength = Object.keys(state.QueueRowEntries).length;
+            let nextIndex = currentlyPlayingIndex;
             newPlayingIndexHistory = [ ...state.playingIndexHistory ];
             if (queueLength === 0) {
                 // empty queue, do nothing
                 return { ...state };
             }
-            if (state.shuffleMode) {
+            if (state.repeatMode) {
+                if (state.youtubeVideoObject === null && state.currentlyPlayingIndex !== NO_MEDIA_PLAYING) {
+                    console.log('inconsistent state, no youtube video object');
+                }
+                if (state.youtubeVideoObject !== null) {
+                    replayVideo(state.youtubeVideoObject);
+                    return { ...state };
+                } else {
+                    nextIndex = getNextIndex(currentlyPlayingIndex, queueLength);
+                }
+            } else if (state.shuffleMode) {
                 const max = queueLength - 1;
                 nextIndex = getNextIndexShuffle(currentlyPlayingIndex, max);
             } else {
-                if (currentlyPlayingIndex === NO_MEDIA_PLAYING) {
-                    nextIndex = 0;
-                } else if (currentlyPlayingIndex === queueLength) {
-                    // end of queue
-                    nextIndex = NO_MEDIA_PLAYING;
-                } else {
-                    nextIndex = state.currentlyPlayingIndex + 1;
-                }
+                nextIndex = getNextIndex(currentlyPlayingIndex, queueLength);
             }
 
             if (nextIndex !== currentlyPlayingIndex && currentlyPlayingIndex !== NO_MEDIA_PLAYING) {
                 newPlayingIndexHistory = [ ...newPlayingIndexHistory, currentlyPlayingIndex ]
             }
-            console.log('playing set to ' + nextIndex);
             return { ...state, currentlyPlayingIndex: nextIndex, playingIndexHistory: newPlayingIndexHistory,
                 playState: youtubeStates.PAUSED, youtubeVideoObject: null };
         case types.PLAY_PREV_MEDIA:
@@ -142,6 +155,8 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, volumeLevel: newVolumeLevel };
         case types.TOGGLE_SHUFFLE:
             return { ...state, shuffleMode: !state.shuffleMode };
+        case types.TOGGLE_REPEAT:
+            return { ...state, repeatMode: !state.repeatMode };
         case types.TOGGLE_MEDIA_DETAIL_MODAL:
             return { ...state, showMediaDetailsModal: !state.showMediaDetailsModal };
         case types.CHANGE_YOUTUBE_VIDEO_OBJECT:

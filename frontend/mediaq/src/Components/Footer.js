@@ -14,6 +14,7 @@ import SeekBehindIcon from 'open-iconic/svg/media-skip-backward.svg';
 import PrevMediaIcon from 'open-iconic/svg/media-step-backward.svg';
 import NextMediaIcon from 'open-iconic/svg/media-step-forward.svg';
 import ShuffleIcon from 'open-iconic/svg/random.svg';
+import RepeatIcon from 'open-iconic/svg/loop-circular.svg'
 import info from 'open-iconic/svg/info.svg';
 
 import { connect } from 'react-redux';
@@ -23,6 +24,7 @@ import {
     playNextMedia,
     setVolume,
     toggleShuffle,
+    toggleRepeat,
     toggleMediaDetailModal,
     deleteCheckedRows
 } from "../actions/index";
@@ -86,6 +88,10 @@ class Footer extends Component {
     render() {
         const paddingLeft = {paddingLeft: 2};
         const volumeSlider = {paddingLeft: 20, width:150, paddingRight: 20, paddingTop: 13};
+        let icon = {
+            width: '8px',
+            height: '8px'
+        };
         return (
             <div style={this.phantom}>
                 <div style={this.style}>
@@ -93,24 +99,29 @@ class Footer extends Component {
                         <Container>
                             {!this.props.deletionMode && <Nav className="mx-auto" navbar>
                                 <NavItem style={paddingLeft}>
+                                    <Button onClick={this.props.toggleRepeat} color={'primary'}
+                                            active={this.props.repeatMode}
+                                            style={{backgroundColor:this.props.repeatMode ?
+                                                    'blue':''}}>
+                                        <img alt={'repeat'} src={RepeatIcon} style={icon} />
+                                    </Button>
+                                </NavItem>
+                                <NavItem style={paddingLeft}>
                                     <Button onClick={this.props.toggleShuffle} color={'primary'}
                                             active={this.props.shuffleMode}
                                             style={{backgroundColor:this.props.shuffleMode ?
                                                     'blue':''}}>
-                                        <img alt={'shuffle'}
-                                             src={ShuffleIcon} />
+                                        <img alt={'shuffle'} src={ShuffleIcon} style={icon} />
                                     </Button>
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={this.props.decrementCurrentlyPlayingIndex} color={'primary'}>
-                                        <img alt={'prev_media'}
-                                             src={PrevMediaIcon} />
+                                        <img alt={'prev_media'} src={PrevMediaIcon} style={icon} />
                                     </Button>
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={this.seekBehindButtonClicked} color={'primary'}>
-                                        <img alt={'seek_behind'}
-                                             src={SeekBehindIcon} />
+                                        <img alt={'seek_behind'} src={SeekBehindIcon} style={icon} />
                                     </Button>
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
@@ -120,14 +131,12 @@ class Footer extends Component {
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={this.seekAheadButtonClicked} color={'primary'}>
-                                        <img alt={'seek_ahead'}
-                                             src={SeekAheadIcon} />
+                                        <img alt={'seek_ahead'} src={SeekAheadIcon} style={icon} />
                                     </Button>
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={this.props.playNextMedia} color={'primary'}>
-                                        <img alt={'next_media'}
-                                             src={NextMediaIcon} />
+                                        <img alt={'next_media'} src={NextMediaIcon} style={icon} />
                                     </Button>
                                 </NavItem>
                                 <NavItem style={volumeSlider}>
@@ -143,7 +152,7 @@ class Footer extends Component {
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={() => {this.props.toggleMediaDetailModal()}} color="secondary"
                                             className="rounded-circle">
-                                        <img alt="More Info" src={info} />
+                                        <img alt="More Info" src={info} style={icon} />
                                     </Button>
                                 </NavItem>
                             </Nav>}
@@ -170,6 +179,7 @@ const mapStateToProps = state => {
         currentlyPlayingYoutubeVideoObject: state.semiRoot.youtubeVideoObject,
         volumeLevel: state.semiRoot.volumeLevel,
         shuffleMode: state.semiRoot.shuffleMode,
+        repeatMode: state.semiRoot.repeatMode,
         deletionMode: state.socket.deletionMode
     }
 };
@@ -181,6 +191,7 @@ const mapDispatchToProps = dispatch => {
         playNextMedia: () => dispatch(playNextMedia()),
         setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
         toggleShuffle: () => dispatch(toggleShuffle()),
+        toggleRepeat: () => dispatch(toggleRepeat()),
         toggleMediaDetailModal: () => dispatch(toggleMediaDetailModal()),
         deleteCheckedRows: () => dispatch(deleteCheckedRows())
     }
