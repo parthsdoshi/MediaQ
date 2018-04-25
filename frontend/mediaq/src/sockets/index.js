@@ -110,8 +110,8 @@ const setupSocket = (dispatch) => {
         }
         const response = responseData['response'];
         if (response === socketErrors.SUCCESS) {
-            const medias = responseData['data']['medias']
-            dispatch(removeFromQueue(medias))
+            const medias = responseData['data']['medias'];
+            dispatch(removeFromQueue(medias));
             dispatch(setDeletionMode(false))
         }
     };
@@ -169,8 +169,8 @@ const setupSocket = (dispatch) => {
             let qID = responseData['qID'];
             dispatch(setQIDPopupDisplayStatus(true));
             dispatch(setQID(qID));
-            let displayName = responseData['data']['displayName']
-            dispatch(setUserList([displayName]))
+            let displayName = responseData['data']['displayName'];
+            dispatch(setUserList([displayName]));
             dispatch(addToQueue(newQueueMedia));
             socket.emit(socketCommands.ADDMEDIAS,
                 { 'data': {'medias':  newQueueMedia}, 'qID': qID },
@@ -178,7 +178,7 @@ const setupSocket = (dispatch) => {
         }
     };
 
-    socket.on('connect', (data) => {
+    socket.on('connect', () => {
         if (VERBOSE_SOCKET_LISTEN) {
             console.log('socket got connect');
         }
@@ -236,11 +236,11 @@ const setupSocket = (dispatch) => {
         }
         const response = data['response'];
         if (response === socketErrors.SUCCESS) {
-            const medias = data['data']['medias']
-            dispatch(removeFromQueue(medias))
+            const medias = data['data']['medias'];
+            dispatch(removeFromQueue(medias));
             dispatch(setDeletionMode(false))
         }
-    })
+    });
 
     return socket
 };

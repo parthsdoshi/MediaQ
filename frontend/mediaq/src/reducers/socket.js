@@ -1,5 +1,5 @@
 import * as types from "../constants/action-types";
-import { socketCommands, socketErrors, VERBOSE_SOCKET_LISTEN } from '../sockets/socketConstants';
+import { socketCommands } from '../sockets/socketConstants';
 
 const initialState = {
     socket: null,
@@ -52,12 +52,12 @@ export default function socket(state = initialState, action) {
             if (!action.payload.newDeletionMode) {
                 return { ...state, deletionMode: action.payload.newDeletionMode, rowEntriesCheckboxClicked: []}
             }
-            return { ...state, deletionMode: action.payload.newDeletionMode }
+            return { ...state, deletionMode: action.payload.newDeletionMode };
         case types.ROW_ENTRY_CHECKBOX_CLICKED:
-            let index = state.rowEntriesCheckboxClicked.indexOf(action.payload.rowID)
+            let index = state.rowEntriesCheckboxClicked.indexOf(action.payload.rowID);
             if (index > -1) {
-                let arr = state.rowEntriesCheckboxClicked.slice(0)
-                arr.splice(index, 1)
+                let arr = state.rowEntriesCheckboxClicked.slice(0);
+                arr.splice(index, 1);
                 return { ...state, rowEntriesCheckboxClicked: arr }
             } else {
                 return { ...state, rowEntriesCheckboxClicked: [...state.rowEntriesCheckboxClicked, action.payload.rowID] }
@@ -65,9 +65,9 @@ export default function socket(state = initialState, action) {
         case types.DELETE_CHECKED_ROWS:
             state.socket.emit(socketCommands.REMOVEMEDIAS,
                 { 'data': {'medias': state.rowEntriesCheckboxClicked}, 'qID': state.qID }, 
-                state.socket.REMOVEMEDIASACKNOWLEDGEMENT)
+                state.socket.REMOVEMEDIASACKNOWLEDGEMENT);
             // emit
-            return state
+            return state;
         default:
             return state;
     }

@@ -165,7 +165,7 @@ export const removeFromQueue = medias => {
         type: types.REMOVE_FROM_QUEUE,
         payload: { medias: medias }
     }
-}
+};
 
 export const setQueue = newQueue => {
     return {
@@ -192,4 +192,4 @@ export const deleteCheckedRows = () => {
     return {
         type: types.DELETE_CHECKED_ROWS
     }
-}
+};

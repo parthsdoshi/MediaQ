@@ -160,6 +160,7 @@ function getPlaylistVideosCallback(response) {
     if (response.nextPageToken !== undefined) {
         executePlaylistSearchNextPage(playlistRecursiveHelper.playlistID,
             response.nextPageToken, getPlaylistVideosCallback);
+        return;
     } else {
         const returnFunction = playlistRecursiveHelper.resultCallback;
         const results = playlistRecursiveHelper.runningResults;

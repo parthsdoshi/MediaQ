@@ -9,7 +9,7 @@ import youTubeLogo from '../youtube.png'
 
 class QueueRowEntry extends Component {
 
-    playButtonClicked = (buttonID) => {
+    playButtonClicked = () => {
         //buttonID is the same as this.props.rowID in this case
         this.props.rowEntryPlayButtonClicked(this.props.rowID);
     };

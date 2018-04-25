@@ -53,7 +53,7 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, userList: [...state.userList, action.payload.newUser] };
         case types.REMOVE_USER:
             let newUserList = state.userList.slice(0); //clone array
-            let index = newUserList.indexOf(action.payload.userToRemove)
+            let index = newUserList.indexOf(action.payload.userToRemove);
             if (index > -1) {
                 newUserList.splice(index, 1)
             }
@@ -107,9 +107,9 @@ export default function semiRoot(state = initialState, action) {
         case types.ADD_TO_QUEUE:
             return { ...state, QueueRowEntries: {...state.QueueRowEntries, ...action.payload.medias} };
         case types.REMOVE_FROM_QUEUE:
-            let newQueueRowEntries = {...state.QueueRowEntries}
+            let newQueueRowEntries = {...state.QueueRowEntries};
             for (let id of action.payload.medias) {
-                console.log(id)
+                console.log(id);
                 if (id in newQueueRowEntries) {
                     delete newQueueRowEntries[id]
                 }

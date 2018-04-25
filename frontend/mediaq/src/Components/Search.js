@@ -55,7 +55,7 @@ class Search extends Component {
     }
     componentDidUpdate() {
         if (this.state.justConstructed) {
-            this.setState({ justConstructed: false })
+            this.setState({ justConstructed: false });
             this.searchInput.focus()
         }
     }
@@ -122,11 +122,11 @@ class Search extends Component {
         this.props.loadVideoCallback(mediaId, this.state.youtubeResults[mediaId]);
     };
 
-    handleSearchButtonPress = (target) => {
+    handleSearchButtonPress = () => {
         this.searchYoutube(this.state.searchBoxTextValue, this.numberOfResults);
     };
 
-    handlePlaylistButtonPress = (target) => {
+    handlePlaylistButtonPress = () => {
         this.importYoutubePlaylist(this.state.searchBoxTextValue);
     };
 
@@ -180,6 +180,13 @@ class Search extends Component {
         let youtubeMedia = [];
         if (this.state.displaySearchResults) {
             for (let key in this.state.youtubeResults) {
+                // todo webstorm warning message:
+                // Possible iteration over unexpected (custom / inherited) members, probably
+                // missing hasOwnProperty check
+                //
+                // Checks for any instances of unfiltered for-in loops in JavaScript. The use of this construct results
+                // in processing inherited or unexpected properties. You need to filter own properties with
+                // hasOwnProperty() method. The validation works in JavaScript, html or jsp files.
                 youtubeMedia.push(this.getResultMedia(key));
             }
         }

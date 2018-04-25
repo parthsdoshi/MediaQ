@@ -54,7 +54,7 @@ class Footer extends Component {
         };
     }
 
-    playButtonClicked = (entryNumber) => {
+    playButtonClicked = () => {
         if (this.props.currentlyPlayingIndex === 0) {
             //no media is playing and play button is pressed, play first in queue
             this.props.incrementCurrentlyPlayingIndex();
