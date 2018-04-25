@@ -117,7 +117,7 @@ class Queue extends Component {
         console.log(medias);
         this.props.addToQueue(medias);
         this.props.socket.emit(socketCommands.ADDMEDIAS,
-            { 'data': {'medias':  medias}, 'qID': this.props.qID },
+            { 'data': { 'medias': medias }, 'qID': this.props.qID },
             this.props.socket.ADDMEDIASACKNOWLEDGEMENT);
         this.setState({
             showAddNewMediaModal: false
@@ -167,7 +167,7 @@ class Queue extends Component {
                 <p><b>Description:</b></p>
                 <p>{rowData.description}</p>
                 <p><b>Author:</b> {rowData.author}</p>
-                <a href={rowData.link} target="_blank" style={{display: "table-cell"}}>
+                <a href={rowData.link} target="_blank" style={{ display: "table-cell" }}>
                     <p><b>Source:</b> {rowData.source}</p>
                 </a>
                 <p><b>Added on:</b> {keyUtils.date(rowData.timestamp).toString()}</p>
@@ -188,7 +188,7 @@ class Queue extends Component {
                     playState={this.props.playState}
                     currentlyPlayingIndex={this.props.currentlyPlayingIndex}
                     rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked}
-                    rowEntryCheckboxClicked={this.props.rowEntryCheckboxClicked} 
+                    rowEntryCheckboxClicked={this.props.rowEntryCheckboxClicked}
                     deletionMode={this.props.deletionMode} />
             );
             if (this.props.currentlyPlayingIndex === i + 1) {
@@ -214,31 +214,37 @@ class Queue extends Component {
         return (
             <div>
                 {this.state.showAddNewMediaModal &&
-                    <AddNewMediaModal hideMe={this.toggleAddNewMediaModal}
+                    <AddNewMediaModal
+                        hideMe={this.toggleAddNewMediaModal}
                         header={'Add new media'}>
-                        <Search loadVideoCallback={this.loadVideoCallback}
-                            loadPlaylistCallback={this.loadPlaylistCallback} />
+                        <Search
+                            loadVideoCallback={this.loadVideoCallback}
+                            loadPlaylistCallback={this.loadPlaylistCallback}
+                            closeSearch={this.toggleAddNewMediaModal} />
                     </AddNewMediaModal>
                 }
                 {this.props.showMediaDetailsModal &&
                     <div>
                         {this.props.currentlyPlayingIndex === 0 &&
-                        <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
-                                    title={'Please Select Media'}
-                                    body={<p><b>Please select a media before attempting to view more details</b></p>} />
+                            <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
+                                buttonColor="warning"
+                                title={'Please Select Media'}
+                                body={<p><b>Please select a media before attempting to view more details</b></p>} />
                         }
                         {this.props.currentlyPlayingIndex !== 0 &&
                             <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
-                            title={'Media Details'}
-                            body={this.getRowDataMoreDetails(
-                            this.props.QueueRowEntries[this.props.currentlyPlayingIndex - 1])} />
+                                title={'Media Details'}
+                                buttonColor="primary"
+                                body={this.getRowDataMoreDetails(
+                                    this.props.QueueRowEntries[this.props.currentlyPlayingIndex - 1])} />
                         }
                     </div>
                 }
                 {this.props.displaySessionRestoredPopup &&
                     <PopupModal modelWantsToCloseCallback={() => this.props.setSessionRestoredPopupDisplayStatus(false)}
-                                title={'Session Restored'}
-                                body={<p><b>Your session has been restored</b></p>} />
+                        title={'Session Restored'}
+                        buttonColor="primary"
+                        body={<p><b>Your session has been restored</b></p>} />
                 }
 
                 <Table hover>
@@ -256,7 +262,7 @@ class Queue extends Component {
                                 </Button>
                             </th>
                             <th>
-                                <Button onClick={() => this.props.setDeletionMode(!this.props.deletionMode)} 
+                                <Button onClick={() => this.props.setDeletionMode(!this.props.deletionMode)}
                                     color="danger"
                                     className="rounded-circle">
                                     <img alt="Remove from Queue" src={MinusIcon} />
@@ -270,15 +276,15 @@ class Queue extends Component {
                 </Table>
                 {/*{this.props.currentlyPlayingIndex !== 0 &&*/}
                 {/*<div className="text-center">*/}
-                        {/*{getEmbeddedVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,*/}
-                                            {/*this.setYoutubeVideoObjectAPICallback,*/}
-                                            {/*this.youtubeVideoStateChangedAPICallback,*/}
-                                            {/*64*9,*/}
-                                            {/*39*9)}*/}
-                     {/*</ div>*/}
+                {/*{getEmbeddedVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,*/}
+                {/*this.setYoutubeVideoObjectAPICallback,*/}
+                {/*this.youtubeVideoStateChangedAPICallback,*/}
+                {/*64*9,*/}
+                {/*39*9)}*/}
+                {/*</ div>*/}
                 {/*}*/}
             </div>
-            );
+        );
     }
 
 }
@@ -304,7 +310,7 @@ const mapStateToProps = state => {
     return {
         socket: state.socket.socket,
         qID: state.semiRoot.qID,
-        playState : state.semiRoot.playState,
+        playState: state.semiRoot.playState,
         currentlyPlayingYoutubeVideoObject: state.semiRoot.youtubeVideoObject,
         QueueRowEntries: lexicographicalSort(state.semiRoot.QueueRowEntries),
         currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex,
@@ -317,7 +323,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        changePlayState : playState => dispatch(changePlayState(playState)),
+        changePlayState: playState => dispatch(changePlayState(playState)),
         changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObject(youtubeVideoObject)),
         addToQueue: medias => dispatch(addToQueue(medias)),
         setCurrentlyPlayingIndex: newIndex => dispatch(setCurrentlyPlayingIndex(newIndex)),

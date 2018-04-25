@@ -12,7 +12,7 @@ class PopupModal extends Component {
                     </ModalHeader>
                     <ModalBody>{this.props.body}</ModalBody>
                     <ModalFooter>
-                        <Button color="danger" 
+                        <Button color={this.props.buttonColor}
                             onClick={this.props.modelWantsToCloseCallback}>
                             Ok
                         </Button>

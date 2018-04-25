@@ -91,7 +91,7 @@ class Header extends Component {
             <div>
                 <Navbar color="light" light expand="md">
                     <Container>
-                        <NavbarBrand href="/">
+                        <NavbarBrand href="#">
                             <img alt="MediaQ" src={MediaQIcon} width="10%" height="10%" />
                             MediaQ
                         </NavbarBrand>
