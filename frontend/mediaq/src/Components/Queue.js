@@ -24,7 +24,8 @@ import * as keyUtils from 'firebase-key'
 import AddNewMediaModal from './AddNewMediaModal';
 import QueueRowEntry from './QueueRowEntry';
 import Search from './Search';
-import { getEmbeddedVideoComponent } from '../utils/google_utils';
+import { getEmbeddedVideoComponent, getYoutubeVideoVolume } from '../utils/google_utils';
+import { CHECK_VOLUME_INTERVAL_MS } from '../constants/youtube';
 import { socketCommands } from '../sockets/socketConstants';
 import PopupModal from "./PopupModal";
 
@@ -36,10 +37,25 @@ class Queue extends Component {
         this.state = {
             showAddNewMediaModal: false,
         };
-
-        // should probably be stored in redux state...
-        this.number = 0;
     }
+
+    componentDidMount() {
+        this.youtubeVolumeListener = setInterval(() => {
+            if (this.props.currentlyPlayingYoutubeVideoObject === null) {
+                return;
+            }
+            let volumeLevel = getYoutubeVideoVolume(this.props.currentlyPlayingYoutubeVideoObject);
+            if (volumeLevel !== this.props.volumeLevel) {
+                this.props.setVolume(volumeLevel);
+                console.log('interval dispatched' + volumeLevel)
+            }
+        }, CHECK_VOLUME_INTERVAL_MS);
+    };
+
+    componentWillUnmount() {
+        //queue should never reload as of now, but if it ever does make sure this works
+        clearInterval(this.youtubeVolumeListener);
+    };
 
     //scroll if video position changes
     componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -59,7 +75,6 @@ class Queue extends Component {
     setYoutubeVideoObjectAPICallback = (event) => {
         console.log('youtube video called on ready callback: ');
         this.props.changeYoutubeVideoObject(event.target);
-        this.props.setVolume(this.props.volumeLevel);
     };
 
     youtubeVideoStateChangedAPICallback = (event) => {
@@ -163,7 +178,6 @@ class Queue extends Component {
     };
 
     render() {
-        console.log('queuerowentrieslength ' + this.props.QueueRowEntries.length);
         let QueueRowEntries = [];
         for (let i = 0; i < this.props.QueueRowEntries.length; i++) {
             QueueRowEntries.push(

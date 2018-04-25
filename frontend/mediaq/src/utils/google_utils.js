@@ -107,7 +107,34 @@ function executePlaylistSearchNextPage(playlistID, nextPageToken, callback) {
         callback);
 }
 
-// exported functions and their helper functions/variables
+//exported helper functions
+
+export function getYoutubeVideoVolume(youtubeVideoObject) {
+    const isMuted = youtubeVideoObject.isMuted();
+    if (isMuted) {
+        return 0;
+    } else {
+        return youtubeVideoObject.getVolume();
+    }
+}
+
+export function setYoutubeVideoVolume(youtubeVideoObject, newVolume) {
+    if (newVolume < 0 || newVolume > 100) {
+        return;
+    }
+    if (newVolume === 0) {
+        youtubeVideoObject.mute();
+        return;
+    }
+
+    const isMuted = youtubeVideoObject.isMuted();
+    if (isMuted) {
+        youtubeVideoObject.unMute();
+    }
+    youtubeVideoObject.setVolume(newVolume);
+}
+
+// exported search functions and their helper functions/variables
 
 let resultCallback = null;
 let searchInProgress = false;

@@ -130,7 +130,6 @@ class Footer extends Component {
                                     </Button>
                                 </NavItem>
                                 <NavItem style={volumeSlider}>
-                                    {console.log(this.props.volumeLevel)}
                                     <Slider
                                         max={100}
                                         min={0}

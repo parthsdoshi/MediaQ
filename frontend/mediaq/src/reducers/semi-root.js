@@ -1,6 +1,8 @@
 import * as types from "../constants/action-types";
 import * as youtubeStates from "../constants/youtube";
 
+import { getYoutubeVideoVolume, setYoutubeVideoVolume } from "../utils/google_utils";
+
 const initialState = {
     displayName: '',
     qID: '',
@@ -94,8 +96,8 @@ export default function semiRoot(state = initialState, action) {
         case types.SET_VOLUME:
             if (state.youtubeVideoObject === null) {
                 // youtube haven't given back the object yet
-            } else if (state.youtubeVideoObject.getVolume() !== action.payload.newVolumeLevel) {
-                state.youtubeVideoObject.setVolume(action.payload.newVolumeLevel);
+            } else if (getYoutubeVideoVolume(state.youtubeVideoObject) !== action.payload.newVolumeLevel) {
+                setYoutubeVideoVolume(state.youtubeVideoObject, action.payload.newVolumeLevel);
             }
             return { ...state, volumeLevel: action.payload.newVolumeLevel };
         case types.TOGGLE_SHUFFLE:
