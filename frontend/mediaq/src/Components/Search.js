@@ -1,5 +1,14 @@
 import React, { Component } from 'react';
-import { Media, Button, Container, Row, Col } from 'reactstrap';
+import {
+    Media,
+    Button,
+    Container,
+    Row,
+    Col,
+    Input,
+    InputGroupAddon,
+    InputGroup
+} from 'reactstrap';
 
 import { connect } from 'react-redux';
 
@@ -7,10 +16,12 @@ import * as youtubeStates from "../constants/youtube";
 import {
     loadYoutubeAPI,
     getSearchResults,
-    getPlaylistVideos } from '../utils/google_utils';
+    getPlaylistVideos
+} from '../utils/google_utils';
 import {
     generateRowDataFromPlaylistResults,
-    generateRowDataFromYoutubeSearchResults } from '../utils/rowData';
+    generateRowDataFromYoutubeSearchResults
+} from '../utils/rowData';
 import PopupModal from "./PopupModal";
 
 class Search extends Component {
@@ -26,15 +37,32 @@ class Search extends Component {
             youtubeResults: null,
             displaySearchResults: false,
 
-            searchBoxTextValue: ''
+            searchBoxTextValue: '',
+
+            justConstructed: true
         };
 
         this.numberOfResults = youtubeStates.INITIAL_NUMBER_OF_RESULTS;
         this.loadYoutubeAPIOnlyOnce();
     }
 
+    // FOCUS SEARCH BAR - kinda hacky solution...
+    componentDidMount() {
+        // this.setState({searchBoxTextValue: this.state.searchBoxTextValue})        
+        if (this.state.justConstructed) {
+            this.setState({justConstructed: true})
+        }
+    }
+    componentDidUpdate() {
+        if (this.state.justConstructed) {
+            this.setState({ justConstructed: false })
+            this.searchInput.focus()
+        }
+    }
+    //
+
     loadYoutubeAPIOnlyOnce = () => {
-        if ( Search.APIHasLoaded !== true ) {
+        if (Search.APIHasLoaded !== true) {
             loadYoutubeAPI(this.youtubeCallback);
         } else {
             console.log("Youtube API already loaded");
@@ -45,34 +73,34 @@ class Search extends Component {
         console.log("Youtube API loaded");
         // to prevent further instances of this component from loading the API again
         Search.APIHasLoaded = true;
-        this.setState({youtubeReady: true})
+        this.setState({ youtubeReady: true })
     };
 
     searchYoutube = (searchTag, numberOfResults) => {
-        this.setState({displaySearchResults: false});
-        if( this.state.youtubeReady ){
+        this.setState({ displaySearchResults: false });
+        if (this.state.youtubeReady) {
             getSearchResults(searchTag, numberOfResults, this.youtubeSearchCallback);
         } else {
-            this.setState({searchAttemptInvalid: true});
+            this.setState({ searchAttemptInvalid: true });
             console.log('Youtube is not ready');
         }
     };
 
     youtubeSearchCallback = (results) => {
         if (results == null) {
-            this.setState({searchResultsInvalid: true});
+            this.setState({ searchResultsInvalid: true });
             return;
         }
         results = generateRowDataFromYoutubeSearchResults(results, this.props.displayName);
         console.log('search results created: ');
         console.log(results);
-        this.setState({youtubeResults: results, displaySearchResults: true})
+        this.setState({ youtubeResults: results, displaySearchResults: true })
     };
 
     importYoutubePlaylist = (playlistID) => {
-        this.setState({displaySearchResults: false});
-        if( !this.state.youtubeReady ){
-            this.setState({searchAttemptInvalid: true});
+        this.setState({ displaySearchResults: false });
+        if (!this.state.youtubeReady) {
+            this.setState({ searchAttemptInvalid: true });
             console.log('Youtube is not ready');
             return;
         }
@@ -81,7 +109,7 @@ class Search extends Component {
 
     importYoutubePlaylistCallback = (results) => {
         if (results == null) {
-            this.setState({searchResultsInvalid: true});
+            this.setState({ searchResultsInvalid: true });
             return;
         }
         results = generateRowDataFromPlaylistResults(results, this.props.displayName);
@@ -109,13 +137,13 @@ class Search extends Component {
 
     handleKeyboardKeyPress = (target) => {
         const ENTER_BUTTON = 13;
-        if(target.charCode === ENTER_BUTTON){
+        if (target.charCode === ENTER_BUTTON) {
             this.searchYoutube(this.state.searchBoxTextValue);
         }
     };
 
     handleSearchBoxChange = (event) => {
-        this.setState({searchBoxTextValue: event.target.value});
+        this.setState({ searchBoxTextValue: event.target.value });
     };
 
     getResultMedia = (mediaId) => {
@@ -129,11 +157,11 @@ class Search extends Component {
                 <Media>
                     <Media left href="#">
                         <Media object
-                               src={this.state.youtubeResults[mediaId].thumbnail}
-                               alt="Youtube Video Thumbnail" />
+                            src={this.state.youtubeResults[mediaId].thumbnail}
+                            alt="Youtube Video Thumbnail" />
                     </Media>
 
-                    <Media body style={{paddingLeft: 8}}>
+                    <Media body style={{ paddingLeft: 8 }}>
                         <Media heading>
                             {this.state.youtubeResults[mediaId].title}
                         </Media>
@@ -150,7 +178,7 @@ class Search extends Component {
 
     render() {
         let youtubeMedia = [];
-        if( this.state.displaySearchResults ){
+        if (this.state.displaySearchResults) {
             for (let key in this.state.youtubeResults) {
                 youtubeMedia.push(this.getResultMedia(key));
             }
@@ -158,26 +186,31 @@ class Search extends Component {
         return (
             <Container fluid>
                 {this.state.searchResultsInvalid &&
-                <PopupModal modelWantsToCloseCallback={() => this.setState({searchResultsInvalid: false})}
-                            title={'Search Failed'}
-                            body={'Youtube did not respond with a valid result.'} />
+                    <PopupModal modelWantsToCloseCallback={() => this.setState({ searchResultsInvalid: false })}
+                        title={'Search Failed'}
+                        body={'Youtube did not respond with a valid result.'} />
                 }
                 {this.state.searchAttemptInvalid &&
-                <PopupModal modelWantsToCloseCallback={() => this.setState({searchAttemptInvalid: false})}
-                            title={'Search Failed'}
-                            body={'Youtube API has not loaded yet, please try again in a moment.'} />
+                    <PopupModal modelWantsToCloseCallback={() => this.setState({ searchAttemptInvalid: false })}
+                        title={'Search Failed'}
+                        body={'Youtube API has not loaded yet, please try again in a moment.'} />
                 }
-                <Row>
-                        <input type="text"
-                            onKeyPress={this.handleKeyboardKeyPress}
-                            onChange={this.handleSearchBoxChange} />
+                <InputGroup>
+                    <Input type="text"
+                        onKeyPress={this.handleKeyboardKeyPress}
+                        onChange={this.handleSearchBoxChange}
+                        innerRef={(input) => {this.searchInput = input}} />
+                    <InputGroupAddon addonType="append">
                         <Button onClick={this.handleSearchButtonPress} color="primary" >
                             Search
                         </Button>
-                        <Button onClick={this.handlePlaylistButtonPress} color="primary" >
+                    </InputGroupAddon>
+                    <InputGroupAddon addonType="append">
+                        <Button onClick={this.handlePlaylistButtonPress} color="info" >
                             Import Playlist
                         </Button>
-                </Row>
+                    </InputGroupAddon>
+                </InputGroup>
                 <hr className="my-2" />
                 {youtubeMedia}
                 <Row>
