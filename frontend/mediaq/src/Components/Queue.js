@@ -10,8 +10,8 @@ import * as youtubeStates from "../constants/youtube";
 import {
     changePlayState,
     changeYoutubeVideoObject,
-    setCurrentlyPlayingIndex,
-    incrementCurrentlyPlayingIndex,
+    setCurrentlyPlayingMedia,
+    playNextMedia,
     setVolume,
     toggleMediaDetailModal,
     addToQueue,
@@ -28,6 +28,7 @@ import { getEmbeddedVideoComponent, getYoutubeVideoVolume } from '../utils/googl
 import { CHECK_VOLUME_INTERVAL_MS } from '../constants/youtube';
 import { socketCommands } from '../sockets/socketConstants';
 import PopupModal from "./PopupModal";
+import { NO_MEDIA_PLAYING, MIN_VOLUME } from '../constants/queue';
 
 class Queue extends Component {
 
@@ -47,7 +48,6 @@ class Queue extends Component {
             let volumeLevel = getYoutubeVideoVolume(this.props.currentlyPlayingYoutubeVideoObject);
             if (volumeLevel !== this.props.volumeLevel) {
                 this.props.setVolume(volumeLevel);
-                console.log('interval dispatched' + volumeLevel)
             }
         }, CHECK_VOLUME_INTERVAL_MS);
     };
@@ -60,7 +60,7 @@ class Queue extends Component {
     //scroll if video position changes
     componentDidUpdate = (prevProps, prevState, snapshot) => {
         if (prevProps.currentlyPlayingIndex !== this.props.currentlyPlayingIndex &&
-            this.props.currentlyPlayingIndex !== 0) {
+            this.props.currentlyPlayingIndex !== NO_MEDIA_PLAYING) {
             this.scrollToEmbeddedVideo();
         }
     };
@@ -89,7 +89,7 @@ class Queue extends Component {
         const youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
         if (youtubeState === youtubeStates.ENDED) { // ended
             this.props.changePlayState(youtubeStates.PAUSED);
-            this.props.incrementCurrentlyPlayingIndex();
+            this.props.playNextMedia();
         }
         if (this.props.playState !== youtubeStates.PLAYING && youtubeState === youtubeStates.PLAYING) {
             this.props.changePlayState(youtubeStates.PLAYING);
@@ -105,7 +105,7 @@ class Queue extends Component {
         let volumeLevel = this.props.currentlyPlayingYoutubeVideoObject.getVolume();
         const isMuted = this.props.currentlyPlayingYoutubeVideoObject.isMuted();
         if (isMuted) {
-            volumeLevel = 0;
+            volumeLevel = MIN_VOLUME;
         }
         if (volumeLevel !== this.props.volumeLevel) {
             this.props.setVolume(volumeLevel);
@@ -146,7 +146,7 @@ class Queue extends Component {
 
     rowEntryPlayButtonClicked = (entryNumber) => {
         if (entryNumber !== this.props.currentlyPlayingIndex) {
-            this.props.setCurrentlyPlayingIndex(entryNumber);
+            this.props.setCurrentlyPlayingMedia(entryNumber);
             this.props.changePlayState(youtubeStates.BUFFERING);
         } else if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             // youtube haven't given back the object yet
@@ -183,7 +183,7 @@ class Queue extends Component {
             QueueRowEntries.push(
                 <QueueRowEntry
                     key={i}
-                    rowID={i + 1}
+                    rowID={i}
                     rowData={this.props.QueueRowEntries[i]}
                     playState={this.props.playState}
                     currentlyPlayingIndex={this.props.currentlyPlayingIndex}
@@ -191,7 +191,7 @@ class Queue extends Component {
                     rowEntryCheckboxClicked={this.props.rowEntryCheckboxClicked}
                     deletionMode={this.props.deletionMode} />
             );
-            if (this.props.currentlyPlayingIndex === i + 1) {
+            if (this.props.currentlyPlayingIndex === i) {
                 //todo use better keys?
                 QueueRowEntries.push(
                     <tr ref="embeddedVideo" key={this.props.QueueRowEntries[i].timestamp}>
@@ -225,18 +225,18 @@ class Queue extends Component {
                 }
                 {this.props.showMediaDetailsModal &&
                     <div>
-                        {this.props.currentlyPlayingIndex === 0 &&
+                        {this.props.currentlyPlayingIndex === NO_MEDIA_PLAYING &&
                             <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
                                 buttonColor="warning"
                                 title={'Please Select Media'}
                                 body={<p><b>Please select a media before attempting to view more details</b></p>} />
                         }
-                        {this.props.currentlyPlayingIndex !== 0 &&
+                        {this.props.currentlyPlayingIndex !== NO_MEDIA_PLAYING &&
                             <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
                                 title={'Media Details'}
                                 buttonColor="primary"
                                 body={this.getRowDataMoreDetails(
-                                    this.props.QueueRowEntries[this.props.currentlyPlayingIndex - 1])} />
+                                    this.props.QueueRowEntries[this.props.currentlyPlayingIndex])} />
                         }
                     </div>
                 }
@@ -274,15 +274,6 @@ class Queue extends Component {
                         {QueueRowEntries}
                     </tbody>
                 </Table>
-                {/*{this.props.currentlyPlayingIndex !== 0 &&*/}
-                {/*<div className="text-center">*/}
-                {/*{getEmbeddedVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,*/}
-                {/*this.setYoutubeVideoObjectAPICallback,*/}
-                {/*this.youtubeVideoStateChangedAPICallback,*/}
-                {/*64*9,*/}
-                {/*39*9)}*/}
-                {/*</ div>*/}
-                {/*}*/}
             </div>
         );
     }
@@ -326,8 +317,8 @@ const mapDispatchToProps = dispatch => {
         changePlayState: playState => dispatch(changePlayState(playState)),
         changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObject(youtubeVideoObject)),
         addToQueue: medias => dispatch(addToQueue(medias)),
-        setCurrentlyPlayingIndex: newIndex => dispatch(setCurrentlyPlayingIndex(newIndex)),
-        incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
+        setCurrentlyPlayingMedia: newIndex => dispatch(setCurrentlyPlayingMedia(newIndex)),
+        playNextMedia: () => dispatch(playNextMedia()),
         setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
         toggleMediaDetailModal: () => dispatch(toggleMediaDetailModal()),
         setSessionRestoredPopupDisplayStatus: (newStatus) => dispatch(setSessionRestoredPopupDisplayStatus(newStatus)),

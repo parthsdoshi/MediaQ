@@ -19,8 +19,8 @@ import info from 'open-iconic/svg/info.svg';
 import { connect } from 'react-redux';
 import {
     seekSecondsAhead,
-    decrementCurrentlyPlayingIndex,
-    incrementCurrentlyPlayingIndex,
+    playPreviousMedia,
+    playNextMedia,
     setVolume,
     toggleShuffle,
     toggleMediaDetailModal,
@@ -29,6 +29,7 @@ import {
 
 import MediaPlayPauseButton from './MediaPlayPauseButton';
 import * as youtubeStates from '../constants/youtube';
+import { MIN_VOLUME, MAX_VOLUME } from '../constants/queue'
 
 class Footer extends Component {
     constructor(props) {
@@ -57,7 +58,7 @@ class Footer extends Component {
     playButtonClicked = (entryNumber) => {
         if (this.props.currentlyPlayingIndex === 0) {
             //no media is playing and play button is pressed, play first in queue
-            this.props.incrementCurrentlyPlayingIndex();
+            this.props.playNextMedia();
         }
         if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             // youtube haven't given back the object yet
@@ -124,15 +125,15 @@ class Footer extends Component {
                                     </Button>
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
-                                    <Button onClick={this.props.incrementCurrentlyPlayingIndex} color={'primary'}>
+                                    <Button onClick={this.props.playNextMedia} color={'primary'}>
                                         <img alt={'next_media'}
                                              src={NextMediaIcon} />
                                     </Button>
                                 </NavItem>
                                 <NavItem style={volumeSlider}>
                                     <Slider
-                                        max={100}
-                                        min={0}
+                                        max={MAX_VOLUME}
+                                        min={MIN_VOLUME}
                                         step={.2}
                                         vertical={false}
                                         onChange={this.handleChangeVolumeSlider}
@@ -176,8 +177,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         seekSecondsAhead: seconds => dispatch(seekSecondsAhead(seconds)),
-        decrementCurrentlyPlayingIndex: () => dispatch(decrementCurrentlyPlayingIndex()),
-        incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
+        decrementCurrentlyPlayingIndex: () => dispatch(playPreviousMedia()),
+        playNextMedia: () => dispatch(playNextMedia()),
         setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
         toggleShuffle: () => dispatch(toggleShuffle()),
         toggleMediaDetailModal: () => dispatch(toggleMediaDetailModal()),

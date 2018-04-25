@@ -1,6 +1,6 @@
 import * as types from "../constants/action-types";
 import * as youtubeStates from "../constants/youtube";
-
+import { NO_MEDIA_PLAYING, MAX_VOLUME, MIN_VOLUME } from "../constants/queue";
 import { getYoutubeVideoVolume, setYoutubeVideoVolume } from "../utils/google_utils";
 
 const initialState = {
@@ -11,8 +11,9 @@ const initialState = {
     displaySessionRestoredPopup: false,
 
     playState: youtubeStates.PAUSED,
-    currentlyPlayingIndex: 0, //0 means no video is playing
-    volumeLevel: 100,
+    currentlyPlayingIndex: NO_MEDIA_PLAYING,
+    playingIndexHistory: [],
+    volumeLevel: MAX_VOLUME,
     shuffleMode: false,
     showMediaDetailsModal: false,
     youtubeVideoObject: null,
@@ -22,18 +23,23 @@ const initialState = {
     userList: []
 };
 
-function getNextPlayingIndexShuffled(state) {
-    const current = state.currentlyPlayingIndex;
-    const max = Object.keys(state.QueueRowEntries).length;
-    if (current <= 0 || current > max) {//trivial
-        return Math.floor(Math.random() * max) + 1;
+function getNextIndexShuffle(current, max) {
+    // max is inclusive
+    if (current === NO_MEDIA_PLAYING || current > max || current < 0) {//trivial
+        return Math.floor(Math.random() * max);
     }
-    if (max <= 1) {//cannot be done, return default value
-        return initialState.currentlyPlayingIndex;
+    if (current === 0 && max === 0) {
+        // only one media and its currently playing
+        return current;
+    }
+    if (max < 0) {
+        // can't be done
+        console.log('getRandomNumNotCurrent error, returning.');
+        return;
     }
 
-    const random = Math.floor(Math.random() * (max - 1)) + 1; // random number from 1 to max-1
-    // return conditions splits choices to 1 2 3 ... current-2 current-1 current+1 current+2 ... max-1 max
+    const random = Math.floor(Math.random() * (max - 1)); // random number from 0 to max-2
+    // return conditions splits choices to 0 1 2 3 ... current-2 current-1 current+1 current+2 ... max-1
     return random >= current ? random+1 : random;
 }
 
@@ -55,32 +61,59 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, userList: [...state.userList, action.payload.newUser] };
         case types.REMOVE_USER:
             let newUserList = state.userList.slice(0); //clone array
-            let index = newUserList.indexOf(action.payload.userToRemove)
+            let index = newUserList.indexOf(action.payload.userToRemove);
             if (index > -1) {
                 newUserList.splice(index, 1)
             }
             return { ...state, userList: newUserList };
         case types.SET_USER_LIST:
             return { ...state, userList: action.payload.userList };
-        case types.SET_CURRENTLY_PLAYING_INDEX:
-            return { ...state, currentlyPlayingIndex: action.payload.newIndex,
+        case types.SET_CURRENTLY_PLAYING_MEDIA:
+            let newIndex = action.payload.newIndex;
+            if (state.currentlyPlayingIndex === newIndex) {
+                return [ ...state ];
+            }
+            let newPlayingIndexHistory = [ ...state.playingIndexHistory, state.currentlyPlayingIndex ];
+            return { ...state, currentlyPlayingIndex: newIndex, playingIndexHistory: newPlayingIndexHistory,
                 playState: youtubeStates.PAUSED, youtubeVideoObject: null };
-        case types.DECREMENT_CURRENTLY_PLAYING_INDEX:
-            let prevIndex = state.currentlyPlayingIndex - 1;
-            if (state.shuffleMode) {
-                prevIndex = getNextPlayingIndexShuffled(state)
+        case types.PLAY_NEXT_MEDIA:
+            let nextIndex;
+            const currentlyPlayingIndex = state.currentlyPlayingIndex;
+            const queueLength = Object.keys(state.QueueRowEntries).length;
+            newPlayingIndexHistory = [ ...state.playingIndexHistory ];
+            if (queueLength === 0) {
+                // empty queue, do nothing
+                return { ...state };
             }
-            return { ...state, currentlyPlayingIndex: prevIndex,
+            if (state.shuffleMode) {
+                const max = queueLength - 1;
+                nextIndex = getNextIndexShuffle(currentlyPlayingIndex, max);
+            } else {
+                if (currentlyPlayingIndex === NO_MEDIA_PLAYING) {
+                    nextIndex = 0;
+                } else if (currentlyPlayingIndex === queueLength) {
+                    // end of queue
+                    nextIndex = NO_MEDIA_PLAYING;
+                } else {
+                    nextIndex = state.currentlyPlayingIndex + 1;
+                }
+            }
+
+            if (nextIndex !== currentlyPlayingIndex && currentlyPlayingIndex !== NO_MEDIA_PLAYING) {
+                newPlayingIndexHistory = [ ...newPlayingIndexHistory, currentlyPlayingIndex ]
+            }
+            console.log('playing set to ' + nextIndex);
+            return { ...state, currentlyPlayingIndex: nextIndex, playingIndexHistory: newPlayingIndexHistory,
                 playState: youtubeStates.PAUSED, youtubeVideoObject: null };
-        case types.INCREMENT_CURRENTLY_PLAYING_INDEX:
-            let nextIndex = state.currentlyPlayingIndex + 1;
-            if (nextIndex === state.QueueRowEntries.length + 1) {
-                nextIndex = 0;
+        case types.PLAY_PREV_MEDIA:
+            let prevIndex;
+            newPlayingIndexHistory = [ ...state.playingIndexHistory ];
+            if (state.playingIndexHistory.length === 0) {
+                prevIndex = NO_MEDIA_PLAYING;
+            } else {
+                prevIndex = newPlayingIndexHistory.pop();
             }
-            if (state.shuffleMode) {
-                nextIndex = getNextPlayingIndexShuffled(state)
-            }
-            return { ...state, currentlyPlayingIndex: nextIndex,
+            return { ...state, currentlyPlayingIndex: prevIndex, playingIndexHistory: newPlayingIndexHistory,
                 playState: youtubeStates.PAUSED, youtubeVideoObject: null };
         case types.CHANGE_PLAY_STATE:
             return { ...state, playState: action.payload.playState };
@@ -94,12 +127,19 @@ export default function semiRoot(state = initialState, action) {
             }
             return { ...state };
         case types.SET_VOLUME:
+            let newVolumeLevel = action.payload.newVolumeLevel;
+            if (newVolumeLevel < MIN_VOLUME) {
+                newVolumeLevel = MIN_VOLUME;
+            }
+            if (newVolumeLevel > MAX_VOLUME) {
+                newVolumeLevel = MAX_VOLUME;
+            }
             if (state.youtubeVideoObject === null) {
                 // youtube haven't given back the object yet
-            } else if (getYoutubeVideoVolume(state.youtubeVideoObject) !== action.payload.newVolumeLevel) {
-                setYoutubeVideoVolume(state.youtubeVideoObject, action.payload.newVolumeLevel);
+            } else if (getYoutubeVideoVolume(state.youtubeVideoObject) !== newVolumeLevel) {
+                setYoutubeVideoVolume(state.youtubeVideoObject, newVolumeLevel);
             }
-            return { ...state, volumeLevel: action.payload.newVolumeLevel };
+            return { ...state, volumeLevel: newVolumeLevel };
         case types.TOGGLE_SHUFFLE:
             return { ...state, shuffleMode: !state.shuffleMode };
         case types.TOGGLE_MEDIA_DETAIL_MODAL:
@@ -109,7 +149,7 @@ export default function semiRoot(state = initialState, action) {
         case types.ADD_TO_QUEUE:
             return { ...state, QueueRowEntries: {...state.QueueRowEntries, ...action.payload.medias} };
         case types.REMOVE_FROM_QUEUE:
-            let newQueueRowEntries = {...state.QueueRowEntries}
+            let newQueueRowEntries = {...state.QueueRowEntries};
             for (let id of action.payload.medias) {
                 console.log(id)
                 if (id in newQueueRowEntries) {

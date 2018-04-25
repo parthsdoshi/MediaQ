@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Input } from 'reactstrap';
 
-import MinusIcon from 'open-iconic/svg/minus.svg';
-
 import MediaPlayPauseButton from './MediaPlayPauseButton';
 import * as youtubeStates from '../constants/youtube';
 import youTubeLogo from '../youtube.png'
@@ -20,7 +18,7 @@ class QueueRowEntry extends Component {
             youtubeStates.PAUSED: this.props.playState;
         return (
             <tr>
-                <th scope="row">{this.props.rowID + ':'}</th>
+                <th scope="row">{this.props.rowID + 1 + ':'}</th>
                 <td>
                     <MediaPlayPauseButton buttonClickedCallback={this.playButtonClicked}
                                             buttonID={this.props.rowID}
@@ -41,12 +39,6 @@ class QueueRowEntry extends Component {
                     <Input type="checkbox" onClick={() => this.props.rowEntryCheckboxClicked(this.props.rowData.timestamp)} />
                 </td>}
                 {!this.props.deletionMode && <td />}
-                {/*<td>*/}
-                    {/*<Button color="danger">*/}
-                        {/*<img alt="Remove to Queue" src={MinusIcon} />*/}
-                    {/*</Button>*/}
-                {/*</td>*/}
-
             </tr>
         );
     }
