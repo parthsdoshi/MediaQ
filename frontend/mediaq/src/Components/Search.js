@@ -46,20 +46,9 @@ class Search extends Component {
         this.loadYoutubeAPIOnlyOnce();
     }
 
-    // FOCUS SEARCH BAR - kinda hacky solution...
     componentDidMount() {
-        // this.setState({searchBoxTextValue: this.state.searchBoxTextValue})        
-        if (this.state.justConstructed) {
-            this.setState({justConstructed: true})
-        }
+        this.searchInput.focus()
     }
-    componentDidUpdate() {
-        if (this.state.justConstructed) {
-            this.setState({ justConstructed: false })
-            this.searchInput.focus()
-        }
-    }
-    //
 
     loadYoutubeAPIOnlyOnce = () => {
         if (Search.APIHasLoaded !== true) {
