@@ -1,3 +1,6 @@
+//search example
+// XIJPcurl -A 'apiguide application' 'http://api.search.nicovideo.jp/api/v2/video/contents/search?targets=title&fields=contentId,title,viewCounter&_sort=-viewCounter&_limit=10' --data-urlencode "q聖槍爆裂ボーイ"
+
 class NicovideoPlayer {
     static playerId = 0;
     static origin = 'https://embed.nicovideo.jp';
