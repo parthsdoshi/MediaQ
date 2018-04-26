@@ -236,8 +236,8 @@ const setupSocket = (dispatch) => {
         }
         const response = data['response'];
         if (response === socketErrors.SUCCESS) {
-            const medias = data['data']['medias']
-            dispatch(removeFromQueue(medias))
+            const medias = data['data']['medias'];
+            dispatch(removeFromQueue(medias));
             dispatch(setDeletionMode(false))
         }
     })
