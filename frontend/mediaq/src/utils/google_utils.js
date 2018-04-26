@@ -1,5 +1,5 @@
 import React from 'react';
-import YouTube from 'react-youtube';
+import ReactPlayer from 'react-player';
 
 /* global gapi */
 // above tells compiler that gapi is global
@@ -16,22 +16,26 @@ export function initClient() {
     });
 }
 
-export function getEmbeddedVideoComponent(id, onReady, onStateChange, width=640, height=390) {
-    const opts = {
-        height: height,
-        width: width,
-        playerVars: { // https://developers.google.com/youtube/player_parameters
-            autoplay: 1,
-            rel: 0,
-            showinfo: 0,
-//            controls: 0,
-//            disablekb: 1,
-        }
+export function getEmbeddedVideoComponent(url, onReady, onStateChange, width=640, height=390) {
+    const youtubeVars = { //https://developers.google.com/youtube/player_parameters
+        autoplay: 1,
+        rel: 0,
+        enablejsapi: 1,
+        controls: 1,
+        showinfo: 0,
     };
-    return (<YouTube videoId={id}
-                    opts={opts}
-                    onReady={onReady}
-                    onStateChange={onStateChange}/>);
+    const youtubeEvents = {
+        onReady: onReady,
+        onStateChange: onStateChange
+    };
+
+    return (<ReactPlayer url={url}
+                         config={{
+                             youtube:{
+                                 playerVars: youtubeVars,
+                                 events: youtubeEvents
+                             }
+                         }}/>);
 }
 
 export function loadYoutubeAPI(youtubeCallback) {

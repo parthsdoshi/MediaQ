@@ -198,7 +198,7 @@ class Queue extends Component {
                         <td />
                         <td />
                         <td>
-                            {getEmbeddedVideoComponent(this.props.QueueRowEntries[i].id,
+                            {getEmbeddedVideoComponent(this.props.QueueRowEntries[i].link,
                                 this.setYoutubeVideoObjectAPICallback,
                                 this.youtubeVideoStateChangedAPICallback,
                                 64 * 9,
