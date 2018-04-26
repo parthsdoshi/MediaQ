@@ -13,6 +13,7 @@ import {
 import { connect } from 'react-redux';
 
 import * as youtubeStates from "../constants/youtube";
+import * as charCodes from '../constants/charCodes';
 import {
     loadYoutubeAPI,
     getSearchResults,
@@ -47,7 +48,16 @@ class Search extends Component {
     }
 
     componentDidMount() {
-        this.searchInput.focus()
+        // this.setState({searchBoxTextValue: this.state.searchBoxTextValue})
+        if (this.state.justConstructed) {
+            this.setState({ justConstructed: true })
+        }
+    }
+    componentDidUpdate() {
+        if (this.state.justConstructed) {
+            this.setState({ justConstructed: false });
+            this.searchInput.focus()
+        }
     }
 
     loadYoutubeAPIOnlyOnce = () => {
@@ -111,11 +121,11 @@ class Search extends Component {
         this.props.loadVideoCallback(mediaId, this.state.youtubeResults[mediaId]);
     };
 
-    handleSearchButtonPress = (target) => {
+    handleSearchButtonPress = () => {
         this.searchYoutube(this.state.searchBoxTextValue, this.numberOfResults);
     };
 
-    handlePlaylistButtonPress = (target) => {
+    handlePlaylistButtonPress = () => {
         this.importYoutubePlaylist(this.state.searchBoxTextValue);
     };
 
@@ -125,9 +135,12 @@ class Search extends Component {
     };
 
     handleKeyboardKeyPress = (target) => {
-        const ENTER_BUTTON = 13;
-        if (target.charCode === ENTER_BUTTON) {
-            this.searchYoutube(this.state.searchBoxTextValue);
+        switch (target.charCode) {
+            case charCodes.ENTER:
+                this.searchYoutube(this.state.searchBoxTextValue);
+                return
+            default:
+                return
         }
     };
 
@@ -169,6 +182,13 @@ class Search extends Component {
         let youtubeMedia = [];
         if (this.state.displaySearchResults) {
             for (let key in this.state.youtubeResults) {
+                // todo webstorm warning message:
+                // Possible iteration over unexpected (custom / inherited) members, probably
+                // missing hasOwnProperty check
+                //
+                // Checks for any instances of unfiltered for-in loops in JavaScript. The use of this construct results
+                // in processing inherited or unexpected properties. You need to filter own properties with
+                // hasOwnProperty() method. The validation works in JavaScript, html or jsp files.
                 youtubeMedia.push(this.getResultMedia(key));
             }
         }
@@ -177,18 +197,20 @@ class Search extends Component {
                 {this.state.searchResultsInvalid &&
                     <PopupModal modelWantsToCloseCallback={() => this.setState({ searchResultsInvalid: false })}
                         title={'Search Failed'}
+                        buttonColor="danger"
                         body={'Youtube did not respond with a valid result.'} />
                 }
                 {this.state.searchAttemptInvalid &&
                     <PopupModal modelWantsToCloseCallback={() => this.setState({ searchAttemptInvalid: false })}
                         title={'Search Failed'}
+                        buttonColor="danger"
                         body={'Youtube API has not loaded yet, please try again in a moment.'} />
                 }
                 <InputGroup>
                     <Input type="text"
                         onKeyPress={this.handleKeyboardKeyPress}
                         onChange={this.handleSearchBoxChange}
-                        innerRef={(input) => {this.searchInput = input}} />
+                        innerRef={(input) => { this.searchInput = input }} />
                     <InputGroupAddon addonType="append">
                         <Button onClick={this.handleSearchButtonPress} color="primary" >
                             Search

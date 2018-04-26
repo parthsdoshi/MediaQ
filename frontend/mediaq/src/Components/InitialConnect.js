@@ -136,12 +136,14 @@ class InitialConnect extends Component {
                         title={'Your new Queue ID: ' + this.props.qID}
                         body={'Your Queue ID is "' + this.props.qID +
                             '" save it and give it to friends to join your queue'}
+                        buttonColor="primary"
                     />}
                 {this.props.displayIncorrectQIDPopup &&
                     <PopupModal modelWantsToCloseCallback={this.hideIncorrectQIDModal}
                         title={'Incorrect Queue ID'}
                         body={'The Queue ID you inputted "' + this.props.qID +
                             '" is incorrect, please check that this is the correct Queue ID'}
+                        buttonColor="danger"
                     />}
             </div>
         );

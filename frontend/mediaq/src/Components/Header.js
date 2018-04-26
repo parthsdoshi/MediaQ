@@ -18,12 +18,15 @@ import {
 
 import LogoutIcon from 'open-iconic/svg/account-logout.svg';
 import DuplicateIcon from 'open-iconic/svg/fork.svg';
+import ExportIcon from 'open-iconic/svg/data-transfer-download.svg'
+import ImportIcon from 'open-iconic/svg/data-transfer-upload.svg'
 
 import { connect } from 'react-redux';
-import { logout, socketLogout, socketClearState } from "../actions";
-
+import { logout, socketLogout, socketClearState, addToQueue } from "../actions";
+import {rowDataToString, stringToRowData} from "../utils/rowData";
 import MediaQIcon from '../logo.svg';
 import {socketCommands} from "../sockets/socketConstants";
+import ImportPlaylistModal from "./ImportPlaylistModal";
 
 class Header extends Component {
     constructor(props) {
@@ -32,6 +35,7 @@ class Header extends Component {
         this.state = {
             collapseIsOpen: false,
             QIDClipboardPopover: false,
+            importQueuePopup: false,
         };
     }
 
@@ -78,6 +82,35 @@ class Header extends Component {
 
     };
 
+    exportQueue = () => {
+        const QueueRowEntries = this.props.QueueRowEntries;
+        let result = '';
+        for (let key in QueueRowEntries) {
+            result += rowDataToString(QueueRowEntries[key]) + '\n\n';
+        }
+        let element = document.createElement("a");
+        const file = new Blob([result], {type: 'text/plain'});
+        element.href = URL.createObjectURL(file);
+        element.download = "myFile.txt";
+        element.click();
+    };
+
+    importQueue = (text) => {
+        this.setState({
+            importQueuePopup: false
+        });
+        if (text === "") {
+            return;
+        }
+        const importedQueue = stringToRowData(text, this.props.displayName);
+        console.log(importedQueue);
+        this.props.addToQueue(importedQueue);
+        this.props.socket.emit(socketCommands.ADDMEDIAS,
+            { 'data': { 'medias': importedQueue }, 'qID': this.props.qID },
+            this.props.socket.ADDMEDIASACKNOWLEDGEMENT);
+
+    };
+
     render() {
         let icon = {
             width: '16px',
@@ -89,16 +122,19 @@ class Header extends Component {
         //todo change if qid !== '' to loggedin === true and make sure it works
         return (
             <div>
+                {this.state.importQueuePopup &&
+                    <ImportPlaylistModal parentCallback={this.importQueue}/>
+                }
                 <Navbar color="light" light expand="md">
                     <Container>
-                        <NavbarBrand href="/">
+                        <NavbarBrand href="#">
                             <img alt="MediaQ" src={MediaQIcon} width="10%" height="10%" />
                             MediaQ
                         </NavbarBrand>
                         <NavbarToggler onClick={this.toggle} />
                         <Collapse isOpen={this.state.collapseIsOpen} navbar>
                             <Nav className="ml-auto" navbar>
-                                {this.props.qID !== "" && this.props.displayName !== "" &&
+                                {this.props.loggedIn &&
                                     <UncontrolledDropdown nav inNavbar>
                                         <DropdownToggle nav caret>
                                             {'User List (' + this.props.userList.length + ')'}
@@ -108,7 +144,7 @@ class Header extends Component {
                                         </DropdownMenu>
                                     </UncontrolledDropdown>
                                 }
-                                {this.props.qID !== "" && this.props.displayName !== "" &&
+                                {this.props.loggedIn &&
                                     <NavItem>
                                         <NavLink id="QIDPopover" onClick={this.copyQIDToClipboard} href="#">
                                             {'Queue ID: ' + this.props.qID}
@@ -119,7 +155,7 @@ class Header extends Component {
                                         </Popover>
                                     </NavItem>
                                 }
-                                {this.props.qID !== "" && this.props.displayName !== "" &&
+                                {this.props.loggedIn &&
                                     <UncontrolledDropdown nav inNavbar>
                                         <DropdownToggle nav caret>
                                             {this.props.displayName}
@@ -130,6 +166,23 @@ class Header extends Component {
                                                     <img alt="Duplicate Queue" src={DuplicateIcon} style={icon} />
                                                     <div style={{ marginLeft: 20, display: 'inline' }}>
                                                         Duplicate Queue
+                                                    </div>
+                                                </NavLink>
+                                            </DropdownItem>
+                                            <DropdownItem onClick={this.exportQueue} >
+                                                <NavLink href="#">
+                                                    <img alt="Export Queue" src={ExportIcon} style={icon} />
+                                                    <div style={{ marginLeft: 20, display: 'inline' }}>
+                                                        Export Queue
+                                                    </div>
+                                                </NavLink>
+                                            </DropdownItem>
+                                            <DropdownItem onClick={() =>
+                                                this.setState({importQueuePopup: !this.state.importQueuePopup})} >
+                                                <NavLink href="#">
+                                                    <img alt="Import Queue" src={ImportIcon} style={icon} />
+                                                    <div style={{ marginLeft: 20, display: 'inline' }}>
+                                                        Import Queue
                                                     </div>
                                                 </NavLink>
                                             </DropdownItem>
@@ -156,6 +209,7 @@ class Header extends Component {
 const mapStateToProps = state => {
     return {
         socket: state.socket.socket,
+        loggedIn: state.socket.loggedIn,
         displayName: state.semiRoot.displayName,
         qID: state.semiRoot.qID,
         userList: state.semiRoot.userList,
@@ -168,6 +222,7 @@ const mapDispatchToProps = dispatch => {
         logout: () => dispatch(logout()),
         socketLogout: () => dispatch(socketLogout()),
         socketClearState: () => dispatch(socketClearState()),
+        addToQueue: medias => dispatch(addToQueue(medias)),
     }
 };
 

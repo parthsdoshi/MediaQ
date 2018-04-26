@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import PopupModal from './PopupModal'
+import * as charCodes from '../constants/charCodes'
 
 class LoginScreen extends Component {
 
@@ -20,19 +21,26 @@ class LoginScreen extends Component {
         };
     }
 
+    componentDidMount() {
+        this.displayNameInput.focus()
+    }
 
     handleKeyboardKeyPress = (target) => {
-        if(target.charCode === 13){
-            this.callParent();
+        switch(target.charCode) {
+            case charCodes.ENTER:
+                this.callParent()
+                return
+            default:
+                return
         }
     };
 
     handleTextChangeqID = (event) => {
-        this.setState({qIDBoxText: event.target.value});
+        this.setState({ qIDBoxText: event.target.value });
     };
 
     handleTextChangeDisplayname = (event) => {
-        this.setState({displaynameBoxText: event.target.value});
+        this.setState({ displaynameBoxText: event.target.value });
     };
 
     cancel = () => {
@@ -50,7 +58,7 @@ class LoginScreen extends Component {
                 warningModalBody: 'Please input a display name.'
             });
             return;
-        } 
+        }
 
         if (this.state.showQIDInput && this.state.qIDBoxText === '') {
             this.setState({
@@ -75,8 +83,6 @@ class LoginScreen extends Component {
         });
     };
 
-
-
     render() {
         return (
             <div>
@@ -86,24 +92,26 @@ class LoginScreen extends Component {
                     </ModalHeader>
                     <ModalBody>
                         <div className="form-group">
-                            <Input placeholder="Display Name" 
-                                onKeyPress={this.handleKeyboardKeyPress} 
+                            <Input placeholder="Display Name"
+                                innerRef={(input) => {this.displayNameInput = input}}
+                                onKeyPress={this.handleKeyboardKeyPress}
                                 onChange={this.handleTextChangeDisplayname} />
                         </div>
 
-                        { this.state.showQIDInput && 
-                        <div className="form-group">
-                            <Input placeholder="Queue ID" 
-                                onKeyPress={this.handleKeyboardKeyPress} 
-                                onChange={this.handleTextChangeqID} />
-                        </div>
+                        {this.state.showQIDInput &&
+                            <div className="form-group">
+                                <Input placeholder="Queue ID"
+                                    onKeyPress={this.handleKeyboardKeyPress}
+                                    onChange={this.handleTextChangeqID} />
+                            </div>
                         }
 
-                        {this.state.warningModal && 
-                                <PopupModal modelWantsToCloseCallback={this.hideWarning} 
-                                    title={this.state.warningModalTitle} 
-                                    body={this.state.warningModalBody}/>
-                                }
+                        {this.state.warningModal &&
+                            <PopupModal modelWantsToCloseCallback={this.hideWarning}
+                                buttonColor="danger"
+                                title={this.state.warningModalTitle}
+                                body={this.state.warningModalBody} />
+                        }
                     </ModalBody>
                     <ModalFooter>
                         <Button color="primary" onClick={this.callParent}>Start</Button>
@@ -111,7 +119,7 @@ class LoginScreen extends Component {
                     </ModalFooter>
                 </Modal>
             </div>
-            );
+        );
     }
 
 }

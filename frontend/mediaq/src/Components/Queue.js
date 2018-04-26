@@ -10,8 +10,8 @@ import * as youtubeStates from "../constants/youtube";
 import {
     changePlayState,
     changeYoutubeVideoObject,
-    setCurrentlyPlayingIndex,
-    incrementCurrentlyPlayingIndex,
+    setCurrentlyPlayingMedia,
+    playNextMedia,
     setVolume,
     toggleMediaDetailModal,
     addToQueue,
@@ -24,9 +24,11 @@ import * as keyUtils from 'firebase-key'
 import AddNewMediaModal from './AddNewMediaModal';
 import QueueRowEntry from './QueueRowEntry';
 import Search from './Search';
-import { getEmbeddedVideoComponent } from '../utils/google_utils';
+import { getEmbeddedVideoComponent, getYoutubeVideoVolume } from '../utils/google_utils';
+import { CHECK_VOLUME_INTERVAL_MS } from '../constants/youtube';
 import { socketCommands } from '../sockets/socketConstants';
 import PopupModal from "./PopupModal";
+import { NO_MEDIA_PLAYING, MIN_VOLUME } from '../constants/queue';
 
 class Queue extends Component {
 
@@ -36,15 +38,29 @@ class Queue extends Component {
         this.state = {
             showAddNewMediaModal: false,
         };
-
-        // should probably be stored in redux state...
-        this.number = 0;
     }
+
+    componentDidMount() {
+        this.youtubeVolumeListener = setInterval(() => {
+            if (this.props.currentlyPlayingYoutubeVideoObject === null) {
+                return;
+            }
+            let volumeLevel = getYoutubeVideoVolume(this.props.currentlyPlayingYoutubeVideoObject);
+            if (volumeLevel !== this.props.volumeLevel) {
+                this.props.setVolume(volumeLevel);
+            }
+        }, CHECK_VOLUME_INTERVAL_MS);
+    };
+
+    componentWillUnmount() {
+        //queue should never reload as of now, but if it ever does make sure this works
+        clearInterval(this.youtubeVolumeListener);
+    };
 
     //scroll if video position changes
     componentDidUpdate = (prevProps, prevState, snapshot) => {
         if (prevProps.currentlyPlayingIndex !== this.props.currentlyPlayingIndex &&
-            this.props.currentlyPlayingIndex !== 0) {
+            this.props.currentlyPlayingIndex !== NO_MEDIA_PLAYING) {
             this.scrollToEmbeddedVideo();
         }
     };
@@ -59,7 +75,6 @@ class Queue extends Component {
     setYoutubeVideoObjectAPICallback = (event) => {
         console.log('youtube video called on ready callback: ');
         this.props.changeYoutubeVideoObject(event.target);
-        this.props.setVolume(this.props.volumeLevel);
     };
 
     youtubeVideoStateChangedAPICallback = (event) => {
@@ -74,7 +89,7 @@ class Queue extends Component {
         const youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
         if (youtubeState === youtubeStates.ENDED) { // ended
             this.props.changePlayState(youtubeStates.PAUSED);
-            this.props.incrementCurrentlyPlayingIndex();
+            this.props.playNextMedia();
         }
         if (this.props.playState !== youtubeStates.PLAYING && youtubeState === youtubeStates.PLAYING) {
             this.props.changePlayState(youtubeStates.PLAYING);
@@ -90,7 +105,7 @@ class Queue extends Component {
         let volumeLevel = this.props.currentlyPlayingYoutubeVideoObject.getVolume();
         const isMuted = this.props.currentlyPlayingYoutubeVideoObject.isMuted();
         if (isMuted) {
-            volumeLevel = 0;
+            volumeLevel = MIN_VOLUME;
         }
         if (volumeLevel !== this.props.volumeLevel) {
             this.props.setVolume(volumeLevel);
@@ -102,7 +117,7 @@ class Queue extends Component {
         console.log(medias);
         this.props.addToQueue(medias);
         this.props.socket.emit(socketCommands.ADDMEDIAS,
-            { 'data': {'medias':  medias}, 'qID': this.props.qID },
+            { 'data': { 'medias': medias }, 'qID': this.props.qID },
             this.props.socket.ADDMEDIASACKNOWLEDGEMENT);
         this.setState({
             showAddNewMediaModal: false
@@ -131,7 +146,7 @@ class Queue extends Component {
 
     rowEntryPlayButtonClicked = (entryNumber) => {
         if (entryNumber !== this.props.currentlyPlayingIndex) {
-            this.props.setCurrentlyPlayingIndex(entryNumber);
+            this.props.setCurrentlyPlayingMedia(entryNumber);
             this.props.changePlayState(youtubeStates.BUFFERING);
         } else if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             // youtube haven't given back the object yet
@@ -152,7 +167,7 @@ class Queue extends Component {
                 <p><b>Description:</b></p>
                 <p>{rowData.description}</p>
                 <p><b>Author:</b> {rowData.author}</p>
-                <a href={rowData.link} target="_blank" style={{display: "table-cell"}}>
+                <a href={rowData.link} target="_blank" style={{ display: "table-cell" }}>
                     <p><b>Source:</b> {rowData.source}</p>
                 </a>
                 <p><b>Added on:</b> {keyUtils.date(rowData.timestamp).toString()}</p>
@@ -163,21 +178,20 @@ class Queue extends Component {
     };
 
     render() {
-        console.log('queuerowentrieslength ' + this.props.QueueRowEntries.length);
         let QueueRowEntries = [];
         for (let i = 0; i < this.props.QueueRowEntries.length; i++) {
             QueueRowEntries.push(
                 <QueueRowEntry
                     key={i}
-                    rowID={i + 1}
+                    rowID={i}
                     rowData={this.props.QueueRowEntries[i]}
                     playState={this.props.playState}
                     currentlyPlayingIndex={this.props.currentlyPlayingIndex}
                     rowEntryPlayButtonClicked={this.rowEntryPlayButtonClicked}
-                    rowEntryCheckboxClicked={this.props.rowEntryCheckboxClicked} 
+                    rowEntryCheckboxClicked={this.props.rowEntryCheckboxClicked}
                     deletionMode={this.props.deletionMode} />
             );
-            if (this.props.currentlyPlayingIndex === i + 1) {
+            if (this.props.currentlyPlayingIndex === i) {
                 //todo use better keys?
                 QueueRowEntries.push(
                     <tr ref="embeddedVideo" key={this.props.QueueRowEntries[i].timestamp}>
@@ -200,31 +214,37 @@ class Queue extends Component {
         return (
             <div>
                 {this.state.showAddNewMediaModal &&
-                    <AddNewMediaModal hideMe={this.toggleAddNewMediaModal}
+                    <AddNewMediaModal
+                        hideMe={this.toggleAddNewMediaModal}
                         header={'Add new media'}>
-                        <Search loadVideoCallback={this.loadVideoCallback}
-                            loadPlaylistCallback={this.loadPlaylistCallback} />
+                        <Search
+                            loadVideoCallback={this.loadVideoCallback}
+                            loadPlaylistCallback={this.loadPlaylistCallback}
+                            closeSearch={this.toggleAddNewMediaModal} />
                     </AddNewMediaModal>
                 }
                 {this.props.showMediaDetailsModal &&
                     <div>
-                        {this.props.currentlyPlayingIndex === 0 &&
-                        <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
-                                    title={'Please Select Media'}
-                                    body={<p><b>Please select a media before attempting to view more details</b></p>} />
-                        }
-                        {this.props.currentlyPlayingIndex !== 0 &&
+                        {this.props.currentlyPlayingIndex === NO_MEDIA_PLAYING &&
                             <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
-                            title={'Media Details'}
-                            body={this.getRowDataMoreDetails(
-                            this.props.QueueRowEntries[this.props.currentlyPlayingIndex - 1])} />
+                                buttonColor="warning"
+                                title={'Please Select Media'}
+                                body={<p><b>Please select a media before attempting to view more details</b></p>} />
+                        }
+                        {this.props.currentlyPlayingIndex !== NO_MEDIA_PLAYING &&
+                            <PopupModal modelWantsToCloseCallback={() => this.props.toggleMediaDetailModal()}
+                                title={'Media Details'}
+                                buttonColor="primary"
+                                body={this.getRowDataMoreDetails(
+                                    this.props.QueueRowEntries[this.props.currentlyPlayingIndex])} />
                         }
                     </div>
                 }
                 {this.props.displaySessionRestoredPopup &&
                     <PopupModal modelWantsToCloseCallback={() => this.props.setSessionRestoredPopupDisplayStatus(false)}
-                                title={'Session Restored'}
-                                body={<p><b>Your session has been restored</b></p>} />
+                        title={'Session Restored'}
+                        buttonColor="primary"
+                        body={<p><b>Your session has been restored</b></p>} />
                 }
 
                 <Table hover>
@@ -242,7 +262,7 @@ class Queue extends Component {
                                 </Button>
                             </th>
                             <th>
-                                <Button onClick={() => this.props.setDeletionMode(!this.props.deletionMode)} 
+                                <Button onClick={() => this.props.setDeletionMode(!this.props.deletionMode)}
                                     color="danger"
                                     className="rounded-circle">
                                     <img alt="Remove from Queue" src={MinusIcon} />
@@ -254,17 +274,8 @@ class Queue extends Component {
                         {QueueRowEntries}
                     </tbody>
                 </Table>
-                {/*{this.props.currentlyPlayingIndex !== 0 &&*/}
-                {/*<div className="text-center">*/}
-                        {/*{getEmbeddedVideoComponent(this.props.QueueRowEntries[this.props.currentlyPlayingIndex-1].id,*/}
-                                            {/*this.setYoutubeVideoObjectAPICallback,*/}
-                                            {/*this.youtubeVideoStateChangedAPICallback,*/}
-                                            {/*64*9,*/}
-                                            {/*39*9)}*/}
-                     {/*</ div>*/}
-                {/*}*/}
             </div>
-            );
+        );
     }
 
 }
@@ -290,7 +301,7 @@ const mapStateToProps = state => {
     return {
         socket: state.socket.socket,
         qID: state.semiRoot.qID,
-        playState : state.semiRoot.playState,
+        playState: state.semiRoot.playState,
         currentlyPlayingYoutubeVideoObject: state.semiRoot.youtubeVideoObject,
         QueueRowEntries: lexicographicalSort(state.semiRoot.QueueRowEntries),
         currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex,
@@ -303,11 +314,11 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        changePlayState : playState => dispatch(changePlayState(playState)),
+        changePlayState: playState => dispatch(changePlayState(playState)),
         changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObject(youtubeVideoObject)),
         addToQueue: medias => dispatch(addToQueue(medias)),
-        setCurrentlyPlayingIndex: newIndex => dispatch(setCurrentlyPlayingIndex(newIndex)),
-        incrementCurrentlyPlayingIndex: () => dispatch(incrementCurrentlyPlayingIndex()),
+        setCurrentlyPlayingMedia: newIndex => dispatch(setCurrentlyPlayingMedia(newIndex)),
+        playNextMedia: () => dispatch(playNextMedia()),
         setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
         toggleMediaDetailModal: () => dispatch(toggleMediaDetailModal()),
         setSessionRestoredPopupDisplayStatus: (newStatus) => dispatch(setSessionRestoredPopupDisplayStatus(newStatus)),

@@ -107,7 +107,40 @@ function executePlaylistSearchNextPage(playlistID, nextPageToken, callback) {
         callback);
 }
 
-// exported functions and their helper functions/variables
+//exported helper functions
+
+export function getYoutubeVideoVolume(youtubeVideoObject) {
+    const isMuted = youtubeVideoObject.isMuted();
+    if (isMuted) {
+        return 0;
+    } else {
+        return youtubeVideoObject.getVolume();
+    }
+}
+
+export function setYoutubeVideoVolume(youtubeVideoObject, newVolume) {
+    if (newVolume < 0 || newVolume > 100) {
+        return;
+    }
+    if (newVolume === 0) {
+        youtubeVideoObject.mute();
+        return;
+    }
+
+    const isMuted = youtubeVideoObject.isMuted();
+    if (isMuted) {
+        youtubeVideoObject.unMute();
+    }
+    youtubeVideoObject.setVolume(newVolume);
+}
+
+export function replayVideo(youtubeVideoObject) {
+    const allow_seek_ahead = true;
+    youtubeVideoObject.seekTo(0, allow_seek_ahead);
+    youtubeVideoObject.playVideo();
+}
+
+// exported search functions and their helper functions/variables
 
 let resultCallback = null;
 let searchInProgress = false;
@@ -160,6 +193,7 @@ function getPlaylistVideosCallback(response) {
     if (response.nextPageToken !== undefined) {
         executePlaylistSearchNextPage(playlistRecursiveHelper.playlistID,
             response.nextPageToken, getPlaylistVideosCallback);
+        return;
     } else {
         const returnFunction = playlistRecursiveHelper.resultCallback;
         const results = playlistRecursiveHelper.runningResults;
