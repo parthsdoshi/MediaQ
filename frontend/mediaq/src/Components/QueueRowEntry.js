@@ -15,23 +15,23 @@ class QueueRowEntry extends Component {
     render() {
         // if video is not currently selected video then show play icon because video is paused.
         let buttonState = this.props.currentlyPlayingIndex !== this.props.rowID ?
-            youtubeStates.PAUSED: this.props.playState;
+            youtubeStates.PAUSED : this.props.playState;
         return (
             <tr>
                 <th scope="row">{this.props.rowID + 1 + ':'}</th>
                 <td>
                     <MediaPlayPauseButton buttonClickedCallback={this.playButtonClicked}
-                                            buttonID={this.props.rowID}
-                                            playState={buttonState}/>
+                        buttonID={this.props.rowID}
+                        playState={buttonState} />
                 </td>
                 <td>{this.props.rowData.title}</td>
                 <td>{this.props.rowData.author}</td>
                 <td>{this.props.rowData.album}</td>
                 <td>
                     <a href={this.props.rowData.link}
-                       target="_blank" style={{display: "table-cell"}}>
-                    <img  src={youTubeLogo} style={{width: 34, height: 38}}
-                          alt="youtube logo" />
+                        target="_blank" style={{ display: "table-cell" }}>
+                        <img src={youTubeLogo} style={{ width: 34, height: 38 }}
+                            alt="youtube logo" />
                     </a>
                 </td>
                 <td />

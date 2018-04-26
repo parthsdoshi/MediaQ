@@ -38,6 +38,8 @@ class Queue extends Component {
         this.state = {
             showAddNewMediaModal: false,
         };
+
+        this.on = {play: this.playerOnPlay, pause: this.playerOnPause, buffering: this.playerOnBuffering}
     }
 
     componentDidMount() {
@@ -113,6 +115,17 @@ class Queue extends Component {
         }
     };
 
+    playerOnPause = () => {
+        this.props.changePlayState(youtubeStates.PAUSED)
+    }
+    playerOnPlay = () => {
+        console.log('play')
+        this.props.changePlayState(youtubeStates.PLAYING)
+    }
+    playerOnBuffering = () => {
+        this.props.changePlayState(youtubeStates.BUFFERING)
+    }
+
     loadVideosCallback = (medias) => {
         console.log(medias);
         this.props.addToQueue(medias);
@@ -148,13 +161,15 @@ class Queue extends Component {
         if (entryNumber !== this.props.currentlyPlayingIndex) {
             this.props.setCurrentlyPlayingMedia(entryNumber);
             this.props.changePlayState(youtubeStates.BUFFERING);
-        } else if (this.props.currentlyPlayingYoutubeVideoObject === null) {
+//        } else if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             // youtube haven't given back the object yet
         } else {
             if (this.props.playState === youtubeStates.PAUSED || this.props.playState === youtubeStates.BUFFERING) {
-                this.props.currentlyPlayingYoutubeVideoObject.playVideo();
+                // this.props.currentlyPlayingYoutubeVideoObject.playVideo();
+                this.props.changePlayState(youtubeStates.PLAYING)
             } else if (this.props.playState === youtubeStates.PLAYING) {
-                this.props.currentlyPlayingYoutubeVideoObject.pauseVideo()
+                this.props.changePlayState(youtubeStates.PAUSED)
+                // this.props.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }
     };
@@ -192,7 +207,12 @@ class Queue extends Component {
                     deletionMode={this.props.deletionMode} />
             );
             if (this.props.currentlyPlayingIndex === i) {
-                //todo use better keys?
+                let playing = false;
+                if (this.props.playState === youtubeStates.PLAYING) {
+                    playing = true
+                }
+                console.log(playing)
+
                 QueueRowEntries.push(
                     <tr ref="embeddedVideo" key={this.props.QueueRowEntries[i].timestamp}>
                         <td />
@@ -200,7 +220,8 @@ class Queue extends Component {
                         <td>
                             {getEmbeddedVideoComponent(this.props.QueueRowEntries[i].link,
                                 this.setYoutubeVideoObjectAPICallback,
-                                this.youtubeVideoStateChangedAPICallback,
+                                this.on,
+                                playing,
                                 64 * 9,
                                 39 * 9)}
                         </td>

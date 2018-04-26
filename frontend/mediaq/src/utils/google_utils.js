@@ -16,7 +16,7 @@ export function initClient() {
     });
 }
 
-export function getEmbeddedVideoComponent(url, onReady, onStateChange, width=640, height=390) {
+export function getEmbeddedVideoComponent(url, onReady, on, playing, width = 640, height = 390) {
     const youtubeVars = { //https://developers.google.com/youtube/player_parameters
         autoplay: 1,
         rel: 0,
@@ -24,18 +24,31 @@ export function getEmbeddedVideoComponent(url, onReady, onStateChange, width=640
         controls: 1,
         showinfo: 0,
     };
-    const youtubeEvents = {
-        onReady: onReady,
-        onStateChange: onStateChange
-    };
+    // const youtubeEvents = {
+    //     onReady: onReady,
+    //     onStateChange: onStateChange
+    // };
 
     return (<ReactPlayer url={url}
-                         config={{
-                             youtube:{
-                                 playerVars: youtubeVars,
-                                 events: youtubeEvents
-                             }
-                         }}/>);
+        width={width}
+        height={height}
+        config={{
+            youtube: {
+                preload: true,
+                playerVars: youtubeVars
+            }
+        }}
+        playing={playing}
+        onReady={onReady}
+        onStart={() => {console.log('start')}}
+        onPlay={on.play}
+        onProgress={(data) => {console.log(data)}}
+        onDuration={(data) => {console.log(data)}}
+        onPause={on.pause}
+        onBuffer={on.buffer}
+        onSeek={(data) => {console.log(data)}}
+        onEnded={(data) => {console.log(data)}}
+        onError={(data) => {console.log(data)}} />);
 }
 
 export function loadYoutubeAPI(youtubeCallback) {
@@ -63,7 +76,7 @@ function removeEmptyParams(params) {
 }
 
 function executeRequest(request, youtubeSearchCallback) {
-    request.execute(function(response) {
+    request.execute(function (response) {
         youtubeSearchCallback(response)
     });
 }
@@ -82,10 +95,12 @@ function executeSearch(searchTag, numberOfResults, callback) {
     console.log('Youtube API search called with ' + searchTag);
     buildApiRequest('GET',
         '/youtube/v3/search',
-        {'maxResults': numberOfResults,
+        {
+            'maxResults': numberOfResults,
             'part': 'snippet',
             'q': searchTag,
-            'type': 'video'},
+            'type': 'video'
+        },
         callback);
 }
 
@@ -93,9 +108,11 @@ function executePlaylistSearch(playlistID, callback) {
     console.log('Youtube API playlist called with ' + playlistID);
     buildApiRequest('GET',
         '/youtube/v3/playlistItems',
-        {'part': 'snippet',
+        {
+            'part': 'snippet',
             'playlistId': playlistID,
-            'maxResults': 50},
+            'maxResults': 50
+        },
         callback);
 
 }
@@ -104,10 +121,12 @@ function executePlaylistSearchNextPage(playlistID, nextPageToken, callback) {
     console.log('Youtube API playlist next page called with ' + nextPageToken);
     buildApiRequest('GET',
         '/youtube/v3/playlistItems',
-        {'part': 'snippet',
+        {
+            'part': 'snippet',
             'playlistId': playlistID,
             'pageToken': nextPageToken,
-            'maxResults': 50},
+            'maxResults': 50
+        },
         callback);
 }
 
@@ -170,16 +189,20 @@ function getSearchResultsCallback(response) {
 }
 
 //playlist functions
-const playlistRecursiveHelperInitial = { searchInProgress: false, runningResults: [],
-    playlistID: '', resultCallback: null };
+const playlistRecursiveHelperInitial = {
+    searchInProgress: false, runningResults: [],
+    playlistID: '', resultCallback: null
+};
 let playlistRecursiveHelper = { ...playlistRecursiveHelperInitial };
 
 export function getPlaylistVideos(playlistID, youtubeSearchCallback) {
     if (playlistRecursiveHelper.searchInProgress) {
         return;
     }
-    playlistRecursiveHelper = { ...playlistRecursiveHelperInitial,
-        playlistID: playlistID, resultCallback: youtubeSearchCallback, searchInProgress: true };
+    playlistRecursiveHelper = {
+        ...playlistRecursiveHelperInitial,
+        playlistID: playlistID, resultCallback: youtubeSearchCallback, searchInProgress: true
+    };
     executePlaylistSearch(playlistID, getPlaylistVideosCallback);
 }
 
@@ -193,7 +216,7 @@ function getPlaylistVideosCallback(response) {
         return;
     }
 
-    playlistRecursiveHelper.runningResults = [ ...playlistRecursiveHelper.runningResults, response ];
+    playlistRecursiveHelper.runningResults = [...playlistRecursiveHelper.runningResults, response];
     if (response.nextPageToken !== undefined) {
         executePlaylistSearchNextPage(playlistRecursiveHelper.playlistID,
             response.nextPageToken, getPlaylistVideosCallback);
