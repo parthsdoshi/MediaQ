@@ -13,6 +13,7 @@ import {
 import { connect } from 'react-redux';
 
 import * as youtubeStates from "../constants/youtube";
+import * as charCodes from '../constants/charCodes';
 import {
     loadYoutubeAPI,
     getSearchResults,
@@ -50,7 +51,7 @@ class Search extends Component {
     componentDidMount() {
         // this.setState({searchBoxTextValue: this.state.searchBoxTextValue})        
         if (this.state.justConstructed) {
-            this.setState({justConstructed: true})
+            this.setState({ justConstructed: true })
         }
     }
     componentDidUpdate() {
@@ -136,9 +137,12 @@ class Search extends Component {
     };
 
     handleKeyboardKeyPress = (target) => {
-        const ENTER_BUTTON = 13;
-        if (target.charCode === ENTER_BUTTON) {
-            this.searchYoutube(this.state.searchBoxTextValue);
+        switch (target.charCode) {
+            case charCodes.ENTER:
+                this.searchYoutube(this.state.searchBoxTextValue);
+                return
+            default:
+                return
         }
     };
 
@@ -195,18 +199,20 @@ class Search extends Component {
                 {this.state.searchResultsInvalid &&
                     <PopupModal modelWantsToCloseCallback={() => this.setState({ searchResultsInvalid: false })}
                         title={'Search Failed'}
+                        buttonColor="danger"
                         body={'Youtube did not respond with a valid result.'} />
                 }
                 {this.state.searchAttemptInvalid &&
                     <PopupModal modelWantsToCloseCallback={() => this.setState({ searchAttemptInvalid: false })}
                         title={'Search Failed'}
+                        buttonColor="danger"
                         body={'Youtube API has not loaded yet, please try again in a moment.'} />
                 }
                 <InputGroup>
                     <Input type="text"
                         onKeyPress={this.handleKeyboardKeyPress}
                         onChange={this.handleSearchBoxChange}
-                        innerRef={(input) => {this.searchInput = input}} />
+                        innerRef={(input) => { this.searchInput = input }} />
                     <InputGroupAddon addonType="append">
                         <Button onClick={this.handleSearchButtonPress} color="primary" >
                             Search

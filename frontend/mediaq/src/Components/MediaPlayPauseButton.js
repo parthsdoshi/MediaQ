@@ -36,13 +36,15 @@ class MediaPlayPauseButton extends Component {
             src = BufferIcon;
             color = 'danger';
         }
+        const style = {
+            fill: 'blue',
+            stroke: 'blue',
+            width: '8px',
+            height: '8px'
+        };
         return (
             <Button onClick={this.playButtonClicked} color={color}>
-            <img alt={img_alt} style={{
-                fill: 'blue',
-                stroke: 'blue'
-            }}
-                src={src} />
+                <img alt={img_alt} style={style} src={src} />
             </Button>
         );
     }

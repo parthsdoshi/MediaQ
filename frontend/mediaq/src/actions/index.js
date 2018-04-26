@@ -93,22 +93,22 @@ export const setUserList = userList => {
     };
 };
 
-export const setCurrentlyPlayingIndex = newIndex => {
+export const setCurrentlyPlayingMedia = newIndex => {
     return {
-        type: types.SET_CURRENTLY_PLAYING_INDEX,
+        type: types.SET_CURRENTLY_PLAYING_MEDIA,
         payload: {newIndex: newIndex}
     };
 };
 
-export const decrementCurrentlyPlayingIndex = () => {
+export const playPreviousMedia = () => {
     return {
-        type: types.DECREMENT_CURRENTLY_PLAYING_INDEX
+        type: types.PLAY_PREV_MEDIA
     };
 };
 
-export const incrementCurrentlyPlayingIndex = () => {
+export const playNextMedia = () => {
     return {
-        type: types.INCREMENT_CURRENTLY_PLAYING_INDEX
+        type: types.PLAY_NEXT_MEDIA
     };
 };
 
@@ -136,6 +136,12 @@ export const setVolume = newVolumeLevel => {
 export const toggleShuffle = () => {
     return {
         type: types.TOGGLE_SHUFFLE
+    };
+};
+
+export const toggleRepeat = () => {
+    return {
+        type: types.TOGGLE_REPEAT
     };
 };
 
@@ -191,5 +197,5 @@ export const rowEntryCheckboxClicked = rowID => {
 export const deleteCheckedRows = () => {
     return {
         type: types.DELETE_CHECKED_ROWS
-    }
+    };
 };

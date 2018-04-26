@@ -134,6 +134,12 @@ export function setYoutubeVideoVolume(youtubeVideoObject, newVolume) {
     youtubeVideoObject.setVolume(newVolume);
 }
 
+export function replayVideo(youtubeVideoObject) {
+    const allow_seek_ahead = true;
+    youtubeVideoObject.seekTo(0, allow_seek_ahead);
+    youtubeVideoObject.playVideo();
+}
+
 // exported search functions and their helper functions/variables
 
 let resultCallback = null;
