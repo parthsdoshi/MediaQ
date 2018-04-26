@@ -24,6 +24,7 @@ export function getEmbeddedVideoComponent(id, onReady, onStateChange, width=640,
             autoplay: 1,
             rel: 0,
             showinfo: 0,
+            fs: 1,
 //            controls: 0,
 //            disablekb: 1,
         }

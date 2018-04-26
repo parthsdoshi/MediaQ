@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { Table, Button } from 'reactstrap';
 import PlusIcon from 'open-iconic/svg/plus.svg';
 import MinusIcon from 'open-iconic/svg/minus.svg';
-
+import nico from './nicotest';
 import { connect } from 'react-redux';
 
 import * as youtubeStates from "../constants/youtube";
@@ -274,6 +274,7 @@ class Queue extends Component {
                         {QueueRowEntries}
                     </tbody>
                 </Table>
+                <iframe src="http://embed.nicovideo.jp/watch/sm25027001/" width={800} height={500} allowFullScreen={true}/>
             </div>
         );
     }
