@@ -160,6 +160,7 @@ export default function semiRoot(state = initialState, action) {
         case types.TOGGLE_MEDIA_DETAIL_MODAL:
             return { ...state, showMediaDetailsModal: !state.showMediaDetailsModal };
         case types.CHANGE_YOUTUBE_VIDEO_OBJECT:
+            replayVideo(action.payload.youtubeVideoObject);
             return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };
         case types.ADD_TO_QUEUE:
             return { ...state, QueueRowEntries: {...state.QueueRowEntries, ...action.payload.medias} };
