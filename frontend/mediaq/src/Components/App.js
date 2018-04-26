@@ -29,22 +29,22 @@ class App extends Component {
             <div className="App">
                 <Header />
                 {this.props.socket !== null &&
-                <div style={paddingTopStyle}>
-                    {!this.props.loggedIn &&
-                    <InitialConnect/>
-                    }
-                    {this.props.loggedIn &&
-                    <div>
-                        <Container>
-                            <Queue/>
-                        </Container>
-                        <Footer />
+                    <div style={paddingTopStyle}>
+                        {!this.props.loggedIn &&
+                            <InitialConnect />
+                        }
+                        {this.props.loggedIn &&
+                            <div>
+                                <Container>
+                                    <Queue />
+                                </Container>
+                                <Footer />
+                            </div>
+                        }
                     </div>
-                    }
-                </div>
                 }
             </div>
-            );
+        );
     }
 }
 

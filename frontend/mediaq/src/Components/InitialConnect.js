@@ -142,7 +142,7 @@ class InitialConnect extends Component {
                     <PopupModal modelWantsToCloseCallback={this.hideIncorrectQIDModal}
                         title={'Incorrect Queue ID'}
                         body={'The Queue ID you inputted "' + this.props.qID +
-                            '" is incorrect, please check that this is the correct Queue ID'}
+                            '" does not exist, please check that this is the correct Queue ID'}
                         buttonColor="danger"
                     />}
             </div>
