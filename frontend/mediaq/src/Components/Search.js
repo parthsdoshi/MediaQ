@@ -141,6 +141,7 @@ class Search extends Component {
                 this.props.loadVideoCallback(rowData.timestamp, rowData)
             } else {
                 // error
+                console.log('react-player does not support this URL. This probably means the URL does not have an embedded video.')
             }
         } else {
             this.searchYoutube(this.state.searchBoxTextValue, this.numberOfResults);
