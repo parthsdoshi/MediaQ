@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
-import { Table, Button } from 'reactstrap';
+import { Table, Button, Container } from 'reactstrap';
 import PlusIcon from 'open-iconic/svg/plus.svg';
 import MinusIcon from 'open-iconic/svg/minus.svg';
 
@@ -40,7 +40,7 @@ class Queue extends Component {
             showAddNewMediaModal: false,
         };
 
-        this.on = {play: this.playerOnPlay, pause: this.playerOnPause, buffering: this.playerOnBuffering, end: this.playerOnEnd}
+        this.on = { play: this.playerOnPlay, pause: this.playerOnPause, buffering: this.playerOnBuffering, end: this.playerOnEnd }
     }
 
     // componentDidMount() {
@@ -179,17 +179,19 @@ class Queue extends Component {
                     <tr ref="embeddedVideo" key={this.props.QueueRowEntries[i].timestamp}>
                         <td />
                         <td />
-                        <td />
-                        <td style={{height: 300}}>
-                            {getEmbeddedVideoComponent(this.props.QueueRowEntries[i].link,
-                                this.onReady,
-                                this.on,
-                                this.props.playState,
-                                this.props.repeatMode,
-                                this.props.volumeLevel,
-                                '140%',
-                                '100%')}
+                        <td style={{ height: 400 }}>
+                            <Container fluid style={{height: 400}}>
+                                {getEmbeddedVideoComponent(this.props.QueueRowEntries[i].link,
+                                    this.onReady,
+                                    this.on,
+                                    this.props.playState,
+                                    this.props.repeatMode,
+                                    this.props.volumeLevel,
+                                    '140%',
+                                    '100%')}
+                            </Container>
                         </td>
+                        <td />
                         <td />
                         <td />
                         <td />
@@ -312,20 +314,20 @@ function getEmbeddedVideoComponent(url, onReady, on, playState, repeatMode, volu
                 playerVars: youtubeVars
             }
         }}
-        ref={(ref) => {reactRef = ref}}
+        ref={(ref) => { reactRef = ref }}
         playing={playing}
-        volume={volume/100}
+        volume={volume / 100}
         loop={repeatMode}
-        onReady={() => {onReady(reactRef)}}
-        onStart={() => {console.log('onStart')}}
+        onReady={() => { onReady(reactRef) }}
+        onStart={() => { console.log('onStart') }}
         onPlay={on.play}
-        onProgress={(data) => {/* console.log('onProgress'); console.log(data); */}}
-        onDuration={(data) => {console.log('onDuration'); console.log(data)}}
+        onProgress={(data) => {/* console.log('onProgress'); console.log(data); */ }}
+        onDuration={(data) => { console.log('onDuration'); console.log(data) }}
         onPause={on.pause}
         onBuffer={on.buffer}
-        onSeek={(data) => {console.log('onSeek'); console.log(data);}}
+        onSeek={(data) => { console.log('onSeek'); console.log(data); }}
         onEnded={on.end}
-        onError={(data) => {console.log('onError'); console.log(data);}} />);
+        onError={(data) => { console.log('onError'); console.log(data); }} />);
 }
 
 const mapStateToProps = state => {
