@@ -5,11 +5,12 @@ import PlusIcon from 'open-iconic/svg/plus.svg';
 import MinusIcon from 'open-iconic/svg/minus.svg';
 
 import { connect } from 'react-redux';
+import ReactPlayer from 'react-player';
 
-import * as youtubeStates from "../constants/youtube";
+import * as mediaStates from "../constants/media";
 import {
     changePlayState,
-    changeYoutubeVideoObject,
+    changeMediaObject,
     setCurrentlyPlayingMedia,
     playNextMedia,
     setVolume,
@@ -24,8 +25,8 @@ import * as keyUtils from 'firebase-key'
 import AddNewMediaModal from './AddNewMediaModal';
 import QueueRowEntry from './QueueRowEntry';
 import Search from './Search';
-import { getEmbeddedVideoComponent, getYoutubeVideoVolume } from '../utils/google_utils';
-import { CHECK_VOLUME_INTERVAL_MS } from '../constants/youtube';
+import { getYoutubeVideoVolume } from '../utils/google_utils';
+import { CHECK_YOUTUBE_VOLUME_INTERVAL_MS } from '../constants/media';
 import { socketCommands } from '../sockets/socketConstants';
 import PopupModal from "./PopupModal";
 import { NO_MEDIA_PLAYING, MIN_VOLUME } from '../constants/queue';
@@ -42,17 +43,17 @@ class Queue extends Component {
         this.on = {play: this.playerOnPlay, pause: this.playerOnPause, buffering: this.playerOnBuffering}
     }
 
-    componentDidMount() {
-        this.youtubeVolumeListener = setInterval(() => {
-            if (this.props.currentlyPlayingYoutubeVideoObject === null) {
-                return;
-            }
-            let volumeLevel = getYoutubeVideoVolume(this.props.currentlyPlayingYoutubeVideoObject);
-            if (volumeLevel !== this.props.volumeLevel) {
-                this.props.setVolume(volumeLevel);
-            }
-        }, CHECK_VOLUME_INTERVAL_MS);
-    };
+    // componentDidMount() {
+    //     this.youtubeVolumeListener = setInterval(() => {
+    //         if (this.props.currentlyPlayingYoutubeVideoObject === null) {
+    //             return;
+    //         }
+    //         let volumeLevel = getYoutubeVideoVolume(this.props.currentlyPlayingYoutubeVideoObject);
+    //         if (volumeLevel !== this.props.volumeLevel) {
+    //             this.props.setVolume(volumeLevel);
+    //         }
+    //     }, CHECK_YOUTUBE_VOLUME_INTERVAL_MS);
+    // };
 
     componentWillUnmount() {
         //queue should never reload as of now, but if it ever does make sure this works
@@ -74,9 +75,9 @@ class Queue extends Component {
         }
     };
 
-    setYoutubeVideoObjectAPICallback = (event) => {
-        console.log('youtube video called on ready callback: ');
-        this.props.changeYoutubeVideoObject(event.target);
+    onReady = (ref) => {
+        console.log('media called on ready callback: ');
+        this.props.changeMediaObject(ref);
     };
 
     youtubeVideoStateChangedAPICallback = (event) => {
@@ -89,18 +90,18 @@ class Queue extends Component {
             this.props.setVolume(this.props.volumeLevel);
         }
         const youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
-        if (youtubeState === youtubeStates.ENDED) { // ended
-            this.props.changePlayState(youtubeStates.PAUSED);
+        if (youtubeState === mediaStates.ENDED) { // ended
+            this.props.changePlayState(mediaStates.PAUSED);
             this.props.playNextMedia();
         }
-        if (this.props.playState !== youtubeStates.PLAYING && youtubeState === youtubeStates.PLAYING) {
-            this.props.changePlayState(youtubeStates.PLAYING);
+        if (this.props.playState !== mediaStates.PLAYING && youtubeState === mediaStates.PLAYING) {
+            this.props.changePlayState(mediaStates.PLAYING);
         }
-        if (this.props.playState !== youtubeStates.PAUSED && youtubeState === youtubeStates.PAUSED) {
-            this.props.changePlayState(youtubeStates.PAUSED);
+        if (this.props.playState !== mediaStates.PAUSED && youtubeState === mediaStates.PAUSED) {
+            this.props.changePlayState(mediaStates.PAUSED);
         }
-        if (this.props.playState !== youtubeStates.BUFFERING && youtubeState === youtubeStates.BUFFERING) {
-            this.props.changePlayState(youtubeStates.BUFFERING);
+        if (this.props.playState !== mediaStates.BUFFERING && youtubeState === mediaStates.BUFFERING) {
+            this.props.changePlayState(mediaStates.BUFFERING);
         }
 
         //volume
@@ -116,14 +117,13 @@ class Queue extends Component {
     };
 
     playerOnPause = () => {
-        this.props.changePlayState(youtubeStates.PAUSED)
+        this.props.changePlayState(mediaStates.PAUSED)
     }
     playerOnPlay = () => {
-        console.log('play')
-        this.props.changePlayState(youtubeStates.PLAYING)
+        this.props.changePlayState(mediaStates.PLAYING)
     }
     playerOnBuffering = () => {
-        this.props.changePlayState(youtubeStates.BUFFERING)
+        this.props.changePlayState(mediaStates.BUFFERING)
     }
 
     loadVideosCallback = (medias) => {
@@ -160,15 +160,15 @@ class Queue extends Component {
     rowEntryPlayButtonClicked = (entryNumber) => {
         if (entryNumber !== this.props.currentlyPlayingIndex) {
             this.props.setCurrentlyPlayingMedia(entryNumber);
-            this.props.changePlayState(youtubeStates.BUFFERING);
-//        } else if (this.props.currentlyPlayingYoutubeVideoObject === null) {
+            this.props.changePlayState(mediaStates.BUFFERING);
+        } else if (this.props.mediaObject === null) {
             // youtube haven't given back the object yet
         } else {
-            if (this.props.playState === youtubeStates.PAUSED || this.props.playState === youtubeStates.BUFFERING) {
+            if (this.props.playState === mediaStates.PAUSED || this.props.playState === mediaStates.BUFFERING) {
                 // this.props.currentlyPlayingYoutubeVideoObject.playVideo();
-                this.props.changePlayState(youtubeStates.PLAYING)
-            } else if (this.props.playState === youtubeStates.PLAYING) {
-                this.props.changePlayState(youtubeStates.PAUSED)
+                this.props.changePlayState(mediaStates.PLAYING)
+            } else if (this.props.playState === mediaStates.PLAYING) {
+                this.props.changePlayState(mediaStates.PAUSED)
                 // this.props.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }
@@ -207,24 +207,22 @@ class Queue extends Component {
                     deletionMode={this.props.deletionMode} />
             );
             if (this.props.currentlyPlayingIndex === i) {
-                let playing = false;
-                if (this.props.playState === youtubeStates.PLAYING) {
-                    playing = true
-                }
-                console.log(playing)
-
                 QueueRowEntries.push(
                     <tr ref="embeddedVideo" key={this.props.QueueRowEntries[i].timestamp}>
                         <td />
                         <td />
                         <td>
                             {getEmbeddedVideoComponent(this.props.QueueRowEntries[i].link,
-                                this.setYoutubeVideoObjectAPICallback,
+                                this.onReady,
                                 this.on,
-                                playing,
+                                this.props.playState,
+                                this.props.repeatMode,
+                                this.props.volumeLevel,
                                 64 * 9,
                                 39 * 9)}
                         </td>
+                        <td />
+                        <td />
                         <td />
                         <td />
                         <td />
@@ -318,6 +316,50 @@ const lexicographicalSort = (queue) => {
     return ret
 };
 
+function getEmbeddedVideoComponent(url, onReady, on, playState, repeatMode, volume, width = 640, height = 390) {
+    const youtubeVars = { //https://developers.google.com/youtube/player_parameters
+        autoplay: 1,
+        rel: 0,
+        enablejsapi: 1,
+        controls: 1,
+        showinfo: 0,
+    };
+    // const youtubeEvents = {
+    //     onReady: onReady,
+    //     onStateChange: onStateChange
+    // };
+
+    let playing = false;
+    if (playState === mediaStates.PLAYING) {
+        playing = true
+    }
+
+    let reactRef;
+    return (<ReactPlayer url={url}
+        width={width}
+        height={height}
+        config={{
+            youtube: {
+                preload: true,
+                playerVars: youtubeVars
+            }
+        }}
+        ref={(ref) => {reactRef = ref}}
+        playing={playing}
+        volume={volume/100}
+        loop={repeatMode}
+        onReady={() => {onReady(reactRef)}}
+        onStart={() => {console.log('onStart')}}
+        onPlay={on.play}
+        onProgress={(data) => {/* console.log('onProgress'); console.log(data); */}}
+        onDuration={(data) => {console.log('onDuration'); console.log(data)}}
+        onPause={on.pause}
+        onBuffer={on.buffer}
+        onSeek={(data) => {console.log('onSeek'); console.log(data);}}
+        onEnded={() => {console.log('onEnded')}}
+        onError={(data) => {console.log('onError'); console.log(data);}} />);
+}
+
 const mapStateToProps = state => {
     return {
         socket: state.socket.socket,
@@ -329,14 +371,15 @@ const mapStateToProps = state => {
         volumeLevel: state.semiRoot.volumeLevel,
         showMediaDetailsModal: state.semiRoot.showMediaDetailsModal,
         displaySessionRestoredPopup: state.semiRoot.displaySessionRestoredPopup,
-        deletionMode: state.socket.deletionMode
+        deletionMode: state.socket.deletionMode,
+        repeatMode: state.semiRoot.repeatMode
     }
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         changePlayState: playState => dispatch(changePlayState(playState)),
-        changeYoutubeVideoObject: youtubeVideoObject => dispatch(changeYoutubeVideoObject(youtubeVideoObject)),
+        changeMediaObject: youtubeVideoObject => dispatch(changeMediaObject(youtubeVideoObject)),
         addToQueue: medias => dispatch(addToQueue(medias)),
         setCurrentlyPlayingMedia: newIndex => dispatch(setCurrentlyPlayingMedia(newIndex)),
         playNextMedia: () => dispatch(playNextMedia()),

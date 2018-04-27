@@ -79,6 +79,10 @@ export function generateRowDataFromPlaylistResults(playlistResults, displayName)
     return results;
 }
 
+export function generateRowDataFromURL(url, displayName) {
+    return new RowData(url, url, url, url, url, url, '', displayName);
+}
+
 function getPlaylistResultData (playlistData, number, displayName) {
     if (playlistData.items[number].snippet.thumbnails === undefined &&
             playlistData.items[number].snippet.title === 'Deleted video' &&

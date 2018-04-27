@@ -1,7 +1,7 @@
 import * as types from "../constants/action-types";
-import * as youtubeStates from "../constants/youtube";
-import { NO_MEDIA_PLAYING, MAX_VOLUME, MIN_VOLUME } from "../constants/queue";
-import { getYoutubeVideoVolume, setYoutubeVideoVolume, replayVideo } from "../utils/google_utils";
+import * as mediaStates from "../constants/media";
+import { NO_MEDIA_PLAYING, MAX_VOLUME, MIN_VOLUME, mediaType } from "../constants/queue";
+import { getYoutubeVideoVolume, setYoutubeVideoVolume } from "../utils/google_utils";
 
 const initialState = {
     displayName: '',
@@ -10,14 +10,15 @@ const initialState = {
     displayIncorrectQIDPopup: false,
     displaySessionRestoredPopup: false,
 
-    playState: youtubeStates.PAUSED,
+    playState: mediaStates.PAUSED,
     currentlyPlayingIndex: NO_MEDIA_PLAYING,
+    mediaType: mediaType.NONE,
     playingIndexHistory: [],
     volumeLevel: MAX_VOLUME,
     shuffleMode: false,
     repeatMode: false,
     showMediaDetailsModal: false,
-    youtubeVideoObject: null,
+    mediaObject: null,
     QueueRowEntries: {},
     visibleQueue: [],
 
@@ -40,7 +41,7 @@ function getNextIndexShuffle(current, max) {
     }
     const random = Math.floor(Math.random() * (max - 1)); // random number from 0 to max-2
     // return conditions splits choices to 0 1 2 3 ... current-2 current-1 current+1 current+2 ... max-1
-    return random >= current ? random+1 : random;
+    return random >= current ? random + 1 : random;
 }
 
 function getNextIndex(current, queueLength) {
@@ -82,26 +83,26 @@ export default function semiRoot(state = initialState, action) {
         case types.SET_CURRENTLY_PLAYING_MEDIA:
             let newIndex = action.payload.newIndex;
             if (state.currentlyPlayingIndex === newIndex) {
-                return [ ...state ];
+                return [...state];
             }
-            let newPlayingIndexHistory = [ ...state.playingIndexHistory, state.currentlyPlayingIndex ];
-            return { ...state, currentlyPlayingIndex: newIndex, playingIndexHistory: newPlayingIndexHistory,
-                playState: youtubeStates.PAUSED, youtubeVideoObject: null };
+            let newPlayingIndexHistory = [...state.playingIndexHistory, state.currentlyPlayingIndex];
+            return {
+                ...state, currentlyPlayingIndex: newIndex, playingIndexHistory: newPlayingIndexHistory,
+                playState: mediaStates.PAUSED, mediaObject: null
+            };
         case types.PLAY_NEXT_MEDIA:
             const currentlyPlayingIndex = state.currentlyPlayingIndex;
             const queueLength = Object.keys(state.QueueRowEntries).length;
             let nextIndex = currentlyPlayingIndex;
-            newPlayingIndexHistory = [ ...state.playingIndexHistory ];
+            newPlayingIndexHistory = [...state.playingIndexHistory];
             if (queueLength === 0) {
                 // empty queue, do nothing
                 return { ...state };
-            }
-            if (state.repeatMode) {
-                if (state.youtubeVideoObject === null && state.currentlyPlayingIndex !== NO_MEDIA_PLAYING) {
-                    console.log('inconsistent state, no youtube video object');
-                }
-                if (state.youtubeVideoObject !== null) {
-                    replayVideo(state.youtubeVideoObject);
+            } else if (state.repeatMode) {
+                if (state.mediaObject === null && state.currentlyPlayingIndex !== NO_MEDIA_PLAYING) {
+                    console.log('inconsistent state, no media object');
+                } else if (state.mediaObject !== null) {
+                    state.mediaObject.seekTo(0)
                     return { ...state };
                 } else {
                     nextIndex = getNextIndex(currentlyPlayingIndex, queueLength);
@@ -114,29 +115,35 @@ export default function semiRoot(state = initialState, action) {
             }
 
             if (nextIndex !== currentlyPlayingIndex && currentlyPlayingIndex !== NO_MEDIA_PLAYING) {
-                newPlayingIndexHistory = [ ...newPlayingIndexHistory, currentlyPlayingIndex ]
+                newPlayingIndexHistory = [...newPlayingIndexHistory, currentlyPlayingIndex]
             }
-            return { ...state, currentlyPlayingIndex: nextIndex, playingIndexHistory: newPlayingIndexHistory,
-                playState: youtubeStates.PAUSED, youtubeVideoObject: null };
+            return {
+                ...state, currentlyPlayingIndex: nextIndex, playingIndexHistory: newPlayingIndexHistory,
+                playState: mediaStates.PAUSED, mediaObject: null
+            };
         case types.PLAY_PREV_MEDIA:
             let prevIndex;
-            newPlayingIndexHistory = [ ...state.playingIndexHistory ];
-            if (state.playingIndexHistory.length === 0) {
+            newPlayingIndexHistory = [...state.playingIndexHistory];
+            if (state.repeatMode) {
+                state.mediaObject.seekTo(0);
+                return { ...state };
+            } else if (state.playingIndexHistory.length === 0) {
                 prevIndex = NO_MEDIA_PLAYING;
             } else {
                 prevIndex = newPlayingIndexHistory.pop();
             }
-            return { ...state, currentlyPlayingIndex: prevIndex, playingIndexHistory: newPlayingIndexHistory,
-                playState: youtubeStates.PAUSED, youtubeVideoObject: null };
+            return {
+                ...state, currentlyPlayingIndex: prevIndex, playingIndexHistory: newPlayingIndexHistory,
+                playState: mediaStates.PAUSED, mediaObject: null
+            };
         case types.CHANGE_PLAY_STATE:
             return { ...state, playState: action.payload.playState };
         case types.SEEK_SECONDS_AHEAD:
-            if (state.youtubeVideoObject === null) {
-                // youtube haven't given back the object yet
+            if (state.mediaObject === null) {
+                // media haven't given back the object yet
             } else {
-                const current_time = state.youtubeVideoObject.getCurrentTime();
-                const allow_seek_ahead = true;
-                state.youtubeVideoObject.seekTo(current_time + action.payload.seconds, allow_seek_ahead);
+                const current_time = state.mediaObject.getCurrentTime();
+                state.mediaObject.seekTo(current_time + action.payload.seconds);
             }
             return { ...state };
         case types.SET_VOLUME:
@@ -147,11 +154,12 @@ export default function semiRoot(state = initialState, action) {
             if (newVolumeLevel > MAX_VOLUME) {
                 newVolumeLevel = MAX_VOLUME;
             }
-            if (state.youtubeVideoObject === null) {
-                // youtube haven't given back the object yet
-            } else if (getYoutubeVideoVolume(state.youtubeVideoObject) !== newVolumeLevel) {
-                setYoutubeVideoVolume(state.youtubeVideoObject, newVolumeLevel);
+            if (state.mediaObject === null) {
+                // media haven't given back the object yet
             }
+            // } else if (getMediaObjectVolume(state.mediaObject) !== newVolumeLevel) {
+            //     setMediaObjectVolume(state.mediaObject, newVolumeLevel);
+            // }
             return { ...state, volumeLevel: newVolumeLevel };
         case types.TOGGLE_SHUFFLE:
             return { ...state, shuffleMode: !state.shuffleMode };
@@ -159,13 +167,17 @@ export default function semiRoot(state = initialState, action) {
             return { ...state, repeatMode: !state.repeatMode };
         case types.TOGGLE_MEDIA_DETAIL_MODAL:
             return { ...state, showMediaDetailsModal: !state.showMediaDetailsModal };
-        case types.CHANGE_YOUTUBE_VIDEO_OBJECT:
-            replayVideo(action.payload.youtubeVideoObject);
-            return { ...state, youtubeVideoObject: action.payload.youtubeVideoObject };
+        case types.CHANGE_MEDIA_OBJECT:
+            action.payload.mediaObject.seekTo(0)
+            return {
+                ...state,
+                mediaObject: action.payload.mediaObject,
+                playState: mediaStates.PLAYING
+            };
         case types.ADD_TO_QUEUE:
-            return { ...state, QueueRowEntries: {...state.QueueRowEntries, ...action.payload.medias} };
+            return { ...state, QueueRowEntries: { ...state.QueueRowEntries, ...action.payload.medias } };
         case types.REMOVE_FROM_QUEUE:
-            let newQueueRowEntries = {...state.QueueRowEntries};
+            let newQueueRowEntries = { ...state.QueueRowEntries };
             for (let id of action.payload.medias) {
                 console.log(id)
                 if (id in newQueueRowEntries) {

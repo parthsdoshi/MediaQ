@@ -10,9 +10,10 @@ import {
     InputGroup
 } from 'reactstrap';
 
+import ReactPlayer from 'react-player';
 import { connect } from 'react-redux';
 
-import * as youtubeStates from "../constants/youtube";
+import * as mediaStates from "../constants/media";
 import * as charCodes from '../constants/charCodes';
 import {
     loadYoutubeAPI,
@@ -21,7 +22,8 @@ import {
 } from '../utils/google_utils';
 import {
     generateRowDataFromPlaylistResults,
-    generateRowDataFromYoutubeSearchResults
+    generateRowDataFromYoutubeSearchResults,
+    generateRowDataFromURL
 } from '../utils/rowData';
 import PopupModal from "./PopupModal";
 
@@ -43,7 +45,7 @@ class Search extends Component {
             justConstructed: true
         };
 
-        this.numberOfResults = youtubeStates.INITIAL_NUMBER_OF_RESULTS;
+        this.numberOfResults = mediaStates.INITIAL_NUMBER_OF_RESULTS;
         this.loadYoutubeAPIOnlyOnce();
     }
 
@@ -123,8 +125,26 @@ class Search extends Component {
         this.props.loadVideoCallback(mediaId, this.state.youtubeResults[mediaId]);
     };
 
+    isURL = (str) => {
+        try {
+            new URL(str);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+
     handleSearchButtonPress = (target) => {
-        this.searchYoutube(this.state.searchBoxTextValue, this.numberOfResults);
+        if (this.isURL(this.state.searchBoxTextValue)) {
+            if (ReactPlayer.canPlay(this.state.searchBoxTextValue)) {
+                const rowData = generateRowDataFromURL(this.state.searchBoxTextValue);
+                this.props.loadVideoCallback(rowData.timestamp, rowData)
+            } else {
+                // error
+            }
+        } else {
+            this.searchYoutube(this.state.searchBoxTextValue, this.numberOfResults);
+        }
     };
 
     handlePlaylistButtonPress = (target) => {
@@ -132,7 +152,7 @@ class Search extends Component {
     };
 
     handleMoreResultsButtonPress = (target) => {
-        this.numberOfResults += youtubeStates.INCREMENT_NUMBER_OF_RESULTS;
+        this.numberOfResults += mediaStates.INCREMENT_NUMBER_OF_RESULTS;
         this.handleSearchButtonPress(target);
     };
 

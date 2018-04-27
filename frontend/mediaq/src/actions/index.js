@@ -151,10 +151,10 @@ export const toggleMediaDetailModal = () => {
     };
 };
 
-export const changeYoutubeVideoObject = youtubeVideoObject => {
+export const changeMediaObject = mediaObject => {
     return {
-        type: types.CHANGE_YOUTUBE_VIDEO_OBJECT,
-        payload: {youtubeVideoObject: youtubeVideoObject}
+        type: types.CHANGE_MEDIA_OBJECT,
+        payload: {mediaObject: mediaObject}
     };
 };
 

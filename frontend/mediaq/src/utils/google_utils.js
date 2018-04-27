@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactPlayer from 'react-player';
 
 /* global gapi */
 // above tells compiler that gapi is global
@@ -14,41 +13,6 @@ export function initClient() {
         clientId: API_KEY,
         scope: 'https://www.googleapis.com/auth/youtube.readonly'
     });
-}
-
-export function getEmbeddedVideoComponent(url, onReady, on, playing, width = 640, height = 390) {
-    const youtubeVars = { //https://developers.google.com/youtube/player_parameters
-        autoplay: 1,
-        rel: 0,
-        enablejsapi: 1,
-        controls: 1,
-        showinfo: 0,
-    };
-    // const youtubeEvents = {
-    //     onReady: onReady,
-    //     onStateChange: onStateChange
-    // };
-
-    return (<ReactPlayer url={url}
-        width={width}
-        height={height}
-        config={{
-            youtube: {
-                preload: true,
-                playerVars: youtubeVars
-            }
-        }}
-        playing={playing}
-        onReady={onReady}
-        onStart={() => {console.log('start')}}
-        onPlay={on.play}
-        onProgress={(data) => {console.log(data)}}
-        onDuration={(data) => {console.log(data)}}
-        onPause={on.pause}
-        onBuffer={on.buffer}
-        onSeek={(data) => {console.log(data)}}
-        onEnded={(data) => {console.log(data)}}
-        onError={(data) => {console.log(data)}} />);
 }
 
 export function loadYoutubeAPI(youtubeCallback) {
@@ -141,27 +105,6 @@ export function getYoutubeVideoVolume(youtubeVideoObject) {
     }
 }
 
-export function setYoutubeVideoVolume(youtubeVideoObject, newVolume) {
-    if (newVolume < 0 || newVolume > 100) {
-        return;
-    }
-    if (newVolume === 0) {
-        youtubeVideoObject.mute();
-        return;
-    }
-
-    const isMuted = youtubeVideoObject.isMuted();
-    if (isMuted) {
-        youtubeVideoObject.unMute();
-    }
-    youtubeVideoObject.setVolume(newVolume);
-}
-
-export function replayVideo(youtubeVideoObject) {
-    const allow_seek_ahead = true;
-    youtubeVideoObject.seekTo(0, allow_seek_ahead);
-    youtubeVideoObject.playVideo();
-}
 
 // exported search functions and their helper functions/variables
 

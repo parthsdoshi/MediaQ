@@ -32,7 +32,7 @@ import {
 } from "../actions/index";
 
 import MediaPlayPauseButton from './MediaPlayPauseButton';
-import * as youtubeStates from '../constants/youtube';
+import * as mediaStates from '../constants/media';
 import { NO_MEDIA_PLAYING, MIN_VOLUME, MAX_VOLUME } from '../constants/queue'
 
 class Footer extends Component {
@@ -67,11 +67,11 @@ class Footer extends Component {
             // if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             // youtube haven't given back the object yet
         } else {
-            if (this.props.playState === youtubeStates.PAUSED || this.props.playState === youtubeStates.BUFFERING) {
-                this.props.changePlayState(youtubeStates.PLAYING)
+            if (this.props.playState === mediaStates.PAUSED || this.props.playState === mediaStates.BUFFERING) {
+                this.props.changePlayState(mediaStates.PLAYING)
                 // this.props.currentlyPlayingYoutubeVideoObject.playVideo();
-            } else if (this.props.playState === youtubeStates.PLAYING) {
-                this.props.changePlayState(youtubeStates.PAUSED)
+            } else if (this.props.playState === mediaStates.PLAYING) {
+                this.props.changePlayState(mediaStates.PAUSED)
                 // this.props.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Button, Input } from 'reactstrap';
 
 import MediaPlayPauseButton from './MediaPlayPauseButton';
-import * as youtubeStates from '../constants/youtube';
+import * as mediaStates from '../constants/media';
 import youTubeLogo from '../youtube.png'
 
 class QueueRowEntry extends Component {
@@ -15,7 +15,7 @@ class QueueRowEntry extends Component {
     render() {
         // if video is not currently selected video then show play icon because video is paused.
         let buttonState = this.props.currentlyPlayingIndex !== this.props.rowID ?
-            youtubeStates.PAUSED : this.props.playState;
+            mediaStates.PAUSED : this.props.playState;
         return (
             <tr>
                 <th scope="row">{this.props.rowID + 1 + ':'}</th>
