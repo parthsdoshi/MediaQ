@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
-import { Table, Button, Container } from 'reactstrap';
+import { Table, Button, Container, ListGroup } from 'reactstrap';
 import PlusIcon from 'open-iconic/svg/plus.svg';
 import MinusIcon from 'open-iconic/svg/minus.svg';
 
@@ -39,63 +39,9 @@ class Queue extends Component {
         this.state = {
             showAddNewMediaModal: false,
         };
-
-        this.on = { play: this.playerOnPlay, pause: this.playerOnPause, buffering: this.playerOnBuffering, end: this.playerOnEnd }
-    }
-
-    // componentDidMount() {
-    //     this.youtubeVolumeListener = setInterval(() => {
-    //         if (this.props.currentlyPlayingYoutubeVideoObject === null) {
-    //             return;
-    //         }
-    //         let volumeLevel = getYoutubeVideoVolume(this.props.currentlyPlayingYoutubeVideoObject);
-    //         if (volumeLevel !== this.props.volumeLevel) {
-    //             this.props.setVolume(volumeLevel);
-    //         }
-    //     }, CHECK_YOUTUBE_VOLUME_INTERVAL_MS);
-    // };
-
-    componentWillUnmount() {
-        //queue should never reload as of now, but if it ever does make sure this works
-        clearInterval(this.youtubeVolumeListener);
-    };
-
-    //scroll if video position changes
-    componentDidUpdate = (prevProps, prevState, snapshot) => {
-        if (prevProps.currentlyPlayingIndex !== this.props.currentlyPlayingIndex &&
-            this.props.currentlyPlayingIndex !== NO_MEDIA_PLAYING) {
-            this.scrollToEmbeddedVideo();
-        }
-    };
-
-    scrollToEmbeddedVideo = () => {
-        const tesNode = ReactDOM.findDOMNode(this.refs.embeddedVideo);
-        if (tesNode != null) { //!= null: not null or undefined
-            window.scrollTo(0, tesNode.offsetTop);
-        }
-    };
-
-    onReady = (ref) => {
-        console.log('media called on ready callback: ');
-        this.props.changeMediaObject(ref);
-    };
-
-    playerOnPause = () => {
-        this.props.changePlayState(mediaStates.PAUSED)
-    }
-    playerOnPlay = () => {
-        this.props.changePlayState(mediaStates.PLAYING)
-    }
-    playerOnBuffering = () => {
-        this.props.changePlayState(mediaStates.BUFFERING)
-    }
-    playerOnEnd = () => {
-        // this.props.changePlayState(mediaStates.PAUSED);
-        this.props.playNextMedia();
     }
 
     loadVideosCallback = (medias) => {
-        console.log(medias);
         this.props.addToQueue(medias);
         this.props.socket.emit(socketCommands.ADDMEDIAS,
             { 'data': { 'medias': medias }, 'qID': this.props.qID },
@@ -165,6 +111,7 @@ class Queue extends Component {
         for (let i = 0; i < this.props.QueueRowEntries.length; i++) {
             QueueRowEntries.push(
                 <QueueRowEntry
+                    buffering={this.props.buffering}
                     key={i}
                     rowID={i}
                     rowData={this.props.QueueRowEntries[i]}
@@ -174,31 +121,6 @@ class Queue extends Component {
                     rowEntryCheckboxClicked={this.props.rowEntryCheckboxClicked}
                     deletionMode={this.props.deletionMode} />
             );
-            if (this.props.currentlyPlayingIndex === i) {
-                QueueRowEntries.push(
-                    <tr ref="embeddedVideo" key={this.props.QueueRowEntries[i].timestamp}>
-                        <td />
-                        <td />
-                        <td style={{ height: 400 }}>
-                            <Container fluid style={{height: 400}}>
-                                {getEmbeddedVideoComponent(this.props.QueueRowEntries[i].link,
-                                    this.onReady,
-                                    this.on,
-                                    this.props.playState,
-                                    this.props.repeatMode,
-                                    this.props.volumeLevel,
-                                    '140%',
-                                    '100%')}
-                            </Container>
-                        </td>
-                        <td />
-                        <td />
-                        <td />
-                        <td />
-                        <td />
-                    </ tr>
-                );
-            }
         }
         return (
             <div>
@@ -235,99 +157,41 @@ class Queue extends Component {
                         buttonColor="primary"
                         body={<p><b>Your session has been restored</b></p>} />
                 }
-
-                <Table hover>
-                    <thead>
-                        <tr>
-                            <th />
-                            <th />
-                            <th>Title</th>
-                            <th>Author/Artist</th>
-                            <th>Album</th>
-                            <th>Source</th>
-                            <th>
-                                <Button onClick={this.toggleAddNewMediaModal} color="primary" className="rounded-circle">
-                                    <img alt="Add to Queue" src={PlusIcon} />
-                                </Button>
-                            </th>
-                            <th>
-                                <Button onClick={() => this.props.setDeletionMode(!this.props.deletionMode)}
-                                    color="danger"
-                                    className="rounded-circle">
-                                    <img alt="Remove from Queue" src={MinusIcon} />
-                                </Button>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {QueueRowEntries}
-                    </tbody>
-                </Table>
+                {true &&
+                    <Table hover>
+                        <thead>
+                            <tr>
+                                <th />
+                                <th />
+                                <th>Title</th>
+                                <th>Author/Artist</th>
+                                <th>Album</th>
+                                <th>Source</th>
+                                <th>
+                                    <Button onClick={this.toggleAddNewMediaModal} color="primary" className="rounded-circle">
+                                        <img alt="Add to Queue" src={PlusIcon} />
+                                    </Button>
+                                </th>
+                                <th>
+                                    <Button onClick={() => this.props.setDeletionMode(!this.props.deletionMode)}
+                                        color="danger"
+                                        className="rounded-circle">
+                                        <img alt="Remove from Queue" src={MinusIcon} />
+                                    </Button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </Table>
+                }
+                <ListGroup style={{ overflowY: 'scroll', WebkitOverflowScrolling: 'touch', overflowScrolling: 'touch', maxHeight: '70vh' }}>
+                    {QueueRowEntries}
+                </ListGroup>
             </div>
         );
     }
 
-}
-
-//todo move in utils file
-const lexicographicalSort = (queue) => {
-    let keys = [];
-    for (let key in queue) {
-        keys.push(key)
-    }
-
-    keys.sort();
-
-    let ret = [];
-    for (let key of keys) {
-        ret.push(queue[key])
-    }
-
-    return ret
-};
-
-function getEmbeddedVideoComponent(url, onReady, on, playState, repeatMode, volume, width = '100%', height = '100%') {
-    const youtubeVars = { //https://developers.google.com/youtube/player_parameters
-        autoplay: 1,
-        rel: 0,
-        enablejsapi: 1,
-        controls: 1,
-        showinfo: 0,
-    };
-    // const youtubeEvents = {
-    //     onReady: onReady,
-    //     onStateChange: onStateChange
-    // };
-
-    let playing = false;
-    if (playState === mediaStates.PLAYING) {
-        playing = true
-    }
-
-    let reactRef;
-    return (<ReactPlayer url={url}
-        width={width}
-        height={height}
-        config={{
-            youtube: {
-                preload: true,
-                playerVars: youtubeVars
-            }
-        }}
-        ref={(ref) => { reactRef = ref }}
-        playing={playing}
-        volume={volume / 100}
-        loop={repeatMode}
-        onReady={() => { onReady(reactRef) }}
-        onStart={() => { console.log('onStart') }}
-        onPlay={on.play}
-        onProgress={(data) => {/* console.log('onProgress'); console.log(data); */ }}
-        onDuration={(data) => { console.log('onDuration'); console.log(data) }}
-        onPause={on.pause}
-        onBuffer={on.buffer}
-        onSeek={(data) => { console.log('onSeek'); console.log(data); }}
-        onEnded={on.end}
-        onError={(data) => { console.log('onError'); console.log(data); }} />);
 }
 
 const mapStateToProps = state => {
@@ -335,14 +199,15 @@ const mapStateToProps = state => {
         socket: state.socket.socket,
         qID: state.semiRoot.qID,
         playState: state.semiRoot.playState,
-        currentlyPlayingYoutubeVideoObject: state.semiRoot.youtubeVideoObject,
-        QueueRowEntries: lexicographicalSort(state.semiRoot.QueueRowEntries),
+        mediaObject: state.semiRoot.mediaObject,
+        QueueRowEntries: state.semiRoot.visibleQueue,
         currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex,
         volumeLevel: state.semiRoot.volumeLevel,
         showMediaDetailsModal: state.semiRoot.showMediaDetailsModal,
         displaySessionRestoredPopup: state.semiRoot.displaySessionRestoredPopup,
         deletionMode: state.socket.deletionMode,
-        repeatMode: state.semiRoot.repeatMode
+        repeatMode: state.semiRoot.repeatMode,
+        buffering: state.semiRoot.buffering
     }
 };
 

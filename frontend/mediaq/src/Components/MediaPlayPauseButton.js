@@ -17,7 +17,11 @@ class MediaPlayPauseButton extends Component {
         let img_alt = '';
         let src = null;
         let color = '';
-        if (this.props.playState === mediaStates.PLAYING) {
+        if (this.props.buffering) {
+            img_alt = 'buffer';
+            src = BufferIcon;
+            color = 'danger';
+        } else if (this.props.playState === mediaStates.PLAYING) {
             img_alt = 'pause';
             src = PauseIcon;
             color = 'warning';
@@ -25,10 +29,6 @@ class MediaPlayPauseButton extends Component {
             img_alt = 'play';
             src = PlayIcon;
             color = 'primary';
-        } else if (this.props.playState === mediaStates.BUFFERING) {
-            img_alt = 'buffer';
-            src = BufferIcon;
-            color = 'danger';
         } else {
             //don't know what to do, just show buffering
             console.log('this.props.playState unknown value encountered ' + this.props.playState);

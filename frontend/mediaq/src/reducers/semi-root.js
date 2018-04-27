@@ -11,6 +11,7 @@ const initialState = {
     displaySessionRestoredPopup: false,
 
     playState: mediaStates.PAUSED,
+    buffering: false,
     currentlyPlayingIndex: NO_MEDIA_PLAYING,
     mediaType: mediaType.NONE,
     playingIndexHistory: [],
@@ -92,7 +93,7 @@ export default function semiRoot(state = initialState, action) {
             };
         case types.PLAY_NEXT_MEDIA:
             const currentlyPlayingIndex = state.currentlyPlayingIndex;
-            const queueLength = Object.keys(state.QueueRowEntries).length;
+            const queueLength = state.visibleQueue.length;
             let nextIndex = currentlyPlayingIndex;
             newPlayingIndexHistory = [...state.playingIndexHistory];
             if (queueLength === 0) {
@@ -137,7 +138,10 @@ export default function semiRoot(state = initialState, action) {
                 playState: mediaStates.PAUSED, mediaObject: null
             };
         case types.CHANGE_PLAY_STATE:
-            return { ...state, playState: action.payload.playState };
+            if (action.payload.playState === mediaStates.BUFFERING) {
+                return { ...state, buffering: true }
+            }
+            return { ...state, playState: action.payload.playState, buffering: false };
         case types.SEEK_SECONDS_AHEAD:
             if (state.mediaObject === null) {
                 // media haven't given back the object yet
@@ -175,20 +179,39 @@ export default function semiRoot(state = initialState, action) {
                 playState: mediaStates.PLAYING
             };
         case types.ADD_TO_QUEUE:
-            return { ...state, QueueRowEntries: { ...state.QueueRowEntries, ...action.payload.medias } };
+            let newState = { ...state, QueueRowEntries: { ...state.QueueRowEntries, ...action.payload.medias } };
+            newState.visibleQueue = lexicographicalSort(newState.QueueRowEntries);
+            return newState;
         case types.REMOVE_FROM_QUEUE:
             let newQueueRowEntries = { ...state.QueueRowEntries };
             for (let id of action.payload.medias) {
-                console.log(id)
                 if (id in newQueueRowEntries) {
                     delete newQueueRowEntries[id]
                 }
             }
-
-            return { ...state, QueueRowEntries: newQueueRowEntries };
+            let updatedVisibleQueue = lexicographicalSort(newQueueRowEntries);
+            return { ...state, QueueRowEntries: newQueueRowEntries, visibleQueue: updatedVisibleQueue };
         case types.SET_QUEUE:
-            return { ...state, QueueRowEntries: action.payload.newQueue };
+            let newVisibleQueue = lexicographicalSort(action.payload.newQueue);
+            return { ...state, QueueRowEntries: action.payload.newQueue, visibleQueue: newVisibleQueue };
         default:
             return state;
     }
+};
+
+//todo move in utils file
+const lexicographicalSort = (queue) => {
+    let keys = [];
+    for (let key in queue) {
+        keys.push(key)
+    }
+
+    keys.sort();
+
+    let ret = [];
+    for (let key of keys) {
+        ret.push(queue[key])
+    }
+
+    return ret
 };

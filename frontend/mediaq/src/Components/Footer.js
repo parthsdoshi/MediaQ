@@ -134,6 +134,7 @@ class Footer extends Component {
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
                                     <MediaPlayPauseButton playState={this.props.playState}
+                                        buffering={this.props.buffering}
                                         buttonID={-1}
                                         buttonClickedCallback={this.playButtonClicked} />
                                 </NavItem>
@@ -167,7 +168,7 @@ class Footer extends Component {
                             {this.props.deletionMode && <Nav className="mx-auto">
                                 <NavItem>
                                     <Button onClick={this.props.deleteCheckedRows} color="danger">
-                                        Delete Checked Media
+                                        Delete Selected Media
                                     </Button>
                                 </NavItem>
                             </Nav>}
@@ -188,7 +189,8 @@ const mapStateToProps = state => {
         volumeLevel: state.semiRoot.volumeLevel,
         shuffleMode: state.semiRoot.shuffleMode,
         repeatMode: state.semiRoot.repeatMode,
-        deletionMode: state.socket.deletionMode
+        deletionMode: state.socket.deletionMode,
+        buffering: state.semiRoot.buffering
     }
 };
 
