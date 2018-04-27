@@ -1,6 +1,6 @@
 import * as keyUtils from 'firebase-key'
 
-export function RowData(id, title, description, author, album, source, thumbnail, displayName) {
+export function RowData(id, title, description, author, album, source, thumbnail, displayName, link) {
     this.id = id;
     this.title = title;
     this.description = description;
@@ -10,7 +10,7 @@ export function RowData(id, title, description, author, album, source, thumbnail
     this.thumbnail = thumbnail;
     this.displayName = displayName;
     this.timestamp = keyUtils.key();
-    this.link = "https://www.youtube.com/watch?v=" + this.id;
+    this.link = link;
 }
 
 export function rowDataToString(rowData) {
@@ -25,6 +25,10 @@ export function rowDataToString(rowData) {
         'thumbnail: ' + rowData.thumbnail;
 }
 
+function youtubeIdToLink(id) {
+    return "https://www.youtube.com/watch?v=" + id;
+}
+
 export function stringToRowData(string, displayName) {
     let split = string.split('\n');
     let result = {};
@@ -35,8 +39,9 @@ export function stringToRowData(string, displayName) {
         const author = split[i+2].substring(split[i+2].indexOf(': ') + 2);
         const album = split[i+3].substring(split[i+3].indexOf(': ') + 2);
         const source = split[i+4].substring(split[i+4].indexOf(': ') + 2);
+        const link = split[i+7].substring(split[i+3].indexOf(': ') + 1);
         const thumbnail = split[i+8].substring(split[i+5].indexOf(': ') + 8);
-        const rowData = new RowData(id, title, description, author, album, source, thumbnail, displayName);
+        const rowData = new RowData(id, title, description, author, album, source, thumbnail, displayName, link);
         result[rowData.timestamp] = rowData;
     }
     return result;
@@ -60,7 +65,8 @@ function getResultData(data, number, displayName) {
         ' - ',
         'YouTube',
         data.items[number].snippet.thumbnails.default.url,
-        displayName)
+        displayName,
+        youtubeIdToLink(data.items[number].id.videoId))
 }
 
 export function generateRowDataFromPlaylistResults(playlistResults, displayName) {
@@ -80,7 +86,7 @@ export function generateRowDataFromPlaylistResults(playlistResults, displayName)
 }
 
 export function generateRowDataFromURL(url, displayName) {
-    return new RowData(url, url, url, url, url, url, '', displayName);
+    return new RowData(url, url, url, url, url, url, '', displayName, url);
 }
 
 function getPlaylistResultData (playlistData, number, displayName) {
@@ -112,5 +118,6 @@ function getPlaylistResultData (playlistData, number, displayName) {
         ' - ',
         'YouTube',
         thumbnail,
-        displayName);
+        displayName,
+        youtubeIdToLink(playlistData.items[number].snipped.resourceId.videoId));
 }

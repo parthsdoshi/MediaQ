@@ -211,17 +211,17 @@ class Queue extends Component {
                     <tr ref="embeddedVideo" key={this.props.QueueRowEntries[i].timestamp}>
                         <td />
                         <td />
-                        <td>
+                        <td />
+                        <td style={{height: 300}}>
                             {getEmbeddedVideoComponent(this.props.QueueRowEntries[i].link,
                                 this.onReady,
                                 this.on,
                                 this.props.playState,
                                 this.props.repeatMode,
                                 this.props.volumeLevel,
-                                64 * 9,
-                                39 * 9)}
+                                '140%',
+                                '100%')}
                         </td>
-                        <td />
                         <td />
                         <td />
                         <td />
@@ -316,7 +316,7 @@ const lexicographicalSort = (queue) => {
     return ret
 };
 
-function getEmbeddedVideoComponent(url, onReady, on, playState, repeatMode, volume, width = 640, height = 390) {
+function getEmbeddedVideoComponent(url, onReady, on, playState, repeatMode, volume, width = '100%', height = '100%') {
     const youtubeVars = { //https://developers.google.com/youtube/player_parameters
         autoplay: 1,
         rel: 0,
