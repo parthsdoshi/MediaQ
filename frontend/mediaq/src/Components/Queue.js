@@ -40,7 +40,7 @@ class Queue extends Component {
             showAddNewMediaModal: false,
         };
 
-        this.on = {play: this.playerOnPlay, pause: this.playerOnPause, buffering: this.playerOnBuffering}
+        this.on = {play: this.playerOnPlay, pause: this.playerOnPause, buffering: this.playerOnBuffering, end: this.playerOnEnd}
     }
 
     // componentDidMount() {
@@ -80,42 +80,6 @@ class Queue extends Component {
         this.props.changeMediaObject(ref);
     };
 
-    youtubeVideoStateChangedAPICallback = (event) => {
-        console.log(event.target)
-        if (this.props.currentlyPlayingYoutubeVideoObject === null) {
-            //this might happen when we set the currentobject to null because of a media change
-            //but when switching from one youtube video to another, youtube doesnt call onReady callback
-            //it calls this, thus set the video object to the current object then handle similarly to normal calls.
-            this.props.changeYoutubeVideoObject(event.target);
-            this.props.setVolume(this.props.volumeLevel);
-        }
-        const youtubeState = this.props.currentlyPlayingYoutubeVideoObject.getPlayerState();
-        if (youtubeState === mediaStates.ENDED) { // ended
-            this.props.changePlayState(mediaStates.PAUSED);
-            this.props.playNextMedia();
-        }
-        if (this.props.playState !== mediaStates.PLAYING && youtubeState === mediaStates.PLAYING) {
-            this.props.changePlayState(mediaStates.PLAYING);
-        }
-        if (this.props.playState !== mediaStates.PAUSED && youtubeState === mediaStates.PAUSED) {
-            this.props.changePlayState(mediaStates.PAUSED);
-        }
-        if (this.props.playState !== mediaStates.BUFFERING && youtubeState === mediaStates.BUFFERING) {
-            this.props.changePlayState(mediaStates.BUFFERING);
-        }
-
-        //volume
-        let volumeLevel = this.props.currentlyPlayingYoutubeVideoObject.getVolume();
-        const isMuted = this.props.currentlyPlayingYoutubeVideoObject.isMuted();
-        if (isMuted) {
-            volumeLevel = MIN_VOLUME;
-        }
-        if (volumeLevel !== this.props.volumeLevel) {
-            this.props.setVolume(volumeLevel);
-            console.log(volumeLevel)
-        }
-    };
-
     playerOnPause = () => {
         this.props.changePlayState(mediaStates.PAUSED)
     }
@@ -124,6 +88,10 @@ class Queue extends Component {
     }
     playerOnBuffering = () => {
         this.props.changePlayState(mediaStates.BUFFERING)
+    }
+    playerOnEnd = () => {
+        // this.props.changePlayState(mediaStates.PAUSED);
+        this.props.playNextMedia();
     }
 
     loadVideosCallback = (medias) => {
@@ -356,7 +324,7 @@ function getEmbeddedVideoComponent(url, onReady, on, playState, repeatMode, volu
         onPause={on.pause}
         onBuffer={on.buffer}
         onSeek={(data) => {console.log('onSeek'); console.log(data);}}
-        onEnded={() => {console.log('onEnded')}}
+        onEnded={on.end}
         onError={(data) => {console.log('onError'); console.log(data);}} />);
 }
 

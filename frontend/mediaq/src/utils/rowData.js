@@ -119,5 +119,5 @@ function getPlaylistResultData (playlistData, number, displayName) {
         'YouTube',
         thumbnail,
         displayName,
-        youtubeIdToLink(playlistData.items[number].snipped.resourceId.videoId));
+        youtubeIdToLink(playlistData.items[number].snippet.resourceId.videoId));
 }
