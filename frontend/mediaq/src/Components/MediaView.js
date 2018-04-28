@@ -8,8 +8,38 @@ import { mediaType } from '../constants/queue';
 
 import { changePlayState, changeMediaObject, playNextMedia, setVolume, changeMediaType } from '../actions/index'
 import { NO_MEDIA_PLAYING, MAX_VOLUME } from '../constants/queue';
+import { getYoutubeVideoVolume } from '../utils/google_utils';
 
 class MediaView extends Component {
+    constructor(props) {
+        super(props);
+
+        //https://developers.google.com/youtube/player_parameters
+        this.youtubeVars = {
+            autoplay: 1,
+            rel: 0,
+            enablejsapi: 1,
+            controls: 1,
+            showinfo: 1,
+        };
+    }
+
+    componentDidMount() {
+        this.youtubeVolumeListener = setInterval(() => {
+            if (window['YT']) {
+                let volumeLevel = getYoutubeVideoVolume(window['YT'].get('widget2'));
+                if (volumeLevel != this.props.volumeLevel) {
+                    this.props.setVolume(volumeLevel);
+                }
+            }
+        }, mediaStates.CHECK_YOUTUBE_VOLUME_INTERVAL_MS);
+    }
+
+    componentWillUnmount() {
+        if (this.youtubeVolumeListener) {
+            clearInterval(this.youtubeVolumeListener);
+        }
+    }
 
     playerOnReady = (ref) => {
         this.props.changeMediaObject(ref);
@@ -34,15 +64,6 @@ class MediaView extends Component {
     }
 
     render() {
-        //https://developers.google.com/youtube/player_parameters
-        const youtubeVars = {
-            autoplay: 1,
-            rel: 0,
-            enablejsapi: 1,
-            controls: 1,
-            showinfo: 1,
-        };
-
         let url = '';
         if (this.props.currentlyPlayingIndex != NO_MEDIA_PLAYING) {
             url = this.props.visibleQueue[this.props.currentlyPlayingIndex].link;
@@ -58,7 +79,8 @@ class MediaView extends Component {
                             height={'100%'}
                             config={{
                                 youtube: {
-                                    playerVars: youtubeVars
+                                    preload: true,
+                                    playerVars: this.youtubeVars
                                 },
                                 twitch: {
                                     options: {
@@ -91,6 +113,7 @@ const mapStateToProps = state => {
     return {
         playState: state.semiRoot.playState,
         mediaObject: state.semiRoot.mediaObject,
+        mediaType: state.semiRoot.mediaType,
         currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex,
         volumeLevel: state.semiRoot.volumeLevel,
         repeatMode: state.semiRoot.repeatMode,
