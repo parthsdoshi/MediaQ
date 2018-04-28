@@ -85,6 +85,12 @@ class Footer extends Component {
         this.props.seekSecondsAhead(5);
     };
 
+    handleChangeSampleVolumeSlider = (value) => {
+        if (Math.abs(value - this.props.volumeLevel) >= 30) {
+            this.props.setVolume(value);
+        }
+    };
+
     handleChangeVolumeSlider = (value) => {
         this.props.setVolume(value);
     };
@@ -154,8 +160,9 @@ class Footer extends Component {
                                         min={MIN_VOLUME}
                                         step={.2}
                                         vertical={false}
-                                        onChange={this.handleChangeVolumeSlider}
-                                        value={this.props.volumeLevel}
+                                        onChange={this.handleChangeSampleVolumeSlider}
+                                        onAfterChange={this.handleChangeVolumeSlider}
+                                        defaultValue={MAX_VOLUME}
                                     />
                                 </NavItem>
                                 <NavItem style={paddingLeft}>

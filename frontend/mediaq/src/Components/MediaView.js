@@ -50,6 +50,9 @@ class MediaView extends Component {
                     config={{
                         youtube: {
                             playerVars: youtubeVars
+                        },
+                        twitch: {
+                            chat: 'default'
                         }
                     }}
                     ref={(ref) => { this.reactRef = ref }}
