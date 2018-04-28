@@ -1,4 +1,5 @@
 import * as keyUtils from 'firebase-key'
+import { mediaType } from '../constants/queue';
 
 export function RowData(id, title, description, author, album, source, thumbnail, displayName, link) {
     this.id = id;
@@ -39,8 +40,8 @@ export function stringToRowData(string, displayName) {
         const author = split[i+2].substring(split[i+2].indexOf(': ') + 2);
         const album = split[i+3].substring(split[i+3].indexOf(': ') + 2);
         const source = split[i+4].substring(split[i+4].indexOf(': ') + 2);
-        const link = split[i+7].substring(split[i+3].indexOf(': ') + 1);
-        const thumbnail = split[i+8].substring(split[i+5].indexOf(': ') + 8);
+        const link = split[i+7].substring(split[i+7].indexOf(': ') + 2);
+        const thumbnail = split[i+8].substring(split[i+8].indexOf(': ') + 2);
         const rowData = new RowData(id, title, description, author, album, source, thumbnail, displayName, link);
         result[rowData.timestamp] = rowData;
     }
@@ -63,7 +64,7 @@ function getResultData(data, number, displayName) {
         data.items[number].snippet.description,
         data.items[number].snippet.channelTitle,
         ' - ',
-        'YouTube',
+        mediaType.YOUTUBE,
         data.items[number].snippet.thumbnails.default.url,
         displayName,
         youtubeIdToLink(data.items[number].id.videoId))
@@ -86,7 +87,7 @@ export function generateRowDataFromPlaylistResults(playlistResults, displayName)
 }
 
 export function generateRowDataFromURL(url, displayName) {
-    return new RowData(url, url, url, url, url, url, '', displayName, url);
+    return new RowData(url, url, url, url, url, url, mediaType.OTHER, displayName, url);
 }
 
 function getPlaylistResultData (playlistData, number, displayName) {
@@ -116,7 +117,7 @@ function getPlaylistResultData (playlistData, number, displayName) {
         playlistData.items[number].snippet.description,
         ' Playlist ',
         ' - ',
-        'YouTube',
+        mediaType.YOUTUBE,
         thumbnail,
         displayName,
         youtubeIdToLink(playlistData.items[number].snippet.resourceId.videoId));

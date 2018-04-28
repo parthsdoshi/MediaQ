@@ -29,7 +29,7 @@ const initialState = {
 function getNextIndexShuffle(current, max) {
     // max is inclusive
     if (current === NO_MEDIA_PLAYING || current > max || current < 0) {//trivial
-        return Math.floor(Math.random() * max);
+        return Math.floor(Math.random() * (max + 1));
     }
     if (current === 0 && max === 0) {
         // only one media and its currently playing
@@ -40,8 +40,8 @@ function getNextIndexShuffle(current, max) {
         console.log('getRandomNumNotCurrent error, returning.');
         return;
     }
-    const random = Math.floor(Math.random() * (max - 1)); // random number from 0 to max-2
-    // return conditions splits choices to 0 1 2 3 ... current-2 current-1 current+1 current+2 ... max-1
+    const random = Math.floor(Math.random() * (max)); // random number from 0 to max-1
+    // return conditions splits choices to 0 1 2 3 ... current-2 current-1 current+1 current+2 ... max-1 max
     return random >= current ? random + 1 : random;
 }
 

@@ -40,7 +40,7 @@ class App extends Component {
                             <div>
                                 <Container fluid>
                                     <Row>
-                                        <Col sm="12" md="6" style={{ marginBottom: '1em' }}>
+                                        <Col sm="12" md="6">
                                             {this.props.currentlyPlayingIndex != NO_MEDIA_PLAYING && <MediaView />}
                                         </Col>
                                         <Col sm="12" md="6">

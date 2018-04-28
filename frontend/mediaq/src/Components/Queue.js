@@ -51,9 +51,6 @@ class Queue extends Component {
         this.props.socket.emit(socketCommands.ADDMEDIAS,
             { 'data': { 'medias': medias }, 'qID': this.props.qID },
             this.props.socket.ADDMEDIASACKNOWLEDGEMENT);
-        this.setState({
-            showAddNewMediaModal: false
-        });
     };
 
     loadVideoCallback = (mediaId, rowData) => {
@@ -113,7 +110,6 @@ class Queue extends Component {
 
     initDragDropListGroup = () => {
         var el = document.getElementById('listGroupItems');
-        console.log(el);
         if (el)
             Sortable.create(el);
     }

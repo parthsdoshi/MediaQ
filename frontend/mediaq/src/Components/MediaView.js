@@ -26,8 +26,10 @@ class MediaView extends Component {
 
     componentDidMount() {
         this.youtubeVolumeListener = setInterval(() => {
-            if (window['YT']) {
-                let volumeLevel = getYoutubeVideoVolume(window['YT'].get('widget2'));
+            if (this.props.visibleQueue[this.props.currentlyPlayingIndex].source === mediaType.YOUTUBE && window['YT']) {
+                let widget = window['YT'].get('widget2');
+                console.log(widget);
+                let volumeLevel = getYoutubeVideoVolume(widget);
                 if (volumeLevel != this.props.volumeLevel) {
                     this.props.setVolume(volumeLevel);
                 }
@@ -44,7 +46,7 @@ class MediaView extends Component {
     playerOnReady = (ref) => {
         this.props.changeMediaObject(ref);
         let media = mediaType.OTHER;
-        if (this.props.visibleQueue[this.props.currentlyPlayingIndex].source == 'YouTube') {
+        if (this.props.visibleQueue[this.props.currentlyPlayingIndex].source === mediaType.YOUTUBE) {
             media = mediaType.YOUTUBE;
         }
         this.props.changeMediaType(media);
@@ -69,7 +71,7 @@ class MediaView extends Component {
             url = this.props.visibleQueue[this.props.currentlyPlayingIndex].link;
         }
         return (
-            <Jumbotron>
+            <Jumbotron style={{marginBottom: '.5em'}}>
                 <Container>
                     <Container style={{ position: 'relative', paddingTop: '56.25%' }}>
                         <ReactPlayer
