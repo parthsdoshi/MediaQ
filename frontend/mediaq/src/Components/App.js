@@ -9,6 +9,7 @@ import Header from './Header';
 import InitialConnect from './InitialConnect';
 import Queue from './Queue';
 import MediaView from './MediaView';
+import { NO_MEDIA_PLAYING } from '../constants/queue';
 
 class App extends Component {
 
@@ -23,7 +24,7 @@ class App extends Component {
 
     render() {
         let paddingTopStyle = {
-            paddingTop: 50
+            paddingTop: '1em'
         };
 
         // TODO: use Fade reactstrap component to make below look better if we have time
@@ -39,13 +40,11 @@ class App extends Component {
                             <div>
                                 <Container fluid>
                                     <Row>
-                                        <Col sm="12" md="4">
-                                            <MediaView />
+                                        <Col sm="12" md="6" style={{ marginBottom: '1em' }}>
+                                            {this.props.currentlyPlayingIndex != NO_MEDIA_PLAYING && <MediaView />}
                                         </Col>
-                                        <Col sm="12" md="8">
-                                            <Container>
-                                                <Queue />
-                                            </Container>
+                                        <Col sm="12" md="6">
+                                            <Queue />
                                         </Col>
                                     </Row>
                                 </Container>
@@ -63,6 +62,7 @@ const mapStateToProps = state => {
     return {
         socket: state.socket.socket,
         loggedIn: state.socket.loggedIn,
+        currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex
     }
 };
 

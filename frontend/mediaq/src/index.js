@@ -6,7 +6,7 @@ import { createStore } from 'redux';
 import App from './Components/App';
 import rootReducer from './reducers';
 // imports bootstrap4 css files for reactstrap dependency
-import 'bootstrap/dist/css/bootstrap.css';
+import './styles/custom.css'
 
 import setupSocket from './sockets'
 

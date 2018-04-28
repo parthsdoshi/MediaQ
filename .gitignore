@@ -73,3 +73,5 @@ redis_data
 .idea/**
 
 .vscode
+
+*.css

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
-import { Table, Button, Container, ListGroup } from 'reactstrap';
+import { Table, Button, Container, ListGroup, Jumbotron } from 'reactstrap';
+import Sortable from 'sortablejs'
 import PlusIcon from 'open-iconic/svg/plus.svg';
 import MinusIcon from 'open-iconic/svg/minus.svg';
 
@@ -39,6 +40,10 @@ class Queue extends Component {
         this.state = {
             showAddNewMediaModal: false,
         };
+    }
+
+    componentDidMount() {
+        this.initDragDropListGroup();
     }
 
     loadVideosCallback = (medias) => {
@@ -106,6 +111,13 @@ class Queue extends Component {
         )
     };
 
+    initDragDropListGroup = () => {
+        var el = document.getElementById('listGroupItems');
+        console.log(el);
+        if (el)
+            Sortable.create(el);
+    }
+
     render() {
         let QueueRowEntries = [];
         for (let i = 0; i < this.props.QueueRowEntries.length; i++) {
@@ -157,35 +169,17 @@ class Queue extends Component {
                         buttonColor="primary"
                         body={<p><b>Your session has been restored</b></p>} />
                 }
-                {true &&
-                    <Table hover>
-                        <thead>
-                            <tr>
-                                <th />
-                                <th />
-                                <th>Title</th>
-                                <th>Author/Artist</th>
-                                <th>Album</th>
-                                <th>Source</th>
-                                <th>
-                                    <Button onClick={this.toggleAddNewMediaModal} color="primary" className="rounded-circle">
-                                        <img alt="Add to Queue" src={PlusIcon} />
-                                    </Button>
-                                </th>
-                                <th>
-                                    <Button onClick={() => this.props.setDeletionMode(!this.props.deletionMode)}
-                                        color="danger"
-                                        className="rounded-circle">
-                                        <img alt="Remove from Queue" src={MinusIcon} />
-                                    </Button>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </Table>
-                }
-                <ListGroup style={{ overflowY: 'scroll', WebkitOverflowScrolling: 'touch', overflowScrolling: 'touch', maxHeight: '70vh' }}>
+                <Jumbotron fluid style={{marginBottom: 0, paddingBottom: '1em', paddingTop: '1em'}}>
+                    <Container fluid>
+                        <Button onClick={this.toggleAddNewMediaModal} color="primary">
+                            {"Add to Queue"}
+                        </Button>
+                        <Button onClick={() => this.props.setDeletionMode(!this.props.deletionMode)} color="danger" className="float-right">
+                            {"Delete Mode"}
+                        </Button>
+                    </Container>
+                </Jumbotron>
+                <ListGroup id={'listGroupItems'} style={{ overflowY: 'scroll', WebkitOverflowScrolling: 'touch', overflowScrolling: 'touch', maxHeight: '68vh', width: '100%' }}>
                     {QueueRowEntries}
                 </ListGroup>
             </div>

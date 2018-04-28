@@ -12,6 +12,7 @@ import {
 import MediaPlayPauseButton from './MediaPlayPauseButton';
 import * as mediaStates from '../constants/media';
 import youTubeLogo from '../youtube.png'
+import '../styles/queueRowEntry.css'
 
 class QueueRowEntry extends Component {
     constructor(props) {
@@ -48,13 +49,15 @@ class QueueRowEntry extends Component {
         // if video is not currently selected video then show play icon because video is paused.
         let buttonState = mediaStates.PAUSED;
         let buffering = false;
+        let color = '';
         if (this.props.currentlyPlayingIndex === this.props.rowID) {
             buttonState = this.props.playState;
             buffering = this.props.buffering;
+            color = 'secondary'
         }
 
         return (
-            <ListGroupItem action active={this.props.deletionMode && this.state.active} onClick={this.onClick}>
+            <ListGroupItem action active={this.props.deletionMode && this.state.active} onClick={this.onClick} color={color} className="queueRowEntryListGroupItem">
                 <ListGroupItemHeading>
                     {this.props.rowData.title}
                 </ListGroupItemHeading>

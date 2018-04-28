@@ -158,6 +158,12 @@ export const changeMediaObject = mediaObject => {
     };
 };
 
+export const changeMediaType = mediaType => {
+    return {
+        type: types.CHANGE_MEDIA_TYPE,
+        payload: {mediaType: mediaType}
+    };
+};
 
 export const addToQueue = medias => {
     return {

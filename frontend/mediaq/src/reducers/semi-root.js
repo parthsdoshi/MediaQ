@@ -178,6 +178,8 @@ export default function semiRoot(state = initialState, action) {
                 mediaObject: action.payload.mediaObject,
                 playState: mediaStates.PLAYING
             };
+        case types.CHANGE_MEDIA_TYPE:
+            return { ...state, mediaType: action.payload.mediaType };
         case types.ADD_TO_QUEUE:
             let newState = { ...state, QueueRowEntries: { ...state.QueueRowEntries, ...action.payload.medias } };
             newState.visibleQueue = lexicographicalSort(newState.QueueRowEntries);
