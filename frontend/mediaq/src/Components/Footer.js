@@ -4,7 +4,8 @@ import {
     Navbar,
     Nav,
     NavItem,
-    Container } from 'reactstrap';
+    Container
+} from 'reactstrap';
 
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
@@ -22,6 +23,7 @@ import {
     seekSecondsAhead,
     playPreviousMedia,
     playNextMedia,
+    changePlayState,
     setVolume,
     toggleShuffle,
     toggleRepeat,
@@ -30,8 +32,8 @@ import {
 } from "../actions/index";
 
 import MediaPlayPauseButton from './MediaPlayPauseButton';
-import * as youtubeStates from '../constants/youtube';
-import { MIN_VOLUME, MAX_VOLUME } from '../constants/queue'
+import * as mediaStates from '../constants/media';
+import { NO_MEDIA_PLAYING, MIN_VOLUME, MAX_VOLUME } from '../constants/queue'
 
 class Footer extends Component {
     constructor(props) {
@@ -50,25 +52,27 @@ class Footer extends Component {
         };
 
         this.phantom = {
-          display: 'block',
-          padding: '0px',
-          height: '60px',
-          width: '100%',
+            display: 'block',
+            padding: '0px',
+            height: '60px',
+            width: '100%',
         };
     }
 
-    playButtonClicked = () => {
-        if (this.props.currentlyPlayingIndex === 0) {
+    playButtonClicked = (entryNumber) => {
+        if (this.props.currentlyPlayingIndex === NO_MEDIA_PLAYING) {
             //no media is playing and play button is pressed, play first in queue
             this.props.playNextMedia();
-        }
-        if (this.props.currentlyPlayingYoutubeVideoObject === null) {
+            // }
+            // if (this.props.currentlyPlayingYoutubeVideoObject === null) {
             // youtube haven't given back the object yet
         } else {
-            if (this.props.playState === youtubeStates.PAUSED || this.props.playState === youtubeStates.BUFFERING) {
-                this.props.currentlyPlayingYoutubeVideoObject.playVideo();
-            } else if (this.props.playState === youtubeStates.PLAYING) {
-                this.props.currentlyPlayingYoutubeVideoObject.pauseVideo()
+            if (this.props.playState === mediaStates.PAUSED || this.props.playState === mediaStates.BUFFERING) {
+                this.props.changePlayState(mediaStates.PLAYING)
+                // this.props.currentlyPlayingYoutubeVideoObject.playVideo();
+            } else if (this.props.playState === mediaStates.PLAYING) {
+                this.props.changePlayState(mediaStates.PAUSED)
+                // this.props.currentlyPlayingYoutubeVideoObject.pauseVideo()
             }
         }
     };
@@ -81,13 +85,19 @@ class Footer extends Component {
         this.props.seekSecondsAhead(5);
     };
 
+    handleChangeSampleVolumeSlider = (value) => {
+        if (Math.abs(value - this.props.volumeLevel) >= 5) {
+            this.props.setVolume(value);
+        }
+    };
+
     handleChangeVolumeSlider = (value) => {
         this.props.setVolume(value);
     };
 
     render() {
-        const paddingLeft = {paddingLeft: 2};
-        const volumeSlider = {paddingLeft: 20, width:150, paddingRight: 20, paddingTop: 13};
+        const paddingLeft = { paddingLeft: 2 };
+        const volumeSlider = { paddingLeft: 20, width: 150, paddingRight: 20, paddingTop: 13 };
         let icon = {
             width: '8px',
             height: '8px'
@@ -100,17 +110,21 @@ class Footer extends Component {
                             {!this.props.deletionMode && <Nav className="mx-auto" navbar>
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={this.props.toggleRepeat} color={'primary'}
-                                            active={this.props.repeatMode}
-                                            style={{backgroundColor:this.props.repeatMode ?
-                                                    'blue':''}}>
+                                        active={this.props.repeatMode}
+                                        style={{
+                                            backgroundColor: this.props.repeatMode ?
+                                                'blue' : ''
+                                        }}>
                                         <img alt={'repeat'} src={RepeatIcon} style={icon} />
                                     </Button>
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={this.props.toggleShuffle} color={'primary'}
-                                            active={this.props.shuffleMode}
-                                            style={{backgroundColor:this.props.shuffleMode ?
-                                                    'blue':''}}>
+                                        active={this.props.shuffleMode}
+                                        style={{
+                                            backgroundColor: this.props.shuffleMode ?
+                                                'blue' : ''
+                                        }}>
                                         <img alt={'shuffle'} src={ShuffleIcon} style={icon} />
                                     </Button>
                                 </NavItem>
@@ -126,8 +140,9 @@ class Footer extends Component {
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
                                     <MediaPlayPauseButton playState={this.props.playState}
-                                                          buttonID={-1}
-                                                          buttonClickedCallback={this.playButtonClicked} />
+                                        buffering={this.props.buffering}
+                                        buttonID={-1}
+                                        buttonClickedCallback={this.playButtonClicked} />
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
                                     <Button onClick={this.seekAheadButtonClicked} color={'primary'}>
@@ -145,13 +160,15 @@ class Footer extends Component {
                                         min={MIN_VOLUME}
                                         step={.2}
                                         vertical={false}
-                                        onChange={this.handleChangeVolumeSlider}
+                                        onChange={this.handleChangeSampleVolumeSlider}
+                                        onAfterChange={this.handleChangeVolumeSlider}
+                                        defaultValue={MAX_VOLUME}
                                         value={this.props.volumeLevel}
-                                        />
+                                    />
                                 </NavItem>
                                 <NavItem style={paddingLeft}>
-                                    <Button onClick={() => {this.props.toggleMediaDetailModal()}} color="secondary"
-                                            className="rounded-circle">
+                                    <Button onClick={() => { this.props.toggleMediaDetailModal() }} color="secondary"
+                                        className="rounded-circle">
                                         <img alt="More Info" src={info} style={icon} />
                                     </Button>
                                 </NavItem>
@@ -159,7 +176,7 @@ class Footer extends Component {
                             {this.props.deletionMode && <Nav className="mx-auto">
                                 <NavItem>
                                     <Button onClick={this.props.deleteCheckedRows} color="danger">
-                                        Delete Checked Media
+                                        Delete Selected Media
                                     </Button>
                                 </NavItem>
                             </Nav>}
@@ -167,20 +184,21 @@ class Footer extends Component {
                     </Navbar>
                 </div>
             </div>
-            );
+        );
     }
 }
 
 
 const mapStateToProps = state => {
     return {
-        playState : state.semiRoot.playState,
+        playState: state.semiRoot.playState,
         currentlyPlayingIndex: state.semiRoot.currentlyPlayingIndex,
         currentlyPlayingYoutubeVideoObject: state.semiRoot.youtubeVideoObject,
         volumeLevel: state.semiRoot.volumeLevel,
         shuffleMode: state.semiRoot.shuffleMode,
         repeatMode: state.semiRoot.repeatMode,
-        deletionMode: state.socket.deletionMode
+        deletionMode: state.socket.deletionMode,
+        buffering: state.semiRoot.buffering
     }
 };
 
@@ -189,6 +207,7 @@ const mapDispatchToProps = dispatch => {
         seekSecondsAhead: seconds => dispatch(seekSecondsAhead(seconds)),
         decrementCurrentlyPlayingIndex: () => dispatch(playPreviousMedia()),
         playNextMedia: () => dispatch(playNextMedia()),
+        changePlayState: playState => dispatch(changePlayState(playState)),
         setVolume: newVolumeLevel => dispatch(setVolume(newVolumeLevel)),
         toggleShuffle: () => dispatch(toggleShuffle()),
         toggleRepeat: () => dispatch(toggleRepeat()),

@@ -5,7 +5,7 @@ import PauseIcon from 'open-iconic/svg/media-pause.svg';
 import PlayIcon from 'open-iconic/svg/media-play.svg';
 import BufferIcon from 'open-iconic/svg/aperture.svg';
 
-import * as youtubeStates from "../constants/youtube";
+import * as mediaStates from "../constants/media";
 
 class MediaPlayPauseButton extends Component {
 
@@ -17,18 +17,18 @@ class MediaPlayPauseButton extends Component {
         let img_alt = '';
         let src = null;
         let color = '';
-        if (this.props.playState === youtubeStates.PLAYING) {
-            img_alt = 'pause';
-            src = PauseIcon;
-            color = 'warning';
-        } else if (this.props.playState === youtubeStates.PAUSED) {
-            img_alt = 'play';
-            src = PlayIcon;
-            color = 'primary';
-        } else if (this.props.playState === youtubeStates.BUFFERING) {
+        if (this.props.buffering) {
             img_alt = 'buffer';
             src = BufferIcon;
             color = 'danger';
+        } else if (this.props.playState === mediaStates.PLAYING) {
+            img_alt = 'pause';
+            src = PauseIcon;
+            color = 'warning';
+        } else if (this.props.playState === mediaStates.PAUSED) {
+            img_alt = 'play';
+            src = PlayIcon;
+            color = 'primary';
         } else {
             //don't know what to do, just show buffering
             console.log('this.props.playState unknown value encountered ' + this.props.playState);

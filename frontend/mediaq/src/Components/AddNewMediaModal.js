@@ -17,7 +17,7 @@ class AddNewMediaModal extends Component {
                 </ModalBody>
                 <ModalFooter>
                     <Button color="secondary" onClick={this.props.hideMe}>
-                        Cancel
+                        Done
                     </Button>
                 </ModalFooter>
             </Modal>
