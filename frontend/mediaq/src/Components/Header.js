@@ -128,8 +128,8 @@ class Header extends Component {
                 <Navbar color="light" light expand="md">
                     <Container>
                         <NavbarBrand href="#">
-                            <img alt="MediaQ" src={MediaQIcon} width="10%" height="10%" />
-                            MediaQ
+                            <img alt="MediaQ" src={MediaQIcon} width="50px" height="50px" />
+                            {"MediaQ"}
                         </NavbarBrand>
                         <NavbarToggler onClick={this.toggle} />
                         <Collapse isOpen={this.state.collapseIsOpen} navbar>

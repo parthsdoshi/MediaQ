@@ -1,0 +1,6 @@
+@import './custom.scss';
+
+.queueRowEntryListGroupItem.active {
+    background-color: $dark !important;
+    border-color: $light !important;
+}
