@@ -1,10 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-<<<<<<< HEAD
-=======
 import { createStore, applyMiddleware } from 'redux';
->>>>>>> development
 
 import App from './Components/App';
 import store from './store';
