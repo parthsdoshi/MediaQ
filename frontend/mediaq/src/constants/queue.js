@@ -4,7 +4,7 @@ export const MAX_VOLUME = 100;
 export const MIN_VOLUME = 0;
 
 export const mediaType = {
-    NONE: 0,
-    YOUTUBE: 1,
-    OTHER: 2
+    NONE: 'None',
+    YOUTUBE: 'YouTube',
+    OTHER: 'Other'
 }

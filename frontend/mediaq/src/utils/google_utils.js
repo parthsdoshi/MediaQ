@@ -97,7 +97,10 @@ function executePlaylistSearchNextPage(playlistID, nextPageToken, callback) {
 //exported helper functions
 
 export function getYoutubeVideoVolume(youtubeVideoObject) {
-    const isMuted = youtubeVideoObject.isMuted();
+    let isMuted = false;
+    if (youtubeVideoObject.isMuted) {
+        isMuted = youtubeVideoObject.isMuted();
+    }
     if (isMuted) {
         return 0;
     } else {

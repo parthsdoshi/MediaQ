@@ -26,12 +26,13 @@ class MediaView extends Component {
 
     componentDidMount() {
         this.youtubeVolumeListener = setInterval(() => {
-            if (this.props.visibleQueue[this.props.currentlyPlayingIndex].source === mediaType.YOUTUBE && window['YT']) {
-                let widget = window['YT'].get('widget2');
-                console.log(widget);
-                let volumeLevel = getYoutubeVideoVolume(widget);
-                if (volumeLevel != this.props.volumeLevel) {
-                    this.props.setVolume(volumeLevel);
+            if (this.props.mediaObject) {
+                let widget = this.props.mediaObject.getInternalPlayer();
+                if (this.props.mediaObject.player.isReady && widget.getVolume) {
+                    let volumeLevel = getYoutubeVideoVolume(widget);
+                    if (volumeLevel != this.props.volumeLevel) {
+                        this.props.setVolume(volumeLevel);
+                    }
                 }
             }
         }, mediaStates.CHECK_YOUTUBE_VOLUME_INTERVAL_MS);
@@ -41,6 +42,15 @@ class MediaView extends Component {
         if (this.youtubeVolumeListener) {
             clearInterval(this.youtubeVolumeListener);
         }
+    }
+
+    componentDidCatch(error, info) {
+        console.log('componentdidcatch');
+        console.log(error);
+        console.log(info);
+        this.setState({
+            err: true
+        });
     }
 
     playerOnReady = (ref) => {
@@ -70,8 +80,9 @@ class MediaView extends Component {
         if (this.props.currentlyPlayingIndex != NO_MEDIA_PLAYING) {
             url = this.props.visibleQueue[this.props.currentlyPlayingIndex].link;
         }
+
         return (
-            <Jumbotron style={{marginBottom: '.5em'}}>
+            <Jumbotron style={{ marginBottom: '.5em' }}>
                 <Container>
                     <Container style={{ position: 'relative', paddingTop: '56.25%' }}>
                         <ReactPlayer
