@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 
 import App from './Components/App';
-import store from './store';
+import rootReducer from './reducers';
 // imports bootstrap4 css files for reactstrap dependency
 import './styles/custom.css'
 
