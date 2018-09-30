@@ -186,13 +186,28 @@ export default function semiRoot(state = initialState, action) {
             return newState;
         case types.REMOVE_FROM_QUEUE:
             let newQueueRowEntries = { ...state.QueueRowEntries };
+            let currentlyPlayingHash = "";
+            // get hash of currently playing media to update currentlyplayingindex at the end
+            if (state.currentlyPlayingIndex !== NO_MEDIA_PLAYING) {
+                currentlyPlayingHash = state.visibleQueue[state.currentlyPlayingIndex].timestamp;
+            }
+            // remove deleted elements
             for (let id of action.payload.medias) {
                 if (id in newQueueRowEntries) {
-                    delete newQueueRowEntries[id]
+                    delete newQueueRowEntries[id];
                 }
             }
             let updatedVisibleQueue = lexicographicalSort(newQueueRowEntries);
-            return { ...state, QueueRowEntries: newQueueRowEntries, visibleQueue: updatedVisibleQueue };
+            // loop through updatedVisibleQueue and if the currentlyPlayingHash is in there then update CurrentlyPlayingIndex
+            let newCurrentlyPlayingIndex = NO_MEDIA_PLAYING;
+            for (let i = 0; i < updatedVisibleQueue.length; i++) {
+                if (updatedVisibleQueue[i].timestamp === currentlyPlayingHash){
+                    newCurrentlyPlayingIndex = i; 
+                    break;
+                }
+            }
+            return { ...state, QueueRowEntries: newQueueRowEntries, visibleQueue: updatedVisibleQueue, 
+                currentlyPlayingIndex: newCurrentlyPlayingIndex };
         case types.SET_QUEUE:
             let newVisibleQueue = lexicographicalSort(action.payload.newQueue);
             return { ...state, QueueRowEntries: action.payload.newQueue, visibleQueue: newVisibleQueue };
