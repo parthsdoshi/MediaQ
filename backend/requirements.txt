@@ -2,7 +2,7 @@
 flask
 
 # we need flask-socketio to communicate with socketio protocol on client
-flask-socketio
+flask-socketio==4.3.2
 # should let socketio use native WebSockets
 eventlet
 
