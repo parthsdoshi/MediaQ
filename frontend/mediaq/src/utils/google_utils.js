@@ -3,14 +3,15 @@ import React from 'react';
 /* global gapi */
 // above tells compiler that gapi is global
 
-const API_KEY = '967952823565-ujd2c9i8p32skqcduc93qhu3kah4aif8.apps.googleusercontent.com';
+const API_KEY = 'AIzaSyCA_KKr9FIdY02m43ZVN-lnM1clZTTWdrY'
+const CLIENT_KEY = '400297212570-h58692pn4keojf9niug4nkak43g59o45.apps.googleusercontent.com';
 
 export function initClient() {
     // Initialize the client with API key and People API, and initialize OAuth with an
     // OAuth 2.0 client ID and scopes (space delimited string) to request access.
     gapi.client.init({
-        apiKey: 'AIzaSyCSR-D790Htqm9vFAoDojNjjE3inJ-gONQ',
-        clientId: API_KEY,
+        apiKey: API_KEY,
+        clientId: CLIENT_KEY,
         scope: 'https://www.googleapis.com/auth/youtube.readonly'
     });
 }
